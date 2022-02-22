@@ -1,20 +1,8 @@
 import os
 import sys
 sys.path.append("/home/rohit/PhD_Work/GM_my_version/graphmatchingtools/")
-import argparse
 import numpy as np
 import networkx as nx
-import slam.plot as splt
-import slam.topology as stop
-import slam.generate_parametric_surfaces as sgps
-import trimesh
-import os
-import tools.graph_processing as gp
-from sphere import *
-from tqdm.auto import tqdm,trange
-from scipy.stats import betabinom
-import random
-
 
 
 class dataset_metadata():
