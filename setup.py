@@ -21,7 +21,6 @@ setup(
         "numpy",
         "matplotlib",
         "networkx",
-        "joblib",
     ],
     python_requires=">=3.8",
 )
