@@ -1,7 +1,6 @@
 """
 Module for importing graphs
 """
-
 import os
 
 import numpy as np
