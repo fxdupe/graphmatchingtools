@@ -16,11 +16,16 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
+    scripts=[
+      "scripts/KMeans_Example.py",
+    ],
     packages=find_packages(where=".", exclude=("tests",)),
     install_requires=[
         "numpy",
+        "scipy",
         "matplotlib",
         "networkx",
+        "scikit-learn",
     ],
     python_requires=">=3.8",
 )

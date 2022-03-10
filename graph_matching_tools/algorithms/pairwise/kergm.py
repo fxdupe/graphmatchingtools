@@ -241,6 +241,6 @@ def kergm_method(gradient, number_of_nodes, num_alpha=10, entropy_gamma=0.005, i
     for alpha in alphas:
         x_alpha = kergm_fw_method(gradient, x_alpha, alpha, entropy_gamma, iterations, tolerance,
                                   inner_iterations, inner_tolerance, epsilon)
-    r_ind, c_ind = sco.linear_sum_assignment(-x_alpha)  # , maximize=True)
+    r_ind, c_ind = sco.linear_sum_assignment(-x_alpha)
 
     return r_ind, c_ind
