@@ -11,7 +11,7 @@ import graph_matching_tools.algorithms.multiway.utils as utils
 def hippi_multiway_matching(s, sizes, knode, u_dim, iterations=100, tolerance=1e-6, init=None):
     """
     HiPPI method for multi-graph matching based on a power method
-    :param np.ndarray s: the matrix with all the pairwise assignment
+    :param np.ndarray s: the bulk matrix with the adjacency matrices on the diagonal
     :param list sizes: the number of nodes of the different graphs (in order)
     :param np.ndarray knode: the node affinity matrix
     :param int u_dim: the dimension of the universe of nodes
