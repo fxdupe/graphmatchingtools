@@ -22,7 +22,15 @@ def create_gaussian_node_kernel(sigma, node_data):
         :param int n2: the index of the node inside graph2
         :return the Gaussian kernel between the data on each node
         """
-        distance = np.linalg.norm(np.array(g1.nodes[n1][node_data]) - np.array(g2.nodes[n2][node_data]))
-        return np.exp(-distance**2 / (2.0 * sigma**2.0))
+
+        if (not g1.nodes[n1]["is_dummy"]) and (not g2.nodes[n2]["is_dummy"]):
+
+            distance = np.linalg.norm(np.array(g1.nodes[n1][node_data]) - np.array(g2.nodes[n2][node_data]))
+            
+            return np.exp(-distance**2 / (2.0 * sigma**2.0))
+
+        else:
+
+            return 0.0
 
     return node_kernel
