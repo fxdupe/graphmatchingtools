@@ -18,36 +18,35 @@ from graph_matching_tools.algorithms.kernels.utils import create_full_node_affin
 if __name__ == '__main__':
 
 
+	path_to_dummy_graphs_folder = '/home/rohit/PhD_Work/GM_my_version/Graph_matching/data/simu_graph/test_with_dummy/'
 
-path_to_dummy_graphs_folder = '/home/rohit/PhD_Work/GM_my_version/Graph_matching/data/simu_graph/test_with_dummy/'
 
+	trials = np.sort(os.listdir(path_to_dummy_graphs_folder))
 
-trials = np.sort(os.listdir(path_to_dummy_graphs_folder))
+	sigma = 200
 
-sigma = 200
+	for trial in trials:
+		
+		if float(trial) >= 0.0:
+			
+			print('trial: ', trial)
 
-for trial in trials:
-    
-    if float(trial) >= 0.0:
-        
-        print('trial: ', trial)
+			all_files = os.listdir(path_to_dummy_graphs_folder+trial)
 
-        all_files = os.listdir(path_to_dummy_graphs_folder+trial)
+			for folder in all_files:
 
-        for folder in all_files:
+				if os.path.isdir(path_to_dummy_graphs_folder+trial+'/'+ folder):
 
-            if os.path.isdir(path_to_dummy_graphs_folder+trial+'/'+ folder):
+					print('Noise folder: ',folder)
 
-                print('Noise folder: ',folder)
+					path_to_dummy_graphs = path_to_dummy_graphs_folder + '/' + trial + '/' + folder+'/0/graphs/'
 
-                path_to_dummy_graphs = path_to_dummy_graphs_folder + '/' + trial + '/' + folder+'/0/graphs/'
-
-    
-                graphs = [nx.read_gpickle(path_to_dummy_graphs + graph) for graph in np.sort(os.listdir(path_to_dummy_graphs))]
-                sizes = [nx.number_of_nodes(graph) for graph in graphs]
-            
-                full_affinity = {}
-                node_kernel = create_gaussian_node_kernel(sigma,'coord')
-                full_affinity['full_affinity'] = create_full_node_affinity_matrix(graphs, node_kernel)
-                
-                sio.savemat(path_to_dummy_graphs_folder + '/' + trial + '/' + '/' + folder + '/0/full_affinity.mat',full_affinity)
+		
+					graphs = [nx.read_gpickle(path_to_dummy_graphs + graph) for graph in np.sort(os.listdir(path_to_dummy_graphs))]
+					sizes = [nx.number_of_nodes(graph) for graph in graphs]
+				
+					full_affinity = {}
+					node_kernel = create_gaussian_node_kernel(sigma,'coord')
+					full_affinity['full_affinity'] = create_full_node_affinity_matrix(graphs, node_kernel)
+					
+					sio.savemat(path_to_dummy_graphs_folder + '/' + trial + '/' + '/' + folder + '/0/full_affinity.mat',full_affinity)
