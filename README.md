@@ -12,6 +12,8 @@ Toolbox for common ground for graph matching methods
 
 - HiPPI
 - KMeans
+- MatchEIG
+- QuickMatchs
 - Sparse Quadratic Optimisation over the Stiefel Manifold with Application to Permutation Synchronisation
 
 ## Installation
