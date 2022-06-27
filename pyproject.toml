@@ -1,6 +1,24 @@
 [build-system]
 requires = [
-    "setuptools>=42",
+    "setuptools>=52",
     "wheel"
 ]
 build-backend = "setuptools.build_meta"
+
+[tool.poetry]
+name = "Graph Matching Tools"
+version = "0.5.0"
+description = "Tools for multiple graph matching with coherence"
+authors = ["François-Xavier Dupé <francois-xavier.dupe@univ-amu.fr>"]
+
+[tool.poetry.dependencies]
+python = ">=3.8"
+numpy = ">1.10"
+scipy = ">=1.7"
+matplotlib = ">=3.4"
+networkx = ">=2.7"
+scikit-learn = ">=1.0"
+
+[tool.poetry.dev-dependencies]
+pytest = ">=7.0"
+pytest-cov = ">=3.0"

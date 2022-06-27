@@ -6,10 +6,10 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="GraphMatchingTools",
-    version="1.0.0",
+    version="0.5.0",
     description="Graph Matching Tools",
     author="François-Xavier Dupé",
-    author_email="francois-xavier.dupe@lis-lab.fr",
+    author_email="francois-xavier.dupe@univ-amu.fr",
     url="https://github.com/fxdupe/graphmatchingtools",
     classifiers=[
         "Programming Language :: Python :: 3",

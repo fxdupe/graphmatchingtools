@@ -12,9 +12,14 @@ Toolbox for common ground for graph matching methods
 
 - HiPPI
 - KMeans
+- MSync
 - MatchEIG
 - QuickMatchs
 - Sparse Quadratic Optimisation over the Stiefel Manifold with Application to Permutation Synchronisation
+
+### Mean graph methods
+
+- MM method proposed by Jain
 
 ## Installation
 
@@ -22,6 +27,8 @@ The package can be installed in editable mode using the following command in the
 ```
 pip install -e .
 ```
+
+We also propose a configuration for [Poetry](https://python-poetry.org) as an alternative for installation.
 
 ## Authors
 - Guillaume Auzias (INT)

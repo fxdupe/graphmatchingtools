@@ -9,7 +9,6 @@ import networkx as nx
 def compute_knode(graph1, graph2, kernel):
     """
     Compute the affinity matrix between the nodes
-
     :param nx.classes.graph.Graph graph1: the first graph
     :param nx.classes.graph.Graph graph2: the second graph
     :param callable kernel: the kernel between nodes
@@ -25,7 +24,6 @@ def compute_knode(graph1, graph2, kernel):
 def create_full_node_affinity_matrix(graphs, kernel):
     """
     Compute the full pairwise matrix from graphs
-
     :param list graphs: the list of graphs (in networkx format)
     :param callable kernel: the kernel between the node
     :return: a tuple with the full matrix and the sizes of the different graphs
@@ -54,4 +52,3 @@ def create_full_node_affinity_matrix(graphs, kernel):
         index1 += nx.number_of_nodes(g1)
 
     return knode
-
