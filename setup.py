@@ -17,7 +17,8 @@ setup(
         "Operating System :: OS Independent",
     ],
     scripts=[
-      "scripts/KMeans_Example.py",
+        "scripts/KMeans_Example.py",
+        "scripts/PyTorchGeo_Example.py",
     ],
     packages=find_packages(where=".", exclude=("tests",)),
     install_requires=[

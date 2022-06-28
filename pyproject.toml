@@ -9,7 +9,8 @@ build-backend = "setuptools.build_meta"
 name = "Graph Matching Tools"
 version = "0.5.0"
 description = "Tools for multiple graph matching with coherence"
-authors = ["François-Xavier Dupé <francois-xavier.dupe@univ-amu.fr>"]
+authors = ["François-Xavier Dupé <francois-xavier.dupe@univ-amu.fr>",
+    "Rohit Yadav <rohit.yadav@univ-amu.fr>"]
 
 [tool.poetry.dependencies]
 python = ">=3.8"
