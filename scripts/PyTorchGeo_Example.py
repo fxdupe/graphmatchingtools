@@ -7,11 +7,6 @@ import sys
 import random
 
 import numpy as np
-from torch_geometric.datasets import WILLOWObjectClass
-from torch_geometric.datasets import PascalVOCKeypoints as PascalVOC
-from torch_geometric.datasets import PascalPF
-import torch_geometric.transforms as transforms
-import torch_geometric.utils as tf_utils
 import networkx as nx
 
 import graph_matching_tools.algorithms.kernels.gaussian as gaussian
@@ -27,13 +22,15 @@ import graph_matching_tools.algorithms.multiway.quickmatch as quickmatch
 import graph_matching_tools.algorithms.multiway.kergm as kergm
 import graph_matching_tools.algorithms.multiway.mkergm as mkergm
 import graph_matching_tools.algorithms.multiway.irgcl as irgcl
+import graph_matching_tools.io.pygeo_graphs as pyg
 
 
-def add_dummy_nodes(graphs, rank, dim=1024):
+def add_dummy_nodes(graphs, rank, dimension=1024):
     """
     Add dummy nodes to graph to uniform the sizes
     :param list[nx.Graph] graphs: the list of graphs
     :param int rank: the rank of the universe of nodes
+    :param int dimension: the size of the feature space
     :return: the new list of graph with the new matching index
     """
     sizes = [nx.number_of_nodes(g) for g in graphs]
@@ -52,10 +49,9 @@ def add_dummy_nodes(graphs, rank, dim=1024):
 
         g = graphs[idx_g].copy()
         if sizes[idx_g] < max_nodes:
-            index_n = 0
             for idn in range(max_nodes - sizes[idx_g]):
                 # Add dummy nodes
-                g.add_node(sizes[idx_g] + idn, x=(np.zeros((dim, )) + (idn + 1) * 1e8),
+                g.add_node(sizes[idx_g] + idn, x=(np.zeros((dimension,)) + (idn + 1) * 1e8),
                            pos=(-(idn+1)*1e3, -(idn+1)*1e3))
                 match_index_node.append(sizes[idx_g] + idn)
                 dummy_index_node.append(sizes[idx_g] + idn)
@@ -65,135 +61,6 @@ def add_dummy_nodes(graphs, rank, dim=1024):
         new_dummy_index.append(dummy_index_node)
 
     return new_graphs, new_index, new_dummy_index
-
-
-def generate_willow_groundtruth(nb_nodes, nb_graphs):
-    """
-    Generate groundtruth for the matching
-    :param nb_nodes: the number of nodes for each graph
-    :param nb_graphs: the number of graphs
-    :return: the correspondence map for each node
-    """
-    row = np.arange(nb_nodes * nb_graphs)
-    col = row[:nb_nodes].reshape((1, -1)).repeat(nb_graphs, 0).reshape((-1,))
-    return np.stack([row, col], axis=0)
-
-
-def generate_pascal_groundtruth(graph_sizes, nb_global_nodes, nb_graphs):
-    """
-    Generate groundtruth for the matching
-    :param graph_sizes: the list of the graph sizes
-    :param nb_global_nodes: the global number of nodes
-    :param nb_graphs: the number of graphs
-    :return: the correspondence map for each node
-    """
-    res = np.zeros((2, nb_global_nodes), dtype="i")
-    res[0, :] = np.arange(nb_global_nodes)
-
-    idx = 0
-    for size in graph_sizes:
-        res[1, idx:idx+size] = np.arange(size)
-        idx += size
-
-    return res
-
-
-def generate_groundtruth(graph_sizes, nb_global_nodes, nb_graphs, indexes):
-    """
-    Generate groundtruth for the matching
-    :param list[int] graph_sizes: the list of the graph sizes
-    :param int nb_global_nodes: the global number of nodes
-    :param int nb_graphs: the number of graphs
-    :param list[list] indexes: the new indexes
-    :return: the correspondence map for each node
-    """
-    res = np.zeros((2, nb_global_nodes), dtype="i")
-    res[0, :] = np.arange(nb_global_nodes)
-
-    idx = 0
-    for idx_g in range(len(graph_sizes)):
-        res[1, idx:idx+graph_sizes[idx_g]] = indexes[idx_g]
-        idx += graph_sizes[idx_g]
-
-    return res
-
-
-def convert_to_networkx(dataset):
-    """
-    Conversion of the pytorch data to networkx graphs
-    :param dataset: the torch geometric dataset
-    :return: the converted graphs
-    """
-    graphs = []
-    for idx in range(len(dataset)):
-        g = tf_utils.to_networkx(dataset[idx], node_attrs=["pos", "x"], to_undirected=True)
-        graphs.append(g)
-    return graphs
-
-
-def get_graph_database(name, isotropic, category, repo):
-    """
-    Get the Pascal-VOC dataset
-    :param str name: the name of the database to load
-    :param bool isotropic: get isotropic graphs
-    :param str category: the category of images
-    :param str repo: the repo for graph (download etc)
-    :return: The graphs of keypoint from the image category
-    """
-    transform = transforms.Compose([
-        transforms.Delaunay(),
-        transforms.FaceToEdge(),
-        transforms.Distance() if isotropic else transforms.Cartesian(),
-    ])
-
-    if name == "PascalVOC":
-        pre_filter = lambda data: data.pos.size(0) > 0  # noqa
-        dataset = PascalVOC(repo,
-                            category,
-                            train=False,
-                            transform=transform,
-                            pre_filter=pre_filter)
-    elif name == "PascalPF":
-        transform = transforms.Compose([
-            transforms.Constant(),
-            transforms.KNNGraph(k=8),
-            transforms.Cartesian(),
-        ])
-        dataset = PascalPF(repo, category, transform=transform)
-    else:
-        dataset = WILLOWObjectClass(repo, category=category, transform=transform)
-
-    graphs = convert_to_networkx(dataset)
-    for idx in range(len(graphs)):
-        graphs[idx] = compute_edges_data(graphs[idx])
-    return graphs
-
-
-def compute_edges_data(graph, mu=10.0, sigma=60.0):
-    """
-    Compute the distance between the nodes (using Euclidean distance)
-    :param graph: the input graph
-    :param float mu: the weights scaling factor (default: 1.0)
-    :param float sigma: the variance of the keypoint distances
-    :return: the new graph with the distance on the edges
-    """
-    distances = np.zeros((nx.number_of_nodes(graph), )) + 10**9
-    for u, v in graph.edges:
-        d = np.linalg.norm(np.array(graph.nodes[u]["pos"]) - np.array(graph.nodes[v]["pos"]))
-        graph.edges[u, v]["distance"] = d
-        if distances[u] > d:
-            distances[u] = d
-        if distances[v] > d:
-            distances[v] = d
-    median = np.median(distances)
-
-    for u, v in graph.edges:
-        graph.edges[u, v]["norm_dist"] = graph.edges[u, v]["distance"] / median
-        graph.edges[u, v]["weight"] = np.exp(-(graph.edges[u, v]["distance"]**2) / (2.0 * median**2 * mu))
-        # key_dist = np.linalg.norm(np.array(graph.nodes[u]["x"]) - np.array(graph.nodes[v]["x"]))
-        # graph.edges[u, v]["key_weight"] = np.exp(-(key_dist ** 2) / (2.0 * sigma ** 2))
-
-    return graph
 
 
 if __name__ == "__main__":
@@ -237,8 +104,8 @@ if __name__ == "__main__":
                         choices=["matcheig", "msync", "irgcl", "gpow"])
     args = parser.parse_args()
 
-    all_graphs = get_graph_database(args.database, args.isotropic,
-                                    args.category, args.repo + "/" + args.database)
+    all_graphs = pyg.get_graph_database(args.database, args.isotropic,
+                                        args.category, args.repo + "/" + args.database)
     print("Size dataset: {} graphs".format(len(all_graphs)))
     print([nx.number_of_nodes(g) for g in all_graphs])
 
@@ -253,7 +120,7 @@ if __name__ == "__main__":
 
     if args.add_dummy:
         dim = 2 if args.database == "PascalPF" else 1024
-        all_graphs, graph_index, dummy_index = add_dummy_nodes(all_graphs, args.rank, dim=dim)
+        all_graphs, graph_index, dummy_index = add_dummy_nodes(all_graphs, args.rank, dimension=dim)
 
     if args.shuffle:
         all_graphs, graph_index = utils.randomize_nodes_position(all_graphs)
@@ -274,7 +141,7 @@ if __name__ == "__main__":
         knode = ku.create_full_node_affinity_matrix(all_graphs, node_kernel)
 
     if args.method == "hippi":
-        a = utils.create_weighted_adjacency_matrix(all_graphs, full_size, "weight")
+        a = utils.create_full_weight_matrix(all_graphs, "weight", sigma=args.gamma)
         u_nodes = hippi.hippi_multiway_matching(a, g_sizes, knode, args.rank, iterations=args.iterations,
                                                 tolerance=args.tolerance)
         m_res = u_nodes @ u_nodes.T
@@ -311,14 +178,14 @@ if __name__ == "__main__":
         norm_knode = np.median(g_sizes)
         knode /= norm_knode
 
-        gradient = mkergm.create_fast_gradient(phi, knode)
+        gradient = mkergm.create_gradient(phi, knode)
 
         m_res = mkergm.mkergm(gradient, g_sizes, args.rank, iterations=args.iterations, init=x_init,
                               tolerance=args.tolerance, projection_method=args.proj_method,
                               choice=lambda x: args.reference_graph)
 
     # Compare with groundtruth
-    truth = generate_groundtruth(g_sizes, full_size, len(g_sizes), graph_index)
+    truth = pyg.generate_groundtruth(g_sizes, full_size, len(g_sizes), graph_index)
     a_truth = utils.get_permutation_matrix_from_matching(truth, g_sizes, 50)
 
     if args.robust:

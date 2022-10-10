@@ -1,6 +1,8 @@
 """
 Multigraph version of KerGM
 
+As published in "Kernelized multi-graph matching", ACML 2022
+
 .. moduleauthor:: François-Xavier Dupé
 """
 import numpy as np
@@ -30,9 +32,9 @@ def _iterative_rank_projection(x, rank, sizes, iterations=20, tolerance=1e-3):
     return res
 
 
-def create_fast_gradient(phi, knode):
+def create_gradient(phi, knode):
     """
-    Compute the gradient for the minimization (fast direct version)
+    Compute the gradient for the minimization
     :param np.ndarray phi: the data matrix for the edges of the graphs (stack on the first index)
     :param np.ndarray knode: the current node universe projection
     :return: the corresponding gradient

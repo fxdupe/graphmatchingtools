@@ -3,7 +3,10 @@ Utility function for permutation matrix
 
 .. moduleauthor:: François-Xavier Dupé
 """
+import random
+
 import numpy as np
+import networkx as nx
 
 
 def get_permutation_matrix_from_dictionary(matching, g_sizes):
@@ -28,3 +31,21 @@ def get_permutation_matrix_from_dictionary(matching, g_sizes):
 
     np.fill_diagonal(res, 1)
     return res
+
+
+def randomize_nodes_position(graphs):
+    """
+    Randomize the node position inside a graph
+    :param list graphs: a list of graph (networkx format)
+    :return: the list of new graphs and the new index
+    """
+    res = []
+    new_graphs = []
+    for g in graphs:
+        nb_nodes = nx.number_of_nodes(g)
+        nidx = list(range(nb_nodes))
+        random.shuffle(nidx)
+        n_g = nx.relabel_nodes(g, dict(zip(g.nodes(), nidx)))
+        res.append(nidx)
+        new_graphs.append(n_g)
+    return new_graphs, res

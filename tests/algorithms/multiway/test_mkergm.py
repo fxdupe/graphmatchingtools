@@ -18,7 +18,7 @@ class TestMultiwayKerGM(unittest.TestCase):
         phi[:, 1, 0] = np.array([1, 1, 1])
         knode = np.identity(2)
         x = np.identity(2)
-        gradient = mkergm.create_fast_gradient(phi, knode)
+        gradient = mkergm.create_gradient(phi, knode)
         grad = gradient(x)
         true_res = np.array([[-7, 0], [0, -7]])
         self.assertTrue(np.linalg.norm(grad - true_res) < 1e-5, "Testing gradient computation")
@@ -54,7 +54,7 @@ class TestMultiwayKerGM(unittest.TestCase):
         _, sizes = utils.create_full_adjacency_matrix(graphs)
 
         knode = ku.create_full_node_affinity_matrix(graphs, node_kernel)
-        gradient = mkergm.create_fast_gradient(phi, knode)
+        gradient = mkergm.create_gradient(phi, knode)
 
         res = mkergm.mkergm(gradient, sizes, 3, iterations=100, init=knode, choice=lambda x: 2)
 

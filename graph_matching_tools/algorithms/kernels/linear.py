@@ -1,14 +1,13 @@
-"""This utility module contains some functions for creating Gaussian kernels
+"""This utility module contains some functions for creating linear kernels
 
 .. moduleauthor:: François-Xavier Dupé
 """
 import numpy as np
 
 
-def create_gaussian_node_kernel(sigma, node_data):
+def create_linear_node_kernel(node_data):
     """
-    Create a Gaussian node kernel
-    :param float sigma: the variance hyperparameter (for the Gaussian kernel)
+    Create a linear node kernel
     :param str node_data: the name of the data vector on the nodes
     :return: the node kernel
     """
@@ -22,7 +21,7 @@ def create_gaussian_node_kernel(sigma, node_data):
         :param int n2: the index of the node inside graph2
         :return the Gaussian kernel between the data on each node
         """
-        distance = np.linalg.norm(np.array(g1.nodes[n1][node_data]) - np.array(g2.nodes[n2][node_data]))
-        return np.exp(-distance**2 / (2.0 * sigma**2.0))
+        result = np.dot(np.array(g1.nodes[n1][node_data]).T,  np.array(g2.nodes[n2][node_data]))
+        return result
 
     return node_kernel
