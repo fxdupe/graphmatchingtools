@@ -10,8 +10,8 @@ import networkx as nx
 
 
 def get_permutation_matrix_from_dictionary(matching, g_sizes):
-    """
-    Create the full permutation matrix from the matching result
+    """Create the full permutation matrix from the matching result
+
     :param matching: the matching result for each graph (nodes number, assignment)
     :param g_sizes: the list of the size of the different graph
     :return: the full permutation matrix
@@ -34,8 +34,8 @@ def get_permutation_matrix_from_dictionary(matching, g_sizes):
 
 
 def randomize_nodes_position(graphs):
-    """
-    Randomize the node position inside a graph
+    """Randomize the node position inside a graph
+
     :param list graphs: a list of graph (networkx format)
     :return: the list of new graphs and the new index
     """

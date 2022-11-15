@@ -6,8 +6,8 @@ import scipy.optimize as sco
 
 
 def permutation_projector(v, sizes, choice):
-    """
-    Projections over a set of permutation for each graph (with a reference graph)
+    """Projections over a set of permutation for each graph (with a reference graph)
+
     :param np.ndarray v: the current approximation matrix
     :param list[int] sizes: the sizes of the different graphs
     :param callable choice: the choosing function for the reference graph
@@ -31,8 +31,8 @@ def permutation_projector(v, sizes, choice):
 
 
 def u_projector(v, sizes):
-    """
-    Projections over a set of permutation for each graph (without any reference graph)
+    """Projections over a set of permutation for each graph (without any reference graph)
+
     :param v: the current approximation matrix
     :param sizes: the sizes of the different graphs
     :return: the projected version of v

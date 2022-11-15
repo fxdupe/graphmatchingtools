@@ -13,8 +13,8 @@ import graph_matching_tools.algorithms.multiway.irgcl as irgcl
 
 
 def _iterative_rank_projection(x, rank, sizes, iterations=20, tolerance=1e-3):
-    """
-    Generalized power method for permutation matrix estimation
+    """Generalized power method for permutation matrix estimation
+
     :param np.ndarray x: the input bulk permutation matrix
     :param int rank: the dimension of the universe of nodes
     :param list[int] sizes: the size of the different graphs
@@ -33,16 +33,15 @@ def _iterative_rank_projection(x, rank, sizes, iterations=20, tolerance=1e-3):
 
 
 def create_gradient(phi, knode):
-    """
-    Compute the gradient for the minimization
+    """Compute the gradient for the minimization
+
     :param np.ndarray phi: the data matrix for the edges of the graphs (stack on the first index)
     :param np.ndarray knode: the current node universe projection
     :return: the corresponding gradient
     """
 
     def gradient(x):
-        """
-        Compute the gradient at a given point
+        """Compute the gradient at a given point
 
         :param np.ndarray x: the current bulk "permutation" matrix
         :return: the gradient at point x
@@ -55,8 +54,8 @@ def create_gradient(phi, knode):
 
 
 def _rank_projector(x, rank, sizes, method, choice=None):
-    """
-    Generalized rank projector method
+    """Generalized rank projector method
+
     :param np.ndarray x: the matrix to project
     :param int rank: the size of the universe of nodes
     :param list[int] sizes: the size of the graphs
@@ -84,8 +83,8 @@ def _rank_projector(x, rank, sizes, method, choice=None):
 
 def mkergm(gradient, sizes, u_dim, init, iterations=100, tolerance=1e-2,
            projection_method="matcheig", choice=None):
-    """
-    Multi-graph matching extension of KerGM
+    """Multi-graph matching extension of KerGM
+
     :param callable gradient: the gradient function
     :param list sizes: the number of nodes of the different graphs (in order)
     :param int u_dim: the dimension of the universe of nodes

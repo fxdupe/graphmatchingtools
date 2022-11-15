@@ -12,8 +12,8 @@ import graph_matching_tools.algorithms.kernels.rff as rff
 
 
 def get_graph_from_tensor(tensor, tolerance=1e-5):
-    """
-    Create a graph (networkx) from its tensor representation. All the vectors are named "data".
+    """Create a graph (networkx) from its tensor representation. All the vectors are named "data".
+
     :param np.ndarray tensor: the tensor representation of the graph
     :param float tolerance: the tolerance to detect existing edges (through a norm value)
     :return: the corresponding graph
@@ -30,8 +30,8 @@ def get_graph_from_tensor(tensor, tolerance=1e-5):
 
 
 def get_tensor_from_graph(graph, data_node, data_edge):
-    """
-    Compute a tensor representation of the graph
+    """Compute a tensor representation of the graph
+
     :param nx.Graph graph: the input graph
     :param str data_node: the name of the data vector on nodes
     :param str data_edge: the name of the data vector on edges
@@ -60,8 +60,8 @@ def get_tensor_from_graph(graph, data_node, data_edge):
 
 
 def tensor_matching(t1, t2, node_kernel, edge_gamma, rff_dim=200, num_alpha=20, entropy_gamma=0.2):
-    """
-    Match two graphs using their tensor representation
+    """Match two graphs using their tensor representation
+
     :param np.ndarray t1: the first graph
     :param np.ndarray t2: the second graph
     :param callable node_kernel: the kernel on the node vectors (must take two vectors)
@@ -104,8 +104,8 @@ def tensor_matching(t1, t2, node_kernel, edge_gamma, rff_dim=200, num_alpha=20, 
 
 def compute_mean_graph(graphs, node_data, node_kernel, edge_data, edge_gamma, reference_graph=0, rff_dim=200,
                        num_alpha=20, entropy_gamma=0.2, iterations=10):
-    """
-    Compute the mean graph from a set of graphs
+    """Compute the mean graph from a set of graphs
+
     :param list graphs: the list of graphs
     :param str node_data: the name of the data vector
     :param callable node_kernel: the node kernel

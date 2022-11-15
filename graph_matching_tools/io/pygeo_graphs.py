@@ -13,8 +13,8 @@ import torch_geometric.utils as tf_utils
 
 
 def generate_groundtruth(graph_sizes, nb_global_nodes, nb_graphs, indexes):
-    """
-    Generate groundtruth for the matching
+    """Generate groundtruth for the matching
+
     :param list[int] graph_sizes: the list of the graph sizes
     :param int nb_global_nodes: the global number of nodes
     :param int nb_graphs: the number of graphs
@@ -33,8 +33,8 @@ def generate_groundtruth(graph_sizes, nb_global_nodes, nb_graphs, indexes):
 
 
 def convert_to_networkx(dataset):
-    """
-    Conversion of the pytorch data to networkx graphs
+    """Conversion of the pytorch data to networkx graphs
+
     :param dataset: the torch geometric dataset
     :return: the converted graphs
     """
@@ -46,9 +46,9 @@ def convert_to_networkx(dataset):
 
 
 def get_graph_database(name, isotropic, category, repo):
-    """
-    Get the Pascal-VOC dataset
-    :param str name: the name of the database to load
+    """Get a given graph dataset
+
+    :param str name: the name of the database to load (PascalVOC, PascalPF or Willow [default])
     :param bool isotropic: get isotropic graphs
     :param str category: the category of images
     :param str repo: the repo for graph (download etc)
@@ -84,8 +84,8 @@ def get_graph_database(name, isotropic, category, repo):
 
 
 def compute_edges_data(graph, mu=10.0, sigma=60.0):
-    """
-    Compute the distance between the nodes (using Euclidean distance)
+    """Compute the distance between the nodes (using Euclidean distance)
+
     :param graph: the input graph
     :param float mu: the weights scaling factor (default: 1.0)
     :param float sigma: the variance of the keypoint distances

@@ -9,16 +9,16 @@ import graph_matching_tools.algorithms.multiway.utils as utils
 
 
 def _default_choice(_):
-    """
-    Default choice function for reference graph
+    """Default choice function for reference graph
+
     :return: 0 (aka the first graph)
     """
     return 0
 
 
 def msync(x, sizes, rank, choice=None):
-    """
-    The projector on the universe of nodes of a given rank (or dimension)
+    """The projector on the universe of nodes of a given rank (or dimension)
+
     :param np.ndarray x: the input permutation matrix
     :param list[int] sizes: the sizes of the graphs
     :param int rank: the rank of the universe of nodes

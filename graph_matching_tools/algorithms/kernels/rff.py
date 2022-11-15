@@ -8,8 +8,7 @@ import networkx as nx
 
 
 def compute_phi(graph, data_name, vectors, offsets):
-    """
-    Compute the Phi matrix (the vector associated to each edge) using random Fourier features
+    """Compute the Phi matrix (the vector associated to each edge) using random Fourier features
 
     :param nx.classes.graph.Graph graph: the graph
     :param str data_name: the name of the data vector
@@ -27,8 +26,8 @@ def compute_phi(graph, data_name, vectors, offsets):
 
 
 def create_random_vectors(size, number, sigma):
-    """
-    Compute the random vectors needed for the RRF
+    """Compute the random vectors needed for the RRF
+
     :param int size: the dimension of features
     :param int number: the number of features
     :param float sigma: the variance of the features

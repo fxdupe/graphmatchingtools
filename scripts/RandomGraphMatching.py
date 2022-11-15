@@ -23,8 +23,8 @@ def create_random_graph_method(size, node_number, edge_proba, shuffle=False,
                                add_noise=False, node_noise_variance=1.0,
                                edge_noise_variance=1.0, node_data_dim=1, edge_data_dim=1,
                                remove_nodes=False, max_node_removed=5):
-    """
-    Use Erdos-Renyi way of generating graph
+    """Use Erdos-Renyi way of generating graph
+
     :param size: the number of graphs
     :param node_number: the number of nodes
     :param edge_proba: the proba for edges
@@ -87,8 +87,8 @@ def create_random_graph_method(size, node_number, edge_proba, shuffle=False,
 
 
 def run_graph_generation(args):
-    """
-    Run everything
+    """Run everything
+
     :param args: the arguments from the command line
     :return: the f1-score
     """
@@ -163,8 +163,6 @@ if __name__ == "__main__":
                         default=False)
     parser.add_argument("--node_noise", help="The variance of the noise on the node data", type=float, default=1.0)
     parser.add_argument("--edge_noise", help="The variance of the noise on the node data", type=float, default=1.0)
-    parser.add_argument("--method", help="The method used for solving the optimization problem",
-                        type=str, default="new")
     parser.add_argument("--proj_method", help="The projection method onto the permutation set", type=str,
                         default="matcheig")
     p_args = parser.parse_args()

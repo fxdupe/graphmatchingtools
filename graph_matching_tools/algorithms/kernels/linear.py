@@ -6,15 +6,15 @@ import numpy as np
 
 
 def create_linear_node_kernel(node_data):
-    """
-    Create a linear node kernel
+    """Create a linear node kernel
+
     :param str node_data: the name of the data vector on the nodes
     :return: the node kernel
     """
 
     def node_kernel(g1, n1, g2, n2):
-        """
-        Node kernel (on data)
+        """Node kernel (on data)
+
         :param nx.classes.graph.Graph g1: the first graph
         :param int n1: the index of the node inside graph1
         :param nx.classes.graph.Graph g2: the second graph

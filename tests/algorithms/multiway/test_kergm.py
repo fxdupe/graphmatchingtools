@@ -10,7 +10,7 @@ import graph_matching_tools.algorithms.kernels.utils as ku
 
 class TestDirectMultiwayKerGM(unittest.TestCase):
 
-    def test_mkergm(self):
+    def test_multi_pairwise_kergm(self):
         graph1 = nx.Graph()
         graph1.add_node(0, weight=2.0)
         graph1.add_node(1, weight=20.0)

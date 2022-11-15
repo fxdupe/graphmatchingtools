@@ -2,13 +2,14 @@
 
 This toolbox propose a common ground for several graph matching methods. 
 We propose our methods with a set of state-of-art methods using our own implementation.
-The scope of this work is to offer reproductible research and . 
+The scope of this work is to offer reproductible research and alternatives. 
 
 ## Current available methods
 
 ### Pairwise method
 
 - [KerGM](https://papers.nips.cc/paper/2019/hash/cd63a3eec3319fd9c84c942a08316e00-Abstract.html)
+- [GWL](https://proceedings.mlr.press/v97/xu19b.html)
 
 ### Multiway methods (state-of-art)
 

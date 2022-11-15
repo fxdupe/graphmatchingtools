@@ -13,8 +13,8 @@ import graph_matching_tools.utils.union as uf
 
 
 def compute_density(graphs, sizes, node_data, rho_den):
-    """
-    Compute the density vector
+    """Compute the density vector
+
     :param list graphs: the list of graphs
     :param list sizes: the sizes of the different graphs
     :param str node_data: the name of the data vector
@@ -60,8 +60,8 @@ def compute_density(graphs, sizes, node_data, rho_den):
 
 
 def compute_parents(graphs, sizes, node_data, densities):
-    """
-    Compute the parent vector with the distances
+    """Compute the parent vector with the distances
+
     :param list graphs: the list of graphs
     :param list sizes: the sizes of the graphs
     :param str node_data: the name of the node data
@@ -96,8 +96,7 @@ def compute_parents(graphs, sizes, node_data, densities):
 
 
 def quickmatch(graphs, node_data, rho_den, rho_edge):
-    """
-    The QuickMatch method for graphs matching
+    """The QuickMatch method for graph matching
 
     :param list graphs: the list of graphs
     :param str node_data: the name of the node data vector

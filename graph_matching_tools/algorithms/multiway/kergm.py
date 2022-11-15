@@ -10,18 +10,18 @@ import graph_matching_tools.algorithms.pairwise.kergm as kergm
 
 
 def multi_pairwise_kergm(graphs, sizes, knode, name_data_edge, gamma, entropy, nb_alphas, iterations, rff=100):
-    """
-    Direct pairwise matching on a set of graphs using KerGM
-    :param list graphs: the list of graph to match
-    :param list sizes: the sizes of the different graph
-    :param np.ndarray knode: the full node affinity matrix
-    :param str name_data_edge: the name of the data vector on edges
-    :param float gamma: the hyperparameter for edge kernel
-    :param float entropy: the entropy parameter for the Sinkhorn
-    :param int nb_alphas: the number of alpha values
-    :param int iterations: the maximal number of iterations for each alpha
-    :param int rff: the size of the random Fourier features
-    :return: the full permutation matrix
+    """Direct pairwise matching on a set of graphs using KerGM.
+
+    :param list graphs: the list of graph to match.
+    :param list sizes: the sizes of the different graph.
+    :param np.ndarray knode: the full node affinity matrix.
+    :param str name_data_edge: the name of the data vector on edges.
+    :param float gamma: the hyperparameter for edge kernel.
+    :param float entropy: the entropy parameter for the Sinkhorn.
+    :param int nb_alphas: the number of alpha values.
+    :param int iterations: the maximal number of iterations for each alpha.
+    :param int rff: the size of the random Fourier features.
+    :return: the full permutation matrix.
     """
     vectors, offsets = rffo.create_random_vectors(1, rff, gamma)
 

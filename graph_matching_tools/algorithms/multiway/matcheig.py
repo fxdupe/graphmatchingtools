@@ -8,8 +8,8 @@ import scipy.optimize as sco
 
 
 def matcheig(x, rank, sizes):
-    """
-    Spectral way of building the permutation matrix with a given rank
+    """Spectral way of building the permutation matrix with a given rank
+
     :param np.ndarray x: the input affinity matrix
     :param int rank: the dimension of the universe of nodes
     :param list[int] sizes: the size of the different graphs

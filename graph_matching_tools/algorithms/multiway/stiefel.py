@@ -10,8 +10,8 @@ import graph_matching_tools.algorithms.multiway.utils as utils
 
 
 def sparse_stiefel_manifold_sync(x, rank, sizes, iterations=100, power=3):
-    """
-    Sparse quadratic optimization over the Stiefel manifold for permutation synchronization
+    """Sparse quadratic optimization over the Stiefel manifold for permutation synchronization
+
     :param np.ndarray x: the input "noisy" permutation matrix
     :param int rank: the size of the universe of nodes
     :param list[int] sizes: the size of the different graphs

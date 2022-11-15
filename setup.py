@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="GraphMatchingTools",
-    version="0.5.0",
+    version="0.6.0",
     description="Graph Matching Tools",
     author="François-Xavier Dupé",
     author_email="francois-xavier.dupe@univ-amu.fr",
@@ -27,6 +27,8 @@ setup(
         "matplotlib",
         "networkx",
         "scikit-learn",
+        "jax",
+        "jaxlib"
     ],
     python_requires=">=3.8",
 )

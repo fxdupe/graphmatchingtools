@@ -13,8 +13,7 @@ class GraphDataset:
 	"""
 
 	def __init__(self, path_to_graphs, path_to_groundtruth_ref, suffix=".gpickle"):
-		"""
-		Constructor
+		"""Constructor
 
 		:param str path_to_graphs: The path ot the directory with all the graphs
 		:param str path_to_groundtruth_ref: The path to the file with the ground truth

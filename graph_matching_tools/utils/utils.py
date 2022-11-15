@@ -9,8 +9,8 @@ import random
 
 
 def get_dim_data_edges(graph, data_edge):
-    """
-    Get the dimension of the data on edges
+    """Get the dimension of the data on edges
+
     :param graph: the graph
     :param data_edge: the name of the data vector on edges
     :return: the dimension of the data on edges
@@ -26,8 +26,8 @@ def get_dim_data_edges(graph, data_edge):
 
 
 def create_full_adjacency_matrix(graphs):
-    """
-    Create the full adjacency matrix with the matrices on the diagonal
+    """Create the full adjacency matrix with the matrices on the diagonal
+
     :param list graphs: the list of graphs
     :return: The bulk adjacency matrix
     """
@@ -50,8 +50,8 @@ def create_full_adjacency_matrix(graphs):
 
 
 def create_full_weight_matrix(graphs, edge_data, sigma=1.0):
-    """
-    Create the full weighted matrix with the matrices on the diagonal using Gaussian weights
+    """Create the full weighted matrix with the matrices on the diagonal using Gaussian weights
+
     :param list graphs: the list of graphs
     :param str edge_data: the name of the scalar data on edges
     :param float sigma: the variance of the data
@@ -77,8 +77,8 @@ def create_full_weight_matrix(graphs, edge_data, sigma=1.0):
 
 
 def randomize_nodes_position(graphs):
-    """
-    Randomize the node position inside a graph
+    """Randomize the node position inside a graph
+
     :param list graphs: a list of graph (networkx format)
     :return: the list of new graphs and the new index
     """
@@ -95,8 +95,8 @@ def randomize_nodes_position(graphs):
 
 
 def get_permutation_matrix_from_matching(matching, sizes, max_node):
-    """
-    Create the full permutation matrix from the matching result
+    """Create the full permutation matrix from the matching result
+
     :param matching: the matching result for each graph (nodes number, assignment)
     :param sizes: the list of the size of the different graph
     :param max_node: the maximal label for a node

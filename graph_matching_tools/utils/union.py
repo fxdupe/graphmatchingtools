@@ -8,8 +8,8 @@ import numpy as np
 
 
 def create_set(numbers_of_elements):
-    """
-    Create a default parents matrix for the union-find methode
+    """Create a default parents matrix for the union-find method
+
     :param numbers_of_elements: the number of elements
     :return: the default parent matrix
     """
@@ -19,9 +19,9 @@ def create_set(numbers_of_elements):
 
 
 def find(x, parents):
-    """
-    The FIND part of the method
-    :param int x: the research element
+    """The FIND part of the method
+
+    :param int x: the researched element
     :param parents: the parents table
     :return: the label of x
     """
@@ -33,8 +33,8 @@ def find(x, parents):
 
 
 def union(x, y, parents):
-    """
-    The UNION part of the method
+    """The UNION part of the method
+
     :param int x: the index of the first element
     :param int y: the index of the second element
     :param np.ndarray parents: the parents table

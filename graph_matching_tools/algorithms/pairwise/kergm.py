@@ -1,4 +1,4 @@
-"""This module contains the matching algorithm between a pair of graph
+"""This module contains the matching algorithm between a pair of graph.
 
 Implementation of KerGM for graph matching using both edges and nodes data, from the paper
 Zhang, Z., Xiang, Y., Wu, L., Xue, B., & Nehorai, A. (2019). KerGM: Kernelized graph matching. NeurIPS 2019.
@@ -11,26 +11,26 @@ import networkx as nx
 
 
 def _compute_axb(g1, h1, g2, h2, k):
-    """
-    Compute the AXB (see paper) formula
-    :param np.ndarray g1: the head matrix of the first graph
-    :param np.ndarray h1: the tail matrix of the first graph
-    :param np.ndarray g2: the head matrix of the second graph
-    :param np.ndarray h2: the tail matrix of the second graph
-    :param np.ndarray k: the kernel matrix between the nodes of the first graph (lines) against the second's (columns)
-    :return: the AXB product
+    """Compute the AXB (see paper) formula.
+
+    :param np.ndarray g1: the head matrix of the first graph.
+    :param np.ndarray h1: the tail matrix of the first graph.
+    :param np.ndarray g2: the head matrix of the second graph.
+    :param np.ndarray h2: the tail matrix of the second graph.
+    :param np.ndarray k: the kernel matrix between the nodes of the first graph (lines) against the second's (columns).
+    :return: the AXB product.
     """
     return h1 @ (g1.T @ g2 * k) @ h2.T + h1 @ (g1.T @ h2 * k) @ g2.T +\
         g1 @ (h1.T @ g2 * k) @ h2.T + g1 @ (h1.T @ h1 * k) @ g2.T
 
 
 def _compute_edge_kernel(graph1, graph2, kernel):
-    """
-    Inner function for computing part of the Gram matrix between edges
-    :param nx.classes.graph.Graph graph1: the first graph
-    :param nx.classes.graph.Graph graph2: the second graph
-    :param callable kernel: the kernel function between edges
-    :return: the affinity/Gram matrix between the edges
+    """Inner function for computing part of the Gram matrix between edges.
+
+    :param nx.classes.graph.Graph graph1: the first graph.
+    :param nx.classes.graph.Graph graph2: the second graph.
+    :param callable kernel: the kernel function between edges.
+    :return: the affinity/Gram matrix between the edges.
     """
     k12 = np.zeros((nx.number_of_edges(graph1), nx.number_of_edges(graph2)))
     for ite1 in range(nx.number_of_edges(graph1)):
@@ -44,16 +44,16 @@ def _compute_edge_kernel(graph1, graph2, kernel):
 
 
 def create_gradient(graph1, graph2, kernel, knode):
-    """
-    Compute the gradient for the Frank-Wolfe minimization (exact version)
+    """Compute the gradient for the Frank-Wolfe minimization (exact version).
     The *kernel* function must take four arguments: the two graphs followed by the index of their respective edges.
     For example: kernel(g1, g2, e1, e2) with g1, g2 are the two graphs, e1 is the index of one edge in g1 and e2 an
     edge of g2.
-    :param nx.classes.graph.Graph graph1: the first graph
-    :param nx.classes.graph.Graph graph2: the second graph
-    :param callable kernel: the kernel function between two edges
-    :param np.ndarray knode: the node affinity matrix
-    :return: the corresponding gradient
+
+    :param nx.classes.graph.Graph graph1: the first graph.
+    :param nx.classes.graph.Graph graph2: the second graph.
+    :param callable kernel: the kernel function between two edges.
+    :param np.ndarray knode: the node affinity matrix.
+    :return: the corresponding gradient.
     """
     g1 = np.zeros((nx.number_of_nodes(graph1), nx.number_of_edges(graph1)))
     g2 = np.zeros((nx.number_of_nodes(graph2), nx.number_of_edges(graph2)))
@@ -82,11 +82,11 @@ def create_gradient(graph1, graph2, kernel, knode):
     sphi2 = _compute_axb(g2, h2, g2, h2, k22)
 
     def gradient(x, alpha=0.0):
-        """
-        Compute the gradient at a given point
-        :param np.ndarray x: the current *permutation* matrix
-        :param float alpha: the regularization hyperparameter
-        :return: the gradient at point x
+        """Compute the gradient at a given point.
+
+        :param np.ndarray x: the current *permutation* matrix.
+        :param float alpha: the regularization hyperparameter.
+        :return: the gradient at point x.
         """
         temp = h1 @ (g1.T @ x @ g2 * k12) @ h2.T + h1 @ (g1.T @ x @ h2 * k12) @ g2.T +\
             g1 @ (h1.T @ x @ g2 * k12) @ h2.T + g1 @ (h1.T @ x @ h1 * k12) @ g2.T
@@ -97,22 +97,22 @@ def create_gradient(graph1, graph2, kernel, knode):
 
 
 def create_fast_gradient(phi1, phi2, knode):
-    """
-    Compute the gradient for the Frank-Wolfe minimization (fast version)
-    :param np.ndarray phi1: the data matrix for the edges of the first graph (stack on the first index)
-    :param np.ndarray phi2: the data matrix for the edges of the second graph (stack on the first index)
-    :param np.ndarray knode: the node affinity matrix
-    :return: the corresponding gradient
+    """Compute the gradient for the Frank-Wolfe minimization (fast version).
+
+    :param np.ndarray phi1: the data matrix for the edges of the first graph (stack on the first index).
+    :param np.ndarray phi2: the data matrix for the edges of the second graph (stack on the first index).
+    :param np.ndarray knode: the node affinity matrix.
+    :return: the corresponding gradient.
     """
     sphi1 = np.sum(phi1 @ phi1, axis=0)
     sphi2 = np.sum(phi2 @ phi2, axis=0)
 
     def gradient(x, alpha=0.0):
-        """
-        Compute the gradient at a given point
-        :param np.ndarray x: the current *permutation* matrix
-        :param float alpha: the regularization hyperparameter
-        :return: the gradient at point x
+        """Compute the gradient at a given point.
+
+        :param np.ndarray x: the current *permutation* matrix.
+        :param float alpha: the regularization hyperparameter.
+        :return: the gradient at point x.
         """
         sphi12 = np.sum((phi1 @ x) @ phi2, axis=0)
         grad = (1 - 2*alpha) * (sphi1 @ x + x @ sphi2) - 2 * sphi12 - knode
@@ -121,27 +121,26 @@ def create_fast_gradient(phi1, phi2, knode):
 
 
 def q_value(x, y, grad):
-    """
-    Compute the value of the function Q (for convergence testing)
-    :param np.ndarray x: the current permutation matrix
-    :param np.ndarray y: the new permutation matrix
-    :param np.ndarray grad: the gradient at y-x
-    :return: the value of Q(x, y)
+    """Compute the value of the function Q (for convergence testing).
+
+    :param np.ndarray x: the current permutation matrix.
+    :param np.ndarray y: the new permutation matrix.
+    :param np.ndarray grad: the gradient at y-x.
+    :return: the value of Q(x, y).
     """
     qval = 0.5 * np.sum(grad * (y - x))
     return qval
 
 
 def gap_value(x, x_grad, y, gamma, epsilon=3e-16):
-    """
-    Compute the value of the gap (for convergence testing)
+    """Compute the value of the gap (for convergence testing).
 
-    :param np.ndarray x: the current permutation matrix
-    :param np.ndarray x_grad: the gradient at x
-    :param np.ndarray y: the new permutation matrix
-    :param float gamma: the weighted of the entropy term
-    :param float epsilon: the float precision (to avoid overflow)
-    :return: the value of the gap between x and y
+    :param np.ndarray x: the current permutation matrix.
+    :param np.ndarray x_grad: the gradient at x.
+    :param np.ndarray y: the new permutation matrix.
+    :param float gamma: the weighted of the entropy term.
+    :param float epsilon: the float precision (to avoid overflow).
+    :return: the value of the gap between x and y.
     """
     x_part = np.sum(x_grad * x) + gamma * np.sum(x * np.log(x + epsilon))
     y_part = np.sum(x_grad * y) + gamma * np.sum(y * np.log(y + epsilon))
@@ -149,13 +148,13 @@ def gap_value(x, x_grad, y, gamma, epsilon=3e-16):
 
 
 def sinkhorn_method(x, gamma=1.0, tolerance=1e-6, iterations=10000):
-    """
-    Sinkhorn-Knopp algorithm as proposed by M. Cuturi
-    :param np.ndarray x: the input affinity matrix
-    :param float gamma: the weight of the entropy term
-    :param float tolerance: the tolerance for convergence (default: 1e-6)
-    :param int iterations: the maximum number of iterations (default: 10000)
-    :return: the approximate optimal transport from one side to another
+    """Sinkhorn-Knopp algorithm as proposed by M. Cuturi.
+
+    :param np.ndarray x: the input affinity matrix.
+    :param float gamma: the weight of the entropy term.
+    :param float tolerance: the tolerance for convergence (default: 1e-6).
+    :param int iterations: the maximum number of iterations (default: 10000).
+    :return: the approximate optimal transport from one side to another.
     """
     u = np.ones(x.shape[0])
     v = np.ones(x.shape[1])
@@ -180,8 +179,8 @@ def sinkhorn_method(x, gamma=1.0, tolerance=1e-6, iterations=10000):
 
 def kergm_fw_method(gradient, init, alpha, entropy_gamma=0.005, iterations=1000, tolerance=1e-8,
                     inner_iterations=10000, inner_tolerance=1e-6, epsilon=3e-6):
-    """
-    The Frank-Wolfe method to solve the assignment problem
+    """The Frank-Wolfe method to solve the assignment problem.
+
     :param callable gradient: the gradient function
     :param np.ndarray init: the assignment initialization
     :param float alpha: the equilibrium between convex and concave terms
@@ -218,7 +217,8 @@ def kergm_fw_method(gradient, init, alpha, entropy_gamma=0.005, iterations=1000,
 def kergm_method(gradient, number_of_nodes, num_alpha=10, entropy_gamma=0.005, iterations=100, tolerance=1e-8,
                  inner_iterations=10000, inner_tolerance=1e-6, epsilon=3e-16) -> tuple[np.ndarray, np.ndarray]:
     """
-    Graph assignment method KerGM
+    Graph assignment method KerGM.
+
     :param Callable[[np.ndarray], np.ndarray] gradient: the gradient function (build using one of the two methods)
     :param int | tuple[int] number_of_nodes: the number of nodes of both graphs (tuple or scalar)
     :param int num_alpha: the number of values for alpha

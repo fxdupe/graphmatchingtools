@@ -26,8 +26,8 @@ import graph_matching_tools.io.pygeo_graphs as pyg
 
 
 def add_dummy_nodes(graphs, rank, dimension=1024):
-    """
-    Add dummy nodes to graph to uniform the sizes
+    """Add dummy nodes to graph to uniform the sizes
+
     :param list[nx.Graph] graphs: the list of graphs
     :param int rank: the rank of the universe of nodes
     :param int dimension: the size of the feature space

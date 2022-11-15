@@ -10,8 +10,8 @@ import graph_matching_tools.algorithms.multiway.stiefel as stiefel
 
 
 def beta_t(t):
-    """
-    Example of beta(t)
+    """Example of beta(t)
+
     :param int t: the iteration number
     :return: beta at t
     """
@@ -19,8 +19,8 @@ def beta_t(t):
 
 
 def alpha_t(t):
-    """
-    Example of alpha(t)
+    """Example of alpha(t)
+
     :param int t: the iteration number
     :return: alpha at t
     """
@@ -28,8 +28,8 @@ def alpha_t(t):
 
 
 def lambda_t(t):
-    """
-    Example of lambda(t)
+    """Example of lambda(t)
+
     :param int t: the iteration number
     :return: lambda at t
     """
@@ -37,8 +37,8 @@ def lambda_t(t):
 
 
 def block_scalar_product(x, y, node_number, graph_number):
-    """
-    Block scalar product (one scalar by graph)
+    """Block scalar product (one scalar by graph)
+
     :param np.ndarray x: the left matrix
     :param np.ndarray y: the right matrix
     :param int node_number: the number of nodes
@@ -59,8 +59,8 @@ def block_scalar_product(x, y, node_number, graph_number):
 
 
 def cemp(x, adj, t0, beta, node_number, graph_number):
-    """
-    CEMP algorithm
+    """CEMP algorithm
+
     :param np.ndarray x: the initial bulk permutation matrix
     :param np.ndarray adj: the adjency matrix between the graph
     :param int t0: the number of iterations
@@ -82,8 +82,8 @@ def cemp(x, adj, t0, beta, node_number, graph_number):
 
 
 def irgcl(x, beta, alpha, lbd, node_number, graph_number, t0=5, t_max=100, choice=None):
-    """
-    The Iteratively Reweighted Graph Connection Laplacian (IRGCL)
+    """The Iteratively Reweighted Graph Connection Laplacian (IRGCL)
+
     :param np.ndarray x: the estimated bulk permutation matrix
     :param callable beta: the increasing beta(t) for initialization
     :param callable alpha: the increasing alpha(t)

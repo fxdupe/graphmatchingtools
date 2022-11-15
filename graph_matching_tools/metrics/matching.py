@@ -7,8 +7,8 @@ import numpy as np
 
 
 def compute_f1score(result, truth):
-    """
-    Compute the F1-score from permutation matrix
+    """Compute the F1-score from permutation matrix
+
     :param np.ndarray result: the produced bulk permutation matrix
     :param np.ndarray truth: the ground truth permutation matrix
     :return: a tuple with the f1-score, the precision and the recall
