@@ -90,7 +90,8 @@ def _update_embeddings_gradient(params):
     return res
 
 
-def _update_embeddings(cost_s, cost_t, transport, alpha, beta, node_dim, iterations, descent_step):
+def _update_embeddings(cost_s, cost_t, transport, alpha, beta, node_dim, iterations, descent_step,
+                       starting_embeddings=None):
     """Gradient descent for embedding update.
 
     :param cost_s: the cost matrix of the source graph.
@@ -101,12 +102,17 @@ def _update_embeddings(cost_s, cost_t, transport, alpha, beta, node_dim, iterati
     :param node_dim: the size of the embedding space.
     :param iterations: the number of iterations.
     :param descent_step: the descent step.
+    :param starting_embeddings: a tuple with the starting embeddings (random if None)
     :return: the new embeddings for each graph.
     """
     gradient = jax.grad(_update_embeddings_gradient)
     # Random initialization
-    x_s = np.random.randn(cost_s.shape[0], node_dim)
-    x_t = np.random.randn(cost_t.shape[0], node_dim)
+    if starting_embeddings is None:
+        x_s = np.random.randn(cost_s.shape[0], node_dim)
+        x_t = np.random.randn(cost_t.shape[0], node_dim)
+    else:
+        x_s = starting_embeddings[0]
+        x_t = starting_embeddings[1]
 
     # Gradient descent (with jax magic)
     params = dict()
@@ -149,7 +155,8 @@ def gromov_wasserstein_learning(cost_s, cost_t, mu_s, mu_t, beta, gamma, node_di
     for m in range(outer_iterations):
         alpha_m = m / outer_iterations
         t_m = _gw_proximal_point_solver(cost_s, cost_t, mu_s, mu_t, x_s, x_t, alpha_m, gamma, inner_iterations, 1)
-        x_s, x_t = _update_embeddings(cost_s, cost_t, t_m, alpha_m, beta, node_dim, embed_iterations, embed_step)
+        x_s, x_t = _update_embeddings(cost_s, cost_t, t_m, alpha_m, beta, node_dim, embed_iterations, embed_step,
+                                      starting_embeddings=(x_s, x_t))
 
     # Matching steps
     matchs = np.zeros((cost_s.shape[0], )) - 1.0

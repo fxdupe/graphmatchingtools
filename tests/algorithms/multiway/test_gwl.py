@@ -38,37 +38,33 @@ class TestDirectMultiwayGWL(unittest.TestCase):
         graph1 = nx.Graph()
         graph1.add_node(0, weight=2.0)
         graph1.add_node(1, weight=20.0)
-        graph1.add_edge(0, 1, weight=np.array((1.0, )))
+        graph1.add_edge(0, 1, weight=np.array((10.0, )))
 
         graph2 = nx.Graph()
         graph2.add_node(0, weight=20.0)
         graph2.add_node(1, weight=2.0)
-        graph2.add_edge(0, 1, weight=np.array((1.0, )))
+        graph2.add_edge(0, 1, weight=np.array((10.0, )))
 
         graph3 = nx.Graph()
-        graph3.add_node(0, weight=5.0)
-        graph3.add_node(1, weight=30.0)
-        graph3.add_node(2, weight=2.0)
-        graph3.add_edge(1, 2, weight=np.array((1.0, )))
+        graph3.add_node(0, weight=1.0)
+        graph3.add_node(1, weight=4.0)
+        graph3.add_node(2, weight=5.0)
+        graph3.add_edge(1, 2, weight=np.array((10.0, )))
 
         graphs = [graph1, graph2, graph3]
 
         mus = [get_mu_vector(g) for g in graphs]
         costs = [get_cost_matrix(g) for g in graphs]
 
-        res = 0
-        truth = [[1., 0., 1., 0., 0., 1., 0.],
-                 [0., 1., 1., 0., 0., 1., 0.],
-                 [1., 1., 1., 0., 0., 1., 0.],
-                 [0., 0., 0., 1., 0., 1., 0.],
+        truth = [[1., 0., 0., 1., 0., 1., 0.],
+                 [0., 1., 1., 0., 0., 0., 1.],
+                 [0., 1., 1., 0., 0., 0., 1.],
+                 [1., 0., 0., 1., 0., 1., 0.],
                  [0., 0., 0., 0., 1., 0., 0.],
-                 [1., 1., 1., 1., 0., 1., 0.],
-                 [0., 0., 0., 0., 0., 0., 1.]]
+                 [1., 0., 0., 1., 0., 1., 0.],
+                 [0., 1., 1., 0., 0., 0., 1.]]
         truth = np.array(truth)
 
-        for i in range(10):
-            res = gwl.multi_pairwise_gwl(costs, mus, 10.0, 1.0, 5, 50, 20, 20, 0.01)
-            if np.linalg.norm(res - truth) < 1e-3:
-                break
-
+        res = gwl.multi_pairwise_gwl(costs, mus, 10.0, 2.0, 5, 20, 20, 2, 0.1)
+        # print(res)
         self.assertEqual(np.linalg.norm(res - truth) < 1e-3, True)

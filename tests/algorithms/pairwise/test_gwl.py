@@ -76,6 +76,6 @@ class TestGWL(TestCase):
         mu_s = np.array([2, 1, 1]) / 4.0
         mu_t = np.array([1, 1, 2]) / 4.0
 
-        match = gwl.gromov_wasserstein_learning(cost_s, cost_t, mu_s, mu_t, 10.0, 1.0, 4, 20, 20, 20, 0.001)
+        match = gwl.gromov_wasserstein_learning(cost_s, cost_t, mu_s, mu_t, 10.0, 0.1, 4, 20, 20, 20, 0.001)
         permut = np.array([2, 0, 1])
         self.assertTrue(np.linalg.norm(match - permut) < 1e-7, "Matching comparison")

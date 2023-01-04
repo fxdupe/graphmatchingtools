@@ -19,6 +19,7 @@ setup(
     scripts=[
         "scripts/KMeans_Example.py",
         "scripts/PyTorchGeo_Example.py",
+        "scripts/RandomGraphMatching.py",
     ],
     packages=find_packages(where=".", exclude=("tests",)),
     install_requires=[
@@ -30,5 +31,5 @@ setup(
         "jax",
         "jaxlib"
     ],
-    python_requires=">=3.8",
+    python_requires=">=3.9",
 )
