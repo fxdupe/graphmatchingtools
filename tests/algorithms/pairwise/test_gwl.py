@@ -1,7 +1,6 @@
 from unittest import TestCase
 
 import numpy as np
-import networkx as nx
 
 import graph_matching_tools.algorithms.pairwise.gwl as gwl
 
@@ -44,15 +43,10 @@ class TestGWL(TestCase):
         transport = np.ones((10, 11))
 
         params = dict()
-        params["alpha"] = 1.0
-        params["beta"] = 1.0
-        params["cost_s"] = c_s
-        params["cost_t"] = c_t
-        params["transport"] = transport
         params["x_s"] = x_s
         params["x_t"] = x_t
 
-        res = gwl._update_embeddings_gradient(params)
+        res = gwl._update_embeddings_gradient(params, 1.0, 1.0, c_s, c_t, transport)
         self.assertTrue(np.abs(res - 221.0) < 1.0, "Embedding loss function")
 
     def test_update_embeddings(self):
@@ -78,4 +72,5 @@ class TestGWL(TestCase):
 
         match = gwl.gromov_wasserstein_learning(cost_s, cost_t, mu_s, mu_t, 10.0, 0.1, 4, 20, 20, 20, 0.001)
         permut = np.array([2, 0, 1])
+        print(match)
         self.assertTrue(np.linalg.norm(match - permut) < 1e-7, "Matching comparison")

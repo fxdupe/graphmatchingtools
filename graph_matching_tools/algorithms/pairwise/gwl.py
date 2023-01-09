@@ -71,22 +71,28 @@ def _gw_proximal_point_solver(cost_s, cost_t, mu_s, mu_t, x_s, x_t, alpha, gamma
     return t_m
 
 
-def _update_embeddings_gradient(params):
+def _update_embeddings_gradient(params, alpha, beta, cost_s, cost_t, transport, use_cross_cost=False):
     """Embedding Loss value computation for JAX system with dictionary.
-    All parameters are given through a dictionary with the following elements as keys,
+    Embedding parameters are given through a dictionary with the following elements as keys,
 
     - x_s: the current embedding for the source graph.
     - x_t: the current embedding for the target graph.
     :param params: the dictionary with all the parameter.
+    :param use_cross_cost: toggle to use the cross cost matrix if available
+    :param alpha: equilibrium for the transport regularization.
+    :param beta: the equilibrium for the embeddings.
+    :param cost_s: the cost matrix of the source graph.
+    :param cost_t: the cost matrix of the target graph.
+    :param transport: the current transport matrix.
     :return: the loss value for given embeddings.
     """
     dist_st = _distance_matrix(params["x_s"], params["x_t"])
     dist_ss = _distance_matrix(params["x_s"], params["x_s"])
     dist_tt = _distance_matrix(params["x_t"], params["x_t"])
 
-    r_s = jnp.sum((dist_ss - params["cost_s"]) ** 2)
-    r_t = jnp.sum((dist_tt - params["cost_t"]) ** 2)
-    res = params["alpha"] * jnp.trace(dist_st.T @ params["transport"]) + params["beta"] * (r_s + r_t)
+    r_s = jnp.sum((dist_ss - cost_s) ** 2)
+    r_t = jnp.sum((dist_tt - cost_t) ** 2)
+    res = alpha * jnp.trace(dist_st.T @ transport) + beta * (r_s + r_t)
     return res
 
 
@@ -105,7 +111,7 @@ def _update_embeddings(cost_s, cost_t, transport, alpha, beta, node_dim, iterati
     :param starting_embeddings: a tuple with the starting embeddings (random if None)
     :return: the new embeddings for each graph.
     """
-    gradient = jax.grad(_update_embeddings_gradient)
+    gradient = jax.grad(_update_embeddings_gradient, argnums=0)  # Only applied on the params
     # Random initialization
     if starting_embeddings is None:
         x_s = np.random.randn(cost_s.shape[0], node_dim)
@@ -116,15 +122,10 @@ def _update_embeddings(cost_s, cost_t, transport, alpha, beta, node_dim, iterati
 
     # Gradient descent (with jax magic)
     params = dict()
-    params["alpha"] = alpha
-    params["beta"] = beta
-    params["cost_s"] = cost_s
-    params["cost_t"] = cost_t
-    params["transport"] = transport
     for iteration in range(iterations):
         params["x_s"] = x_s
         params["x_t"] = x_t
-        grad = gradient(params)
+        grad = gradient(params, alpha, beta, cost_s, cost_t, transport)
         x_s = x_s - descent_step * grad["x_s"]
         x_t = x_t - descent_step * grad["x_t"]
 
