@@ -67,10 +67,13 @@ class TestGWL(TestCase):
                            [0., 0., 1.],
                            [1., 1., 0.]], dtype="d")
         cost_t = 1.0 - cost_t
+        cost_st = np.array([[1., 1., 0.],
+                            [0., 1., 1.],
+                            [1., 0., 1.]], dtype="d")
         mu_s = np.array([2, 1, 1]) / 4.0
         mu_t = np.array([1, 1, 2]) / 4.0
 
-        match = gwl.gromov_wasserstein_learning(cost_s, cost_t, mu_s, mu_t, 10.0, 0.1, 4, 20, 20, 20, 0.001)
+        match = gwl.gromov_wasserstein_learning(cost_s, cost_t, mu_s, mu_t, 10.0, 0.1, 4, 20, 20, 20, 0.001,
+                                                cost_st=cost_st, use_cross_cost=True)
         permut = np.array([2, 0, 1])
-        print(match)
         self.assertTrue(np.linalg.norm(match - permut) < 1e-7, "Matching comparison")
