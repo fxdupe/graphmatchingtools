@@ -6,17 +6,7 @@ import networkx as nx
 import graph_matching_tools.algorithms.multiway.gwl as gwl
 import graph_matching_tools.algorithms.kernels.gaussian as kern
 import graph_matching_tools.algorithms.kernels.utils as ku
-
-
-def get_mu_vector(g):
-    """
-    Create probability vector from the weights on the node
-    :param g: the graph
-    :return: the probability vector for each node
-    """
-    mu = np.ones((nx.number_of_nodes(g), ))
-    mu = mu / nx.number_of_nodes(g)
-    return mu
+import graph_matching_tools.algorithms.mean.wasserstein_barycenter as wb
 
 
 class TestDirectMultiwayGWL(unittest.TestCase):
@@ -33,7 +23,7 @@ class TestDirectMultiwayGWL(unittest.TestCase):
         graph2.add_edge(0, 1)
 
         graph3 = nx.Graph()
-        graph3.add_node(0, weight=1.0)
+        graph3.add_node(0, weight=3.0)
         graph3.add_node(1, weight=2.0)
         graph3.add_node(2, weight=5.0)
         graph3.add_edge(1, 2)
@@ -41,9 +31,8 @@ class TestDirectMultiwayGWL(unittest.TestCase):
         graphs = [graph1, graph2, graph3]
 
         node_kernel = kern.create_gaussian_node_kernel(1.0, "weight")
-        mus = [get_mu_vector(g) for g in graphs]
-        costs = [(1.0 - ku.compute_knode(g, g, node_kernel) *
-                  (nx.adjacency_matrix(g).todense() + np.eye(nx.number_of_nodes(g)))) for g in graphs]
+        mus = [wb._get_degree_distributions(g) for g in graphs]
+        costs = [(1.0 - ku.compute_knode(g, g, node_kernel) * nx.adjacency_matrix(g).todense()) for g in graphs]
 
         cross_costs = dict()
         for i_s in range(len(graphs)):

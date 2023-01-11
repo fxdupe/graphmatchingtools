@@ -1,7 +1,7 @@
 """This module contains the matching algorithm between a pair of graph
 
 Implementation of Gromov-Wasserstein Learning method for graph matching, from the paper
-Xu, H., Luo, D., Zha, H., & Duke, L. C. (2019, May). Gromov-wasserstein learning for graph matching and node embedding.
+Xu, H., Luo, D., Zha, H., & Carin, L. (2019, May). Gromov-wasserstein learning for graph matching and node embedding.
  In International conference on machine learning (pp. 6932-6941). PMLR.
 
 .. moduleauthor:: François-Xavier Dupé

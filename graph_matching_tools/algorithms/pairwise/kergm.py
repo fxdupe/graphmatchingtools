@@ -147,23 +147,27 @@ def gap_value(x, x_grad, y, gamma, epsilon=3e-16):
     return x_part - y_part
 
 
-def sinkhorn_method(x, gamma=1.0, tolerance=1e-6, iterations=10000):
+def sinkhorn_method(x, mu_s=None, mu_t=None, gamma=1.0, tolerance=1e-6, iterations=10000):
     """Sinkhorn-Knopp algorithm as proposed by M. Cuturi.
 
     :param np.ndarray x: the input affinity matrix.
     :param float gamma: the weight of the entropy term.
+    :param np.ndarray mu_s: the initial probability for source distribution (uniform by default).
+    :param np.ndarray mu_t: the initial probability for target distribution (uniform by default).
     :param float tolerance: the tolerance for convergence (default: 1e-6).
     :param int iterations: the maximum number of iterations (default: 10000).
     :return: the approximate optimal transport from one side to another.
     """
     u = np.ones(x.shape[0])
     v = np.ones(x.shape[1])
-    base_u = np.ones(x.shape[0]) / x.shape[0]
-    base_v = np.ones(x.shape[1]) / x.shape[1]
+    if mu_s is None:
+        mu_s = np.ones(x.shape[0]) / x.shape[0]
+    if mu_t is None:
+        mu_t = np.ones(x.shape[1]) / x.shape[1]
     c = np.exp(- x / gamma)
     for iteration in range(iterations):
-        v = base_v / (c.T @ u)
-        unew = base_u / (c @ v)
+        v = mu_t / (c.T @ u)
+        unew = mu_s / (c @ v)
 
         u_norm = np.linalg.norm(u)
         if u_norm > 1e-3:
@@ -197,7 +201,7 @@ def kergm_fw_method(gradient, init, alpha, entropy_gamma=0.005, iterations=1000,
 
     for iteration in range(iterations):
         grad = gradient(xt, alpha)
-        yt = sinkhorn_method(grad, entropy_gamma, inner_tolerance, inner_iterations)
+        yt = sinkhorn_method(grad, gamma=entropy_gamma, tolerance=inner_tolerance, iterations=inner_iterations)
         gt = gap_value(xt, grad, yt, entropy_gamma, epsilon=epsilon)
         if np.abs(gt) < epsilon:
             break
