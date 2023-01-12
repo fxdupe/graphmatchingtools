@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="GraphMatchingTools",
-    version="0.6.5",
+    version="0.7.0",
     description="Graph Matching Tools",
     author="François-Xavier Dupé",
     author_email="francois-xavier.dupe@univ-amu.fr",

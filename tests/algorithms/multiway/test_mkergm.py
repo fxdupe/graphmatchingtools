@@ -51,7 +51,7 @@ class TestMultiwayKerGM(unittest.TestCase):
         phi[:, 0:2, 0:2] = phi1
         phi[:, 2:4, 2:4] = phi2
         phi[:, 4:7, 4:7] = phi3
-        _, sizes = utils.create_full_adjacency_matrix(graphs)
+        sizes = [nx.number_of_nodes(g) for g in graphs]
 
         knode = ku.create_full_node_affinity_matrix(graphs, node_kernel)
         gradient = mkergm.create_gradient(phi, knode)

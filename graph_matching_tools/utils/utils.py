@@ -15,21 +15,19 @@ def get_dim_data_edges(graph, data_edge):
     :param data_edge: the name of the data vector on edges
     :return: the dimension of the data on edges
     """
-    dim_edge = 0
     for u, v, data in graph.edges.data(data_edge):
         if np.isscalar(data):
-            dim_edge = 1
-        else:
-            dim_edge = data.shape[0]
-        break
-    return dim_edge
+            return 1
+        elif isinstance(data, np.ndarray):
+            return data.shape[0]
+    return 0
 
 
 def create_full_adjacency_matrix(graphs):
-    """Create the full adjacency matrix with the matrices on the diagonal
+    """Create the full adjacency matrix with the matrices on the diagonal.
 
-    :param list graphs: the list of graphs
-    :return: The bulk adjacency matrix
+    :param list graphs: the list of graphs.
+    :return: The bulk adjacency matrix.
     """
     sizes = []
     full_size = 0
@@ -42,20 +40,20 @@ def create_full_adjacency_matrix(graphs):
 
     index = 0
     for i in range(len(graphs)):
-        adj = (nx.adjacency_matrix(graphs[i], weight=None)).todense()
+        adj = nx.to_numpy_array(graphs[i], weight=None)
         a[index:index+sizes[i], index:index+sizes[i]] = adj
         index += sizes[i]
 
-    return a, sizes
+    return a
 
 
 def create_full_weight_matrix(graphs, edge_data, sigma=1.0):
-    """Create the full weighted matrix with the matrices on the diagonal using Gaussian weights
+    """Create the full weighted matrix with the matrices on the diagonal using Gaussian weights.
 
-    :param list graphs: the list of graphs
-    :param str edge_data: the name of the scalar data on edges
-    :param float sigma: the variance of the data
-    :return: The weighted adjacency matrix
+    :param list graphs: the list of graphs.
+    :param str edge_data: the name of the scalar data on edges.
+    :param float sigma: the variance of the data.
+    :return: The weighted adjacency matrix.
     """
     sizes = []
     full_size = 0
@@ -73,7 +71,7 @@ def create_full_weight_matrix(graphs, edge_data, sigma=1.0):
             w[index+n2, index+n1] = w[index+n1, index+n2]
         index += sizes[i]
 
-    return w, sizes
+    return w
 
 
 def randomize_nodes_position(graphs):

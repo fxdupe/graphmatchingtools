@@ -26,7 +26,7 @@ def get_labels_from_k_means(k, data):
     :param np.ndarray data: the data to cluster
     :return: the labels for each cluster
     """
-    kmeans = KMeans(n_clusters=k, random_state=0).fit(data)
+    kmeans = KMeans(n_clusters=k, random_state=0, n_init=10).fit(data)
     return kmeans.labels_
 
 

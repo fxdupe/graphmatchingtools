@@ -27,8 +27,8 @@ class TestHiPPI(TestCase):
         sizes = [2, 2]
 
         s = np.zeros((4, 4))
-        s[0:2, 0:2] = nx.adjacency_matrix(graph1).todense()
-        s[2:4, 2:4] = nx.adjacency_matrix(graph2).todense()
+        s[0:2, 0:2] = nx.to_numpy_array(graph1, weight=None)
+        s[2:4, 2:4] = nx.to_numpy_array(graph2, weight=None)
 
         knode = utils.create_full_node_affinity_matrix(graphs, node_kernel)
         u = hippi.hippi_multiway_matching(s, sizes, knode, 2, iterations=50)

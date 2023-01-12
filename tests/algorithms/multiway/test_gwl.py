@@ -32,7 +32,7 @@ class TestDirectMultiwayGWL(unittest.TestCase):
 
         node_kernel = kern.create_gaussian_node_kernel(1.0, "weight")
         mus = [wb._get_degree_distributions(g) for g in graphs]
-        costs = [(1.0 - ku.compute_knode(g, g, node_kernel) * nx.adjacency_matrix(g).todense()) for g in graphs]
+        costs = [(1.0 - ku.compute_knode(g, g, node_kernel) * nx.to_numpy_array(g, weight=None)) for g in graphs]
 
         cross_costs = dict()
         for i_s in range(len(graphs)):
