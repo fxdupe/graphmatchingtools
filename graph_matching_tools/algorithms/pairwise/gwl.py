@@ -2,7 +2,7 @@
 
 Implementation of Gromov-Wasserstein Learning method for graph matching, from the paper
 Xu, H., Luo, D., Zha, H., & Carin, L. (2019, May). Gromov-wasserstein learning for graph matching and node embedding.
- In International conference on machine learning (pp. 6932-6941). PMLR.
+In International conference on machine learning (pp. 6932-6941). PMLR.
 
 .. moduleauthor:: François-Xavier Dupé
 """
@@ -76,8 +76,8 @@ def _update_embeddings_gradient(params, alpha, beta, cost_s, cost_t, transport, 
     """Embedding Loss value computation for JAX system with dictionary.
     Embedding parameters are given through a dictionary with the following elements as keys,
 
-    - x_s: the current embedding for the source graph.
-    - x_t: the current embedding for the target graph.
+    - "x_s": the current embedding for the source graph.
+    - "x_t": the current embedding for the target graph.
     :param params: the dictionary with all the parameter.
     :param alpha: equilibrium for the transport regularization.
     :param beta: the equilibrium for the embeddings.
@@ -157,7 +157,7 @@ def gromov_wasserstein_learning(cost_s, cost_t, mu_s, mu_t, beta, gamma, node_di
     :param embed_iterations: the number of iterations for the embedding update.
     :param embed_step: the descent step of the embedding update.
     :param use_cross_cost: toggle to use the cross cost matrix if available.
-    :param cost_st: the cost matrix of the between the two graphs (|s| x |t|).
+    :param cost_st: the cost matrix of the between the two graphs (\|s\| x \|t\|).
     :return: a matching between the two graphs.
     """
     # Learning steps

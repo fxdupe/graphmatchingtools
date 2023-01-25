@@ -2,7 +2,7 @@
 
 This toolbox propose a common ground for several graph matching methods. 
 We propose our methods with a set of state-of-art methods using our own implementation.
-The scope of this work is to offer reproductible research and alternatives. 
+The scope of this work is to offer reproducible research and alternatives. 
 
 ## Current available methods
 
@@ -10,6 +10,7 @@ The scope of this work is to offer reproductible research and alternatives.
 
 - [KerGM](https://papers.nips.cc/paper/2019/hash/cd63a3eec3319fd9c84c942a08316e00-Abstract.html)
 - [GWL](https://proceedings.mlr.press/v97/xu19b.html)
+- [FGW](https://proceedings.mlr.press/v97/titouan19a.html)
 
 ### Multiway methods (state-of-art)
 
@@ -28,15 +29,23 @@ The scope of this work is to offer reproductible research and alternatives.
 ### Mean graph method
 
 - [MMM method based on pairwise matching](https://www.sciencedirect.com/science/article/abs/pii/S003132031630139X)
+- [Wasserstein barycenter using FGW](https://proceedings.mlr.press/v97/titouan19a.html)
 
 ## Installation
 
 The package can be installed in editable mode using the following command in the same repertory as *setup.py*,
-```
+```shell
 pip install -e .
 ```
 
 We also propose a configuration for [Poetry](https://python-poetry.org) as an alternative for installation.
+
+The documentation can be build using *sphinx-build* (please install the required packages for development). For example
+to generate the HTML documentation you can use,
+```shell
+sphinx-build -b html docs <output>
+```
+where <output> is the output directory for documentation.
 
 ## Examples
 
@@ -46,7 +55,7 @@ We provide 3 examples based on this toolbox,
 3. Application of different methods on Willow and PascalVOC databases using
 [Pytorch-Geometrics](https://pytorch-geometric.readthedocs.io/). For example to run
 the MKerGM method on the *duck* class from Willow we can execute,
-```
+```shell
 python scripts/PyTorchGeo_Example.py --category duck --sigma 70.0 --gamma 0.01  --rff 200 --iterations 20 --rank 10
 ```
 
@@ -58,4 +67,4 @@ These examples may require modules that are not required in the setup.
 - Sylvain Takerkart (INT)
 - Rohit Yadav (INT, LIS)
 
-All authors are from [Aix-Marseille University](univ-amu.fr).
+All authors are from [Aix-Marseille University](https://univ-amu.fr).

@@ -17,8 +17,8 @@ import graph_matching_tools.algorithms.kernels.utils as ku
 
 
 def _get_degree_distributions(g):
-    """
-    Create probability vector from the weights on the node
+    """Create probability vector from the weights on the node
+
     :param nx.Graph g: the graph
     :return: the probability vector for each node
     """
@@ -29,8 +29,7 @@ def _get_degree_distributions(g):
 
 
 def _compute_distance_matrix(mean_data, graph, sigma):
-    """
-    Compute the distance between of the data on the mean graph and another graph.
+    """Compute the distance between of the data on the mean graph and another graph.
 
     :param np.ndarray mean_data: the mean data matrix.
     :param nx.Graph graph: a graph (in NetworkX format).
@@ -46,8 +45,7 @@ def _compute_distance_matrix(mean_data, graph, sigma):
 
 
 def _get_data_matrix(graph):
-    """
-    Retrieve the data matrix for a given graph.
+    """Retrieve the data matrix for a given graph.
 
     :param nx.Graph graph: the input graph.
     :return: the data matrix.
@@ -59,8 +57,7 @@ def _get_data_matrix(graph):
 
 
 def get_adjacency_matrix_from_costs_with_valuation(cost, threshold):
-    """
-    Compute the adjacency matrix from a cost matrix with a given threshold and compute a quality value.
+    """Compute the adjacency matrix from a cost matrix with a given threshold and compute a quality value.
     The value is computed as the norm of the difference between the cost matrix and the resulting shortest path
     matrix.
 
@@ -84,8 +81,7 @@ def get_adjacency_matrix_from_costs_with_valuation(cost, threshold):
 
 def fgw_wasserstein_barycenter(graphs, alpha, iterations, fgw_iterations, node_sigma=1.0,
                                weights=None, gamma=1.0, ot_iterations=1000, graph_init=0):
-    """
-    Fused Gromov-Wasserstein + Frechet mean for Wasserstein barycenter.
+    """Fused Gromov-Wasserstein + Frechet mean for Wasserstein barycenter.
 
     Note: this version assumes vector of data on node only.
 
