@@ -36,6 +36,7 @@ before_script:
 test:
   script:
     - pip install pytest pytest-cov coverage
+    - pip install -e .
     - pytest
 
 run:
@@ -47,7 +48,7 @@ run:
 
 pages:
   script:
-    - pip install sphinx furo sphinx-apidoc
+    - pip install sphinx furo sphinx-autoapi
     - cd docs
     - make html
     - mv _build/html/ ../public/
