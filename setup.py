@@ -21,7 +21,7 @@ setup(
         "scripts/PyTorchGeo_Example.py",
         "scripts/RandomGraphMatching.py",
     ],
-    packages=find_packages(where=".", exclude=("tests",)),
+    packages=find_packages(where=".", exclude=("tests*",)),
     install_requires=[
         "numpy",
         "scipy",

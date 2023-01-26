@@ -157,7 +157,7 @@ def gromov_wasserstein_learning(cost_s, cost_t, mu_s, mu_t, beta, gamma, node_di
     :param embed_iterations: the number of iterations for the embedding update.
     :param embed_step: the descent step of the embedding update.
     :param use_cross_cost: toggle to use the cross cost matrix if available.
-    :param cost_st: the cost matrix of the between the two graphs (\|s\| x \|t\|).
+    :param cost_st: the cost matrix of the between the two graphs of size :math:`|source|\\times|target|`.
     :return: a matching between the two graphs.
     """
     # Learning steps

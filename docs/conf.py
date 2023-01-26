@@ -20,6 +20,7 @@ release = '0.7.0'
 
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.coverage',
+              'sphinx.ext.mathjax',
               'autoapi.extension']
 
 templates_path = ['_templates']
