@@ -26,7 +26,7 @@ def generate_groundtruth(graph_sizes, nb_global_nodes, nb_graphs, indexes):
 
     idx = 0
     for idx_g in range(len(graph_sizes)):
-        res[1, idx:idx+graph_sizes[idx_g]] = indexes[idx_g]
+        res[1, idx : idx + graph_sizes[idx_g]] = indexes[idx_g]
         idx += graph_sizes[idx_g]
 
     return res
@@ -40,7 +40,9 @@ def convert_to_networkx(dataset):
     """
     graphs = []
     for idx in range(len(dataset)):
-        g = tf_utils.to_networkx(dataset[idx], node_attrs=["pos", "x"], to_undirected=True)
+        g = tf_utils.to_networkx(
+            dataset[idx], node_attrs=["pos", "x"], to_undirected=True
+        )
         graphs.append(g)
     return graphs
 
@@ -54,25 +56,27 @@ def get_graph_database(name, isotropic, category, repo):
     :param str repo: the repo for graph (download etc)
     :return: The graphs of keypoint from the image category
     """
-    transform = transforms.Compose([
-        transforms.Delaunay(),
-        transforms.FaceToEdge(),
-        transforms.Distance() if isotropic else transforms.Cartesian(),
-    ])
+    transform = transforms.Compose(
+        [
+            transforms.Delaunay(),
+            transforms.FaceToEdge(),
+            transforms.Distance() if isotropic else transforms.Cartesian(),
+        ]
+    )
 
     if name == "PascalVOC":
         pre_filter = lambda data: data.pos.size(0) > 0  # noqa
-        dataset = PascalVOC(repo,
-                            category,
-                            train=False,
-                            transform=transform,
-                            pre_filter=pre_filter)
+        dataset = PascalVOC(
+            repo, category, train=False, transform=transform, pre_filter=pre_filter
+        )
     elif name == "PascalPF":
-        transform = transforms.Compose([
-            transforms.Constant(),
-            transforms.KNNGraph(k=8),
-            transforms.Cartesian(),
-        ])
+        transform = transforms.Compose(
+            [
+                transforms.Constant(),
+                transforms.KNNGraph(k=8),
+                transforms.Cartesian(),
+            ]
+        )
         dataset = PascalPF(repo, category, transform=transform)
     else:
         dataset = WILLOWObjectClass(repo, category=category, transform=transform)
@@ -91,9 +95,11 @@ def compute_edges_data(graph, mu=10.0, sigma=60.0):
     :param float sigma: the variance of the keypoint distances
     :return: the new graph with the distance on the edges
     """
-    distances = np.zeros((nx.number_of_nodes(graph), )) + 10**9
+    distances = np.zeros((nx.number_of_nodes(graph),)) + 10**9
     for u, v in graph.edges:
-        d = np.linalg.norm(np.array(graph.nodes[u]["pos"]) - np.array(graph.nodes[v]["pos"]))
+        d = np.linalg.norm(
+            np.array(graph.nodes[u]["pos"]) - np.array(graph.nodes[v]["pos"])
+        )
         graph.edges[u, v]["distance"] = d
         if distances[u] > d:
             distances[u] = d
@@ -103,6 +109,8 @@ def compute_edges_data(graph, mu=10.0, sigma=60.0):
 
     for u, v in graph.edges:
         graph.edges[u, v]["norm_dist"] = graph.edges[u, v]["distance"] / median
-        graph.edges[u, v]["weight"] = np.exp(-(graph.edges[u, v]["distance"]**2) / (2.0 * median**2 * mu))
+        graph.edges[u, v]["weight"] = np.exp(
+            -(graph.edges[u, v]["distance"] ** 2) / (2.0 * median**2 * mu)
+        )
 
     return graph

@@ -5,28 +5,33 @@
 
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath("../"))
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'GraphMatchingTools'
-copyright = '2023, François-Xavier Dupé, Rohit Yadav'
-author = 'François-Xavier Dupé, Rohit Yadav'
-release = '0.7.0'
+project = "GraphMatchingTools"
+copyright = "2023, François-Xavier Dupé, Rohit Yadav"
+author = "François-Xavier Dupé, Rohit Yadav"
+release = "0.7.0"
+show_authors = True
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ['sphinx.ext.autodoc',
-              'sphinx.ext.coverage',
-              'sphinx.ext.mathjax',
-              'autoapi.extension']
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.coverage",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.doctest",
+    "autoapi.extension",
+]
 
-templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+templates_path = ["_templates"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
-autoapi_dirs = ['../graph_matching_tools']
+autoapi_dirs = ["../graph_matching_tools"]
 autoapi_type = "python"
 autoapi_template_dir = "_templates/autoapi"
 autoapi_options = [
@@ -43,5 +48,5 @@ autodoc_typehints = "signature"
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_title = "GTM {}".format(release)
-html_theme = 'furo'
-html_static_path = ['_static']
+html_theme = "furo"
+html_static_path = ["_static"]

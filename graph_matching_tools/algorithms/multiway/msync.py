@@ -31,6 +31,6 @@ def msync(x, sizes, rank, choice=None):
     s, u = np.linalg.eig(x)
     s = np.real(s)
     idx = np.argsort(s)
-    u = np.real(u[:, idx[idx.shape[0] - rank:]])
+    u = np.real(u[:, idx[idx.shape[0] - rank :]])
     u = utils.permutation_projector(u / np.sqrt(len(sizes)), sizes, choice)
     return u

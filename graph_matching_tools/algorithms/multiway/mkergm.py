@@ -71,7 +71,15 @@ def _rank_projector(x, rank, sizes, method, choice=None):
         res = res @ res.T
     elif method == "irgcl":
         res = matcheig.matcheig(x, rank, sizes)
-        res = irgcl.irgcl(res, irgcl.beta_t, irgcl.alpha_t, irgcl.lambda_t, rank, len(sizes), choice=choice)
+        res = irgcl.irgcl(
+            res,
+            irgcl.beta_t,
+            irgcl.alpha_t,
+            irgcl.lambda_t,
+            rank,
+            len(sizes),
+            choice=choice,
+        )
         res = res @ res.T
     elif method == "gpow":
         res = _iterative_rank_projection(x, rank, sizes)
@@ -81,8 +89,16 @@ def _rank_projector(x, rank, sizes, method, choice=None):
     return res
 
 
-def mkergm(gradient, sizes, u_dim, init, iterations=100, tolerance=1e-2,
-           projection_method="matcheig", choice=None):
+def mkergm(
+    gradient,
+    sizes,
+    u_dim,
+    init,
+    iterations=100,
+    tolerance=1e-2,
+    projection_method="matcheig",
+    choice=None,
+):
     """Multi-graph matching extension of KerGM
 
     :param callable gradient: the gradient function

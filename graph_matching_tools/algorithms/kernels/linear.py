@@ -21,7 +21,9 @@ def create_linear_node_kernel(node_data):
         :param int n2: the index of the node inside graph2
         :return the Gaussian kernel between the data on each node
         """
-        result = np.dot(np.array(g1.nodes[n1][node_data]).T,  np.array(g2.nodes[n2][node_data]))
+        result = np.dot(
+            np.array(g1.nodes[n1][node_data]).T, np.array(g2.nodes[n2][node_data])
+        )
         return result
 
     return node_kernel

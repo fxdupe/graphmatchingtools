@@ -9,7 +9,6 @@ import graph_matching_tools.algorithms.kernels.utils as utils
 
 
 class TestMSync(TestCase):
-
     def test_msync(self):
         node_kernel = kern.create_gaussian_node_kernel(1.0, "weight")
 
@@ -30,8 +29,12 @@ class TestMSync(TestCase):
         res = ms.msync(knode, sizes, 2)
         res = res @ res.T
 
-        truth = np.array([[1., 0., 0., 1.],
-                          [0., 1., 1., 0.],
-                          [0., 1., 1., 0.],
-                          [1., 0., 0., 1.]])
+        truth = np.array(
+            [
+                [1.0, 0.0, 0.0, 1.0],
+                [0.0, 1.0, 1.0, 0.0],
+                [0.0, 1.0, 1.0, 0.0],
+                [1.0, 0.0, 0.0, 1.0],
+            ]
+        )
         self.assertEqual(np.linalg.norm(res - truth) < 1e-3, True)

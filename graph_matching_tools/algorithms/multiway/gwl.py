@@ -7,9 +7,19 @@ import numpy as np
 import graph_matching_tools.algorithms.pairwise.gwl as gwl
 
 
-def multi_pairwise_gwl(costs, mus, beta, gamma, node_dim, outer_iterations,
-                       inner_iterations, embed_iterations, embed_step,
-                       use_cross_cost=False, cross_costs=None):
+def multi_pairwise_gwl(
+    costs,
+    mus,
+    beta,
+    gamma,
+    node_dim,
+    outer_iterations,
+    inner_iterations,
+    embed_iterations,
+    embed_step,
+    use_cross_cost=False,
+    cross_costs=None,
+):
     """Multi-graph version of GWL using only pairwise matching
 
     :param costs: the list of cost matrices for each graph.
@@ -30,21 +40,32 @@ def multi_pairwise_gwl(costs, mus, beta, gamma, node_dim, outer_iterations,
     full_perm = np.eye(full_size, full_size)
 
     index_s = 0
-    for g_s in range(len(costs)-1):
+    for g_s in range(len(costs) - 1):
         index_t = index_s + sizes[g_s]
-        for g_t in range(g_s+1, len(costs)):
+        for g_t in range(g_s + 1, len(costs)):
             cost_st = None
             if use_cross_cost:
                 cost_st = cross_costs["{},{}".format(g_s, g_t)]
 
-            matchs = gwl.gromov_wasserstein_learning(costs[g_s], costs[g_t], mus[g_s], mus[g_t], beta, gamma,
-                                                     node_dim, outer_iterations, inner_iterations,
-                                                     embed_iterations, embed_step, cost_st=cost_st,
-                                                     use_cross_cost=use_cross_cost)
+            matchs = gwl.gromov_wasserstein_learning(
+                costs[g_s],
+                costs[g_t],
+                mus[g_s],
+                mus[g_t],
+                beta,
+                gamma,
+                node_dim,
+                outer_iterations,
+                inner_iterations,
+                embed_iterations,
+                embed_step,
+                cost_st=cost_st,
+                use_cross_cost=use_cross_cost,
+            )
             for i in range(matchs.shape[0]):
                 if matchs[i] > -1:
-                    full_perm[index_s+i, index_t+int(matchs[i])] = 1
-                    full_perm[index_t+int(matchs[i]), index_s+i] = 1
+                    full_perm[index_s + i, index_t + int(matchs[i])] = 1
+                    full_perm[index_t + int(matchs[i]), index_s + i] = 1
             index_t += sizes[g_t]
         index_s += sizes[g_s]
 

@@ -7,7 +7,6 @@ import graph_matching_tools.algorithms.multiway.irgcl as irgcl
 
 
 class TestIRGCL(unittest.TestCase):
-
     def test_irgcl(self):
         graph1 = nx.Graph()
         graph1.add_node(0, weight=2.0)

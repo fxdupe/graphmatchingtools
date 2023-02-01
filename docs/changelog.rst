@@ -11,5 +11,6 @@ Here the most important changes:
 * Begin Sphinx documentation with automatic API generation.
 * Improve some of the unit tests.
 * Update the requirements.
+* Using Gitlab-CI for building wheel.
 
 Note: there is now a dependency with **jax** but it is only require for GWL.

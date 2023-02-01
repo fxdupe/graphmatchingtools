@@ -44,9 +44,15 @@ def create_full_node_affinity_matrix(graphs, kernel):
             g2 = graphs[idx2]
             gram = compute_knode(g1, g2, kernel)
 
-            knode[index1:index1 + nx.number_of_nodes(g1), index2:index2 + nx.number_of_nodes(g2)] = gram
+            knode[
+                index1 : index1 + nx.number_of_nodes(g1),
+                index2 : index2 + nx.number_of_nodes(g2),
+            ] = gram
             if idx1 != idx2:
-                knode[index2:index2 + nx.number_of_nodes(g2), index1:index1 + nx.number_of_nodes(g1)] = gram.T
+                knode[
+                    index2 : index2 + nx.number_of_nodes(g2),
+                    index1 : index1 + nx.number_of_nodes(g1),
+                ] = gram.T
             index2 += nx.number_of_nodes(g2)
 
         index1 += nx.number_of_nodes(g1)

@@ -41,7 +41,7 @@ def create_full_adjacency_matrix(graphs):
     index = 0
     for i in range(len(graphs)):
         adj = nx.to_numpy_array(graphs[i], weight=None)
-        a[index:index+sizes[i], index:index+sizes[i]] = adj
+        a[index : index + sizes[i], index : index + sizes[i]] = adj
         index += sizes[i]
 
     return a
@@ -67,8 +67,8 @@ def create_full_weight_matrix(graphs, edge_data, sigma=1.0):
     index = 0
     for i in range(len(graphs)):
         for n1, n2, data in graphs[i].edges.data(edge_data):
-            w[index+n1, index+n2] = np.exp(- data**2.0 / (2.0 * sigma**2.0))
-            w[index+n2, index+n1] = w[index+n1, index+n2]
+            w[index + n1, index + n2] = np.exp(-(data**2.0) / (2.0 * sigma**2.0))
+            w[index + n2, index + n1] = w[index + n1, index + n2]
         index += sizes[i]
 
     return w
@@ -106,7 +106,7 @@ def get_permutation_matrix_from_matching(matching, sizes, max_node):
     idx = 0
     for g in range(len(sizes)):
         for s in range(sizes[g]):
-            res[matching[0][idx+matching[1][idx+s]], s] = 1
+            res[matching[0][idx + matching[1][idx + s]], s] = 1
         idx += sizes[g]
 
     return res @ res.T

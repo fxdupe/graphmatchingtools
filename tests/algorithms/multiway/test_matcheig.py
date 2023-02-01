@@ -9,7 +9,6 @@ import graph_matching_tools.algorithms.kernels.utils as utils
 
 
 class TestMatchEIG(TestCase):
-
     def test_matcheig(self):
         node_kernel = kern.create_gaussian_node_kernel(0.1, "weight")
 
@@ -29,8 +28,12 @@ class TestMatchEIG(TestCase):
         knode = utils.create_full_node_affinity_matrix(graphs, node_kernel)
         res = me.matcheig(knode, 2, sizes)
 
-        truth = np.array([[1., 0., 0., 1.],
-                          [0., 1., 1., 0.],
-                          [0., 1., 1., 0.],
-                          [1., 0., 0., 1.]])
+        truth = np.array(
+            [
+                [1.0, 0.0, 0.0, 1.0],
+                [0.0, 1.0, 1.0, 0.0],
+                [0.0, 1.0, 1.0, 0.0],
+                [1.0, 0.0, 0.0, 1.0],
+            ]
+        )
         self.assertEqual(np.linalg.norm(res - truth) < 1e-3, True)

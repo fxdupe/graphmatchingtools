@@ -10,7 +10,6 @@ import graph_matching_tools.algorithms.mean.wasserstein_barycenter as wb
 
 
 class TestDirectMultiwayGWL(unittest.TestCase):
-
     def test_multi_pairwise_gwl(self):
         graph1 = nx.Graph()
         graph1.add_node(0, weight=2.0)
@@ -32,23 +31,43 @@ class TestDirectMultiwayGWL(unittest.TestCase):
 
         node_kernel = kern.create_gaussian_node_kernel(1.0, "weight")
         mus = [wb._get_degree_distributions(g) for g in graphs]
-        costs = [(1.0 - ku.compute_knode(g, g, node_kernel) * nx.to_numpy_array(g, weight=None)) for g in graphs]
+        costs = [
+            (
+                1.0
+                - ku.compute_knode(g, g, node_kernel)
+                * nx.to_numpy_array(g, weight=None)
+            )
+            for g in graphs
+        ]
 
         cross_costs = dict()
         for i_s in range(len(graphs)):
-            for i_t in range(i_s+1, len(graphs)):
+            for i_t in range(i_s + 1, len(graphs)):
                 cost_st = 1.0 - ku.compute_knode(graphs[i_s], graphs[i_t], node_kernel)
                 cross_costs["{},{}".format(i_s, i_t)] = cost_st
 
-        truth = [[1., 0., 0., 1., 0., 1., 0.],
-                 [0., 1., 1., 0., 0., 0., 1.],
-                 [0., 1., 1., 0., 0., 0., 1.],
-                 [1., 0., 0., 1., 0., 1., 0.],
-                 [0., 0., 0., 0., 1., 0., 0.],
-                 [1., 0., 0., 1., 0., 1., 0.],
-                 [0., 1., 1., 0., 0., 0., 1.]]
+        truth = [
+            [1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0],
+            [0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0],
+            [0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0],
+            [1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0],
+            [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
+            [1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0],
+            [0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 1.0],
+        ]
         truth = np.array(truth)
 
-        res = gwl.multi_pairwise_gwl(costs, mus, 1.0, 2.0, 5, 20, 20, 2, 0.1, use_cross_cost=True,
-                                     cross_costs=cross_costs)
+        res = gwl.multi_pairwise_gwl(
+            costs,
+            mus,
+            1.0,
+            2.0,
+            5,
+            20,
+            20,
+            2,
+            0.1,
+            use_cross_cost=True,
+            cross_costs=cross_costs,
+        )
         self.assertEqual(np.linalg.norm(res - truth) < 1e-3, True)

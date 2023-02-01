@@ -9,7 +9,6 @@ import graph_matching_tools.algorithms.kernels.utils as utils
 
 
 class TestStiefel(TestCase):
-
     def test_sparse_stiefel_manifold_sync(self):
         node_kernel = kern.create_gaussian_node_kernel(0.1, "weight")
 
@@ -30,8 +29,12 @@ class TestStiefel(TestCase):
         u = stiefel.sparse_stiefel_manifold_sync(knode, 2, sizes)
         res = u @ u.T
 
-        truth = np.array([[1., 0., 0., 1.],
-                          [0., 1., 1., 0.],
-                          [0., 1., 1., 0.],
-                          [1., 0., 0., 1.]])
+        truth = np.array(
+            [
+                [1.0, 0.0, 0.0, 1.0],
+                [0.0, 1.0, 1.0, 0.0],
+                [0.0, 1.0, 1.0, 0.0],
+                [1.0, 0.0, 0.0, 1.0],
+            ]
+        )
         self.assertEqual(np.linalg.norm(res - truth) < 1e-3, True)

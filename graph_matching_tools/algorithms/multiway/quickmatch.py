@@ -22,7 +22,7 @@ def compute_density(graphs, sizes, node_data, rho_den):
     :return: the density vector
     """
     full_sizes = np.sum(sizes)
-    densities = np.zeros((full_sizes, ))
+    densities = np.zeros((full_sizes,))
     min_distances = np.zeros((full_sizes,))
 
     index = 0
@@ -33,8 +33,9 @@ def compute_density(graphs, sizes, node_data, rho_den):
             for j in g:
                 if i == j:
                     continue
-                new_dist = np.linalg.norm(np.array(g.nodes[i][node_data]) -
-                                          np.array(g.nodes[j][node_data]))
+                new_dist = np.linalg.norm(
+                    np.array(g.nodes[i][node_data]) - np.array(g.nodes[j][node_data])
+                )
                 if new_dist < dist:
                     dist = new_dist
             min_distances[index] = dist
@@ -49,9 +50,14 @@ def compute_density(graphs, sizes, node_data, rho_den):
             for graph in graphs:
                 for node in graph:
                     dist = min_distances[inner_index]
-                    density += np.log(1.0 + dist) * np.exp(-np.linalg.norm(np.array(g.nodes[i][node_data]) -
-                                                                           np.array(graph.nodes[node][node_data]))**2.0
-                                                           / (2.0 * (rho_den * dist)**2.0))
+                    density += np.log(1.0 + dist) * np.exp(
+                        -np.linalg.norm(
+                            np.array(g.nodes[i][node_data])
+                            - np.array(graph.nodes[node][node_data])
+                        )
+                        ** 2.0
+                        / (2.0 * (rho_den * dist) ** 2.0)
+                    )
                     inner_index += 1
             densities[index] = density
             index += 1
@@ -69,7 +75,7 @@ def compute_parents(graphs, sizes, node_data, densities):
     :return: the parent vector with the associated distances
     """
     full_size = np.sum(sizes)
-    parents = np.zeros((full_size, ), dtype="i")
+    parents = np.zeros((full_size,), dtype="i")
     distances = np.zeros((full_size,))
 
     index = 0
@@ -83,7 +89,10 @@ def compute_parents(graphs, sizes, node_data, densities):
                     inner_index += nx.number_of_nodes(g)
                     continue
                 for node in graph:
-                    new_dist = np.linalg.norm(np.array(g.nodes[i][node_data]) - np.array(graph.nodes[node][node_data]))
+                    new_dist = np.linalg.norm(
+                        np.array(g.nodes[i][node_data])
+                        - np.array(graph.nodes[node][node_data])
+                    )
                     if new_dist <= dist and densities[index] <= densities[inner_index]:
                         parent = inner_index
                         dist = new_dist
@@ -119,7 +128,7 @@ def quickmatch(graphs, node_data, rho_den, rho_edge):
 
     densities = compute_density(graphs, sizes, node_data, rho_den)
     parents, distances = compute_parents(graphs, sizes, node_data, densities)
-    min_distances = np.zeros((full_size, )) + 1e90
+    min_distances = np.zeros((full_size,)) + 1e90
     s_index = np.argsort(distances)
 
     # Compute the clusters
@@ -145,8 +154,10 @@ def quickmatch(graphs, node_data, rho_den, rho_edge):
 
         # Get the min distance
         min_dist = np.min([min_distances[x_root], min_distances[y_root]])
-        dist = np.linalg.norm(np.array(graphs[g_x].nodes[graph_index[x, 1]][node_data]) -
-                              np.array(graphs[g_y].nodes[graph_index[y, 1]][node_data]))
+        dist = np.linalg.norm(
+            np.array(graphs[g_x].nodes[graph_index[x, 1]][node_data])
+            - np.array(graphs[g_y].nodes[graph_index[y, 1]][node_data])
+        )
 
         if not intersect and distances[x] <= rho_edge * min_dist:
             uf.union(x_root, y_root, clusters_uf)
@@ -158,7 +169,7 @@ def quickmatch(graphs, node_data, rho_den, rho_edge):
                 min_distances[new_root] = dist
 
     # Do the labelling
-    clusters = np.zeros((full_size, ), dtype="i")
+    clusters = np.zeros((full_size,), dtype="i")
     labels = np.zeros((full_size,), dtype="i") - 1
     nb_labels = 0
     for i in range(full_size):

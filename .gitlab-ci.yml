@@ -24,7 +24,7 @@ cache:
 
 stages:
   - test
-  - run
+  - build
   - pages
 
 before_script:
@@ -33,13 +33,19 @@ before_script:
   - virtualenv venv
   - source venv/bin/activate
 
+# Beware jaxlib has AVX issue with current building server
 test:
+  stage: test
   script:
+    - cat /proc/cpuinfo
     - pip install pytest pytest-cov coverage
     - pip install -e .
-    - pytest
+    - pytest --ignore tests/algorithms/pairwise/test_gwl.py --ignore tests/algorithms/multiway/test_gwl.py
+    - cd docs
+    - make doctest
 
-run:
+build:
+  stage: build
   script:
     - python setup.py bdist_wheel
   artifacts:
@@ -47,6 +53,7 @@ run:
       - dist/*.whl
 
 pages:
+  stage: pages
   script:
     - pip install sphinx furo sphinx-autoapi
     - cd docs

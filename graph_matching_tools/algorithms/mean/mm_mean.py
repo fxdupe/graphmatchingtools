@@ -22,7 +22,7 @@ def get_graph_from_tensor(tensor, tolerance=1e-5):
     for i in range(tensor.shape[1]):
         g.add_node(i, data=np.squeeze(tensor[:, i, i]))
     for i in range(tensor.shape[1]):
-        for j in range(i+1, tensor.shape[1]):
+        for j in range(i + 1, tensor.shape[1]):
             vector = np.squeeze(tensor[:, i, j])
             if np.linalg.norm(vector) > tolerance:
                 g.add_edge(i, j, data=vector)
@@ -50,7 +50,7 @@ def get_tensor_from_graph(graph, data_node, data_edge):
     tensor = np.zeros((dim, nx.number_of_nodes(graph), nx.number_of_nodes(graph)))
     # 2.1 - The nodes
     for i in range(tensor.shape[1]):
-        tensor[0:dim_node, i, i] = (graph.nodes[i][data_node])
+        tensor[0:dim_node, i, i] = graph.nodes[i][data_node]
     # 2.2 - The edges
     for u, v, data in graph.edges.data(data_edge):
         tensor[0:dim_edge, u, v] = data
@@ -59,7 +59,9 @@ def get_tensor_from_graph(graph, data_node, data_edge):
     return tensor
 
 
-def tensor_matching(t1, t2, node_kernel, edge_gamma, rff_dim=200, num_alpha=20, entropy_gamma=0.2):
+def tensor_matching(
+    t1, t2, node_kernel, edge_gamma, rff_dim=200, num_alpha=20, entropy_gamma=0.2
+):
     """Match two graphs using their tensor representation
 
     :param np.ndarray t1: the first graph
@@ -78,13 +80,17 @@ def tensor_matching(t1, t2, node_kernel, edge_gamma, rff_dim=200, num_alpha=20, 
     # Compute the RFF
     vectors, offsets = rff.create_random_vectors(t1.shape[0], rff_dim, edge_gamma)
     for i in range(phi1.shape[1]):
-        for j in range(i+1, phi1.shape[2]):
-            phi1[:, i, j] = np.sqrt(2 / vectors.shape[1]) * np.cos(t1[:, i, j] @ vectors + offsets)
+        for j in range(i + 1, phi1.shape[2]):
+            phi1[:, i, j] = np.sqrt(2 / vectors.shape[1]) * np.cos(
+                t1[:, i, j] @ vectors + offsets
+            )
             phi1[:, j, i] = phi1[:, i, j]
 
     for i in range(phi2.shape[1]):
-        for j in range(i+1, phi2.shape[2]):
-            phi2[:, i, j] = np.sqrt(2 / vectors.shape[1]) * np.cos(t2[:, i, j] @ vectors + offsets)
+        for j in range(i + 1, phi2.shape[2]):
+            phi2[:, i, j] = np.sqrt(2 / vectors.shape[1]) * np.cos(
+                t2[:, i, j] @ vectors + offsets
+            )
             phi2[:, j, i] = phi2[:, i, j]
 
     # Compute knode
@@ -97,13 +103,25 @@ def tensor_matching(t1, t2, node_kernel, edge_gamma, rff_dim=200, num_alpha=20, 
     gradient = kergm.create_fast_gradient(phi1, phi2, knode)
 
     # Match
-    r, c = kergm.kergm_method(gradient, knode.shape, num_alpha=num_alpha, entropy_gamma=entropy_gamma)
+    r, c = kergm.kergm_method(
+        gradient, knode.shape, num_alpha=num_alpha, entropy_gamma=entropy_gamma
+    )
 
     return r, c
 
 
-def compute_mean_graph(graphs, node_data, node_kernel, edge_data, edge_gamma, reference_graph=0, rff_dim=200,
-                       num_alpha=20, entropy_gamma=0.2, iterations=10):
+def compute_mean_graph(
+    graphs,
+    node_data,
+    node_kernel,
+    edge_data,
+    edge_gamma,
+    reference_graph=0,
+    rff_dim=200,
+    num_alpha=20,
+    entropy_gamma=0.2,
+    iterations=10,
+):
     """Compute the mean graph from a set of graphs
 
     :param list graphs: the list of graphs
@@ -130,8 +148,14 @@ def compute_mean_graph(graphs, node_data, node_kernel, edge_data, edge_gamma, re
         r_perms = []
         c_perms = []
         for tensor in tensors:
-            r, c = tensor_matching(tensor, mean_graph, node_kernel, edge_gamma, num_alpha=num_alpha,
-                                   entropy_gamma=entropy_gamma)
+            r, c = tensor_matching(
+                tensor,
+                mean_graph,
+                node_kernel,
+                edge_gamma,
+                num_alpha=num_alpha,
+                entropy_gamma=entropy_gamma,
+            )
             r_perms.append(r)
             c_perms.append(c)
 

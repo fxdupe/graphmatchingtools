@@ -19,7 +19,9 @@ def compute_phi(graph, data_name, vectors, offsets):
     n = nx.number_of_nodes(graph)
     phi = np.zeros((vectors.shape[1], n, n))
     for u, v, data in graph.edges.data(data_name):
-        nvect = np.sqrt(2 / vectors.shape[1]) * np.cos(np.dot(data.T, vectors) + offsets)
+        nvect = np.sqrt(2 / vectors.shape[1]) * np.cos(
+            np.dot(data.T, vectors) + offsets
+        )
         phi[:, u, v] = nvect
         phi[:, v, u] = nvect
     return phi

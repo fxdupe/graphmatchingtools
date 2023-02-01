@@ -29,7 +29,7 @@ setup(
         "networkx",
         "scikit-learn",
         "jax",
-        "jaxlib"
+        "jaxlib",
     ],
     python_requires=">=3.9",
 )

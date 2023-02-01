@@ -20,8 +20,12 @@ def _compute_axb(g1, h1, g2, h2, k):
     :param np.ndarray k: the kernel matrix between the nodes of the first graph (lines) against the second's (columns).
     :return: the AXB product.
     """
-    return h1 @ (g1.T @ g2 * k) @ h2.T + h1 @ (g1.T @ h2 * k) @ g2.T +\
-        g1 @ (h1.T @ g2 * k) @ h2.T + g1 @ (h1.T @ h1 * k) @ g2.T
+    return (
+        h1 @ (g1.T @ g2 * k) @ h2.T
+        + h1 @ (g1.T @ h2 * k) @ g2.T
+        + g1 @ (h1.T @ g2 * k) @ h2.T
+        + g1 @ (h1.T @ h1 * k) @ g2.T
+    )
 
 
 def _compute_edge_kernel(graph1, graph2, kernel):
@@ -88,8 +92,12 @@ def create_gradient(graph1, graph2, kernel, knode):
         :param float alpha: the regularization hyperparameter.
         :return: the gradient at point x.
         """
-        temp = h1 @ (g1.T @ x @ g2 * k12) @ h2.T + h1 @ (g1.T @ x @ h2 * k12) @ g2.T +\
-            g1 @ (h1.T @ x @ g2 * k12) @ h2.T + g1 @ (h1.T @ x @ h1 * k12) @ g2.T
+        temp = (
+            h1 @ (g1.T @ x @ g2 * k12) @ h2.T
+            + h1 @ (g1.T @ x @ h2 * k12) @ g2.T
+            + g1 @ (h1.T @ x @ g2 * k12) @ h2.T
+            + g1 @ (h1.T @ x @ h1 * k12) @ g2.T
+        )
         grad = (1 - 2 * alpha) * (sphi1 @ x + x @ sphi2) - 2 * temp - knode
         return grad
 
@@ -115,8 +123,9 @@ def create_fast_gradient(phi1, phi2, knode):
         :return: the gradient at point x.
         """
         sphi12 = np.sum((phi1 @ x) @ phi2, axis=0)
-        grad = (1 - 2*alpha) * (sphi1 @ x + x @ sphi2) - 2 * sphi12 - knode
+        grad = (1 - 2 * alpha) * (sphi1 @ x + x @ sphi2) - 2 * sphi12 - knode
         return grad
+
     return gradient
 
 
@@ -147,7 +156,9 @@ def gap_value(x, x_grad, y, gamma, epsilon=3e-16):
     return x_part - y_part
 
 
-def sinkhorn_method(x, mu_s=None, mu_t=None, gamma=1.0, tolerance=1e-6, iterations=10000):
+def sinkhorn_method(
+    x, mu_s=None, mu_t=None, gamma=1.0, tolerance=1e-6, iterations=10000
+):
     """Sinkhorn-Knopp algorithm as proposed by M. Cuturi.
 
     :param np.ndarray x: the input affinity matrix.
@@ -164,7 +175,7 @@ def sinkhorn_method(x, mu_s=None, mu_t=None, gamma=1.0, tolerance=1e-6, iteratio
         mu_s = np.ones(x.shape[0]) / x.shape[0]
     if mu_t is None:
         mu_t = np.ones(x.shape[1]) / x.shape[1]
-    c = np.exp(- x / gamma)
+    c = np.exp(-x / gamma)
     for iteration in range(iterations):
         v = mu_t / (c.T @ u)
         unew = mu_s / (c @ v)
@@ -181,8 +192,17 @@ def sinkhorn_method(x, mu_s=None, mu_t=None, gamma=1.0, tolerance=1e-6, iteratio
     return res
 
 
-def kergm_fw_method(gradient, init, alpha, entropy_gamma=0.005, iterations=1000, tolerance=1e-8,
-                    inner_iterations=10000, inner_tolerance=1e-6, epsilon=3e-6):
+def kergm_fw_method(
+    gradient,
+    init,
+    alpha,
+    entropy_gamma=0.005,
+    iterations=1000,
+    tolerance=1e-8,
+    inner_iterations=10000,
+    inner_tolerance=1e-6,
+    epsilon=3e-6,
+):
     """The Frank-Wolfe method to solve the assignment problem.
 
     :param callable gradient: the gradient function
@@ -201,14 +221,19 @@ def kergm_fw_method(gradient, init, alpha, entropy_gamma=0.005, iterations=1000,
 
     for iteration in range(iterations):
         grad = gradient(xt, alpha)
-        yt = sinkhorn_method(grad, gamma=entropy_gamma, tolerance=inner_tolerance, iterations=inner_iterations)
+        yt = sinkhorn_method(
+            grad,
+            gamma=entropy_gamma,
+            tolerance=inner_tolerance,
+            iterations=inner_iterations,
+        )
         gt = gap_value(xt, grad, yt, entropy_gamma, epsilon=epsilon)
         if np.abs(gt) < epsilon:
             break
         qt = q_value(xt, yt, gradient(yt - xt, alpha))
         st = 1
         if qt > 0:
-            st = np.min([gt/(2*qt), 1])
+            st = np.min([gt / (2 * qt), 1])
         xtt = xt + st * (yt - xt)
         error = np.linalg.norm(xtt - xt) / np.linalg.norm(xt)
         xt = xtt
@@ -218,8 +243,17 @@ def kergm_fw_method(gradient, init, alpha, entropy_gamma=0.005, iterations=1000,
     return xt
 
 
-def kergm_method(gradient, number_of_nodes, num_alpha=10, entropy_gamma=0.005, iterations=100, tolerance=1e-8,
-                 inner_iterations=10000, inner_tolerance=1e-6, epsilon=3e-16) -> tuple[np.ndarray, np.ndarray]:
+def kergm_method(
+    gradient,
+    number_of_nodes,
+    num_alpha=10,
+    entropy_gamma=0.005,
+    iterations=100,
+    tolerance=1e-8,
+    inner_iterations=10000,
+    inner_tolerance=1e-6,
+    epsilon=3e-16,
+) -> tuple[np.ndarray, np.ndarray]:
     """
     Graph assignment method KerGM.
 
@@ -236,15 +270,28 @@ def kergm_method(gradient, number_of_nodes, num_alpha=10, entropy_gamma=0.005, i
     """
     alphas = np.linspace(0, 1, num_alpha)
     if np.isscalar(number_of_nodes):
-        x_alpha = np.ones((number_of_nodes, number_of_nodes)) / number_of_nodes +\
-                  1e-3 * np.random.randn(number_of_nodes, number_of_nodes)  # Initialization
+        x_alpha = np.ones(
+            (number_of_nodes, number_of_nodes)
+        ) / number_of_nodes + 1e-3 * np.random.randn(
+            number_of_nodes, number_of_nodes
+        )  # Initialization
     else:
-        x_alpha = np.ones(number_of_nodes) / number_of_nodes[0] +\
-                  1e-3 * np.random.randn(number_of_nodes[0], number_of_nodes[1])
+        x_alpha = np.ones(number_of_nodes) / number_of_nodes[
+            0
+        ] + 1e-3 * np.random.randn(number_of_nodes[0], number_of_nodes[1])
 
     for alpha in alphas:
-        x_alpha = kergm_fw_method(gradient, x_alpha, alpha, entropy_gamma, iterations, tolerance,
-                                  inner_iterations, inner_tolerance, epsilon)
+        x_alpha = kergm_fw_method(
+            gradient,
+            x_alpha,
+            alpha,
+            entropy_gamma,
+            iterations,
+            tolerance,
+            inner_iterations,
+            inner_tolerance,
+            epsilon,
+        )
     r_ind, c_ind = sco.linear_sum_assignment(-x_alpha)
 
     return r_ind, c_ind

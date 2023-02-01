@@ -7,7 +7,6 @@ import graph_matching_tools.algorithms.mean.mm_mean as mean
 
 
 class TestMMMean(TestCase):
-
     def test_get_tensor_from_graph(self):
         g = nx.Graph()
         g.add_node(0, weight=4.0)
@@ -18,13 +17,19 @@ class TestMMMean(TestCase):
         g.add_edge(2, 3, weight=5.0)
 
         tensor = mean.get_tensor_from_graph(g, "weight", "weight")
-        self.assertEqual(np.linalg.norm(tensor.shape - np.array([1, 4, 4])) < 1e-3, True)
+        self.assertEqual(
+            np.linalg.norm(tensor.shape - np.array([1, 4, 4])) < 1e-3, True
+        )
 
         tensor = np.squeeze(tensor)
-        truth = np.array([[4., 4., 0., 0.],
-                          [4., 5., 0., 0.],
-                          [0., 0., 6., 5.],
-                          [0., 0., 5., 7.]])
+        truth = np.array(
+            [
+                [4.0, 4.0, 0.0, 0.0],
+                [4.0, 5.0, 0.0, 0.0],
+                [0.0, 0.0, 6.0, 5.0],
+                [0.0, 0.0, 5.0, 7.0],
+            ]
+        )
         self.assertEqual(np.linalg.norm(tensor - truth) < 1e-3, True)
 
     def test_tensor_matching(self):
@@ -68,18 +73,32 @@ class TestMMMean(TestCase):
         g3.add_edge(1, 2, weight=3.0)
 
         graphs = [g1, g2, g3]
-        mean_graph = mean.compute_mean_graph(graphs, "weight", node_kernel, "weight", 1.0, entropy_gamma=10.0)
-        result = np.array([[[2.3333, 3.3333, 0., 0.],
-                            [3.3333, 4.3333, 1., 0.],
-                            [0., 1., 0.6666, 0.6666],
-                            [0., 0., 0.6666, 0.3333]]])
+        mean_graph = mean.compute_mean_graph(
+            graphs, "weight", node_kernel, "weight", 1.0, entropy_gamma=10.0
+        )
+        result = np.array(
+            [
+                [
+                    [2.3333, 3.3333, 0.0, 0.0],
+                    [3.3333, 4.3333, 1.0, 0.0],
+                    [0.0, 1.0, 0.6666, 0.6666],
+                    [0.0, 0.0, 0.6666, 0.3333],
+                ]
+            ]
+        )
         self.assertEqual(np.linalg.norm(mean_graph - result) < 1e-3, True)
 
     def test_get_graph_from_tensor(self):
-        tensor = np.array([[[4., 4., 0., 0.],
-                            [4., 5., 0., 0.],
-                            [0., 0., 2., 5.],
-                            [0., 0., 5., 1.]]])
+        tensor = np.array(
+            [
+                [
+                    [4.0, 4.0, 0.0, 0.0],
+                    [4.0, 5.0, 0.0, 0.0],
+                    [0.0, 0.0, 2.0, 5.0],
+                    [0.0, 0.0, 5.0, 1.0],
+                ]
+            ]
+        )
         g = mean.get_graph_from_tensor(tensor)
         self.assertEqual(nx.number_of_nodes(g), 4)
         self.assertEqual(nx.number_of_edges(g), 2)

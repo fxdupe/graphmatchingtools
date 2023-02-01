@@ -19,10 +19,10 @@ def permutation_projector(v, sizes, choice):
     # Take one graph as reference
     i_max = choice(range(len(sizes)))
     i_begin = int(np.sum(sizes[0:i_max]))
-    ref = v[i_begin:i_begin + sizes[i_max], :]
+    ref = v[i_begin : i_begin + sizes[i_max], :]
 
     for size in sizes:
-        vi = v[index:index + size, :] @ ref.T
+        vi = v[index : index + size, :] @ ref.T
         r, c = sco.linear_sum_assignment(-vi)
         for i in range(r.shape[0]):
             u[r[i] + index, c[i]] = 1
@@ -40,9 +40,9 @@ def u_projector(v, sizes):
     u = np.zeros(v.shape)
     index = 0
     for size in sizes:
-        vi = v[index:index+size, :]
+        vi = v[index : index + size, :]
         r, c = sco.linear_sum_assignment(-vi)
         for i in range(r.shape[0]):
-            u[r[i]+index, c[i]] = 1
+            u[r[i] + index, c[i]] = 1
         index += size
     return u

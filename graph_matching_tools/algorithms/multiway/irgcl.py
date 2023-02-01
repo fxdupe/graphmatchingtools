@@ -15,7 +15,7 @@ def beta_t(t):
     :param int t: the iteration number
     :return: beta at t
     """
-    return np.minimum(2 ** t, 40)
+    return np.minimum(2**t, 40)
 
 
 def alpha_t(t):
@@ -24,7 +24,7 @@ def alpha_t(t):
     :param int t: the iteration number
     :return: alpha at t
     """
-    return np.minimum(1.2 ** (t-1), 40)
+    return np.minimum(1.2 ** (t - 1), 40)
 
 
 def lambda_t(t):
@@ -33,7 +33,7 @@ def lambda_t(t):
     :param int t: the iteration number
     :return: lambda at t
     """
-    return t / (t+1)
+    return t / (t + 1)
 
 
 def block_scalar_product(x, y, node_number, graph_number):
@@ -50,8 +50,10 @@ def block_scalar_product(x, y, node_number, graph_number):
     for g1 in range(graph_number):
         index2 = 0
         for g2 in range(graph_number):
-            res[g1, g2] = np.trace(x[index1:index1 + node_number, index2:index2 + node_number].T @
-                                   y[index1:index1 + node_number, index2:index2 + node_number])
+            res[g1, g2] = np.trace(
+                x[index1 : index1 + node_number, index2 : index2 + node_number].T
+                @ y[index1 : index1 + node_number, index2 : index2 + node_number]
+            )
             index2 += node_number
         index1 += node_number
 
@@ -74,7 +76,12 @@ def cemp(x, adj, t0, beta, node_number, graph_number):
     a_init = None
     for t in range(t0):
         s_init = np.kron(w_init, one_m) * x
-        tmp = 1/node_number * (s_init @ s_init) / (np.kron(w_init @ w_init, one_m) + 1e-3)  # Avoid division by 0
+        tmp = (
+            1
+            / node_number
+            * (s_init @ s_init)
+            / (np.kron(w_init @ w_init, one_m) + 1e-3)
+        )  # Avoid division by 0
         a_init = block_scalar_product(tmp, x, node_number, graph_number)
         w_init = np.exp(beta(t) * a_init)
 
@@ -104,18 +111,33 @@ def irgcl(x, beta, alpha, lbd, node_number, graph_number, t0=5, t_max=100, choic
     a_t = cemp(x, adj, 100, beta, node_number, graph_number)
     w_t = a_t
     # p_t = mwk.u_rank_projector(np.kron(w_t, one_m) * x, [node_number, ] * graph_number, node_number, choice)
-    p_t = stiefel.sparse_stiefel_manifold_sync(np.kron(w_t, one_m) * x, node_number, [node_number, ] * graph_number)
+    p_t = stiefel.sparse_stiefel_manifold_sync(
+        np.kron(w_t, one_m) * x,
+        node_number,
+        [
+            node_number,
+        ]
+        * graph_number,
+    )
     for t in range(t_max):
         x_t = p_t @ p_t.T
         a1_t = block_scalar_product(x_t, x, node_number, graph_number) / graph_number
         w1_t = np.exp(alpha(t) * a1_t)
         s_t = np.kron(w1_t, one_m) * x
-        a2_t = block_scalar_product((s_t @ s_t) / (np.kron(w1_t @ w1_t, one_m)), x, node_number, graph_number)
+        a2_t = block_scalar_product(
+            (s_t @ s_t) / (np.kron(w1_t @ w1_t, one_m)), x, node_number, graph_number
+        )
         a_t = (1 - lbd(t)) * a1_t + lbd(t) * a2_t
         w_t = a_t
         # p_tt = mwk.u_rank_projector(np.kron(w_t, one_m) * x, [node_number, ] * graph_number, node_number, choice)
-        p_tt = stiefel.sparse_stiefel_manifold_sync(np.kron(w_t, one_m) * x, node_number,
-                                                    [node_number, ] * graph_number)
+        p_tt = stiefel.sparse_stiefel_manifold_sync(
+            np.kron(w_t, one_m) * x,
+            node_number,
+            [
+                node_number,
+            ]
+            * graph_number,
+        )
         if np.linalg.norm(p_tt - p_t) < 1e-3:
             break
         pt = p_tt

@@ -24,7 +24,9 @@ def _loss_function(cost_s, cost_t, transport):
         for j_t in range(cost_t.shape[0]):
             c_j_s = jnp.squeeze(cost_s[:, j_s])
             c_j_t = jnp.squeeze(cost_t[:, j_t])
-            res[j_s, j_t] = jnp.sum(((c_j_s[:, jnp.newaxis] - c_j_t[jnp.newaxis, :]) ** 2) * transport)
+            res[j_s, j_t] = jnp.sum(
+                ((c_j_s[:, jnp.newaxis] - c_j_t[jnp.newaxis, :]) ** 2) * transport
+            )
     return res
 
 
@@ -36,14 +38,25 @@ def _distance_matrix(x_s, x_t):
     :return: the normalized distance matrix.
     """
     # n_s = np.linalg.norm(x_s, axis=1)
-    n_s = jnp.sqrt(jnp.sum(x_s ** 2.0, axis=1))
+    n_s = jnp.sqrt(jnp.sum(x_s**2.0, axis=1))
     # n_t = np.linalg.norm(x_t, axis=1)
-    n_t = jnp.sqrt(jnp.sum(x_t ** 2.0, axis=1))
-    dist = 1.0 - jnp.diag(1.0/n_s) @ x_s @ x_t.T @ jnp.diag(1.0/n_t)
+    n_t = jnp.sqrt(jnp.sum(x_t**2.0, axis=1))
+    dist = 1.0 - jnp.diag(1.0 / n_s) @ x_s @ x_t.T @ jnp.diag(1.0 / n_t)
     return dist
 
 
-def _gw_proximal_point_solver(cost_s, cost_t, mu_s, mu_t, x_s, x_t, alpha, gamma, outer_iterations, inner_iterations):
+def _gw_proximal_point_solver(
+    cost_s,
+    cost_t,
+    mu_s,
+    mu_t,
+    x_s,
+    x_t,
+    alpha,
+    gamma,
+    outer_iterations,
+    inner_iterations,
+):
     """Proximal point method for Gromov-Wasserstein discrepancy.
 
     :param cost_s: the cost matrix for the "source" graph.
@@ -62,7 +75,11 @@ def _gw_proximal_point_solver(cost_s, cost_t, mu_s, mu_t, x_s, x_t, alpha, gamma
     a = mu_s
     b = mu_t
     for n in range(outer_iterations):
-        cmn = _loss_function(cost_s, cost_t, t_m) + alpha * _distance_matrix(x_s, x_t) + gamma
+        cmn = (
+            _loss_function(cost_s, cost_t, t_m)
+            + alpha * _distance_matrix(x_s, x_t)
+            + gamma
+        )
         g = jnp.exp(-cmn / gamma) * t_m
         for j in range(inner_iterations):
             b = mu_t / (g.T @ a)
@@ -71,8 +88,9 @@ def _gw_proximal_point_solver(cost_s, cost_t, mu_s, mu_t, x_s, x_t, alpha, gamma
     return t_m
 
 
-def _update_embeddings_gradient(params, alpha, beta, cost_s, cost_t, transport, use_cross_cost=False,
-                                cost_st=None):
+def _update_embeddings_gradient(
+    params, alpha, beta, cost_s, cost_t, transport, use_cross_cost=False, cost_st=None
+):
     """Embedding Loss value computation for JAX system with dictionary.
     Embedding parameters are given through a dictionary with the following elements as keys,
 
@@ -103,8 +121,19 @@ def _update_embeddings_gradient(params, alpha, beta, cost_s, cost_t, transport, 
     return res
 
 
-def _update_embeddings(cost_s, cost_t, transport, alpha, beta, node_dim, iterations, descent_step,
-                       starting_embeddings=None, cost_st=None, use_cross_cost=False):
+def _update_embeddings(
+    cost_s,
+    cost_t,
+    transport,
+    alpha,
+    beta,
+    node_dim,
+    iterations,
+    descent_step,
+    starting_embeddings=None,
+    cost_st=None,
+    use_cross_cost=False,
+):
     """Gradient descent for embedding update.
 
     :param cost_s: the cost matrix of the source graph.
@@ -120,7 +149,9 @@ def _update_embeddings(cost_s, cost_t, transport, alpha, beta, node_dim, iterati
     :param cost_st: the cost matrix of the between the two graphs (|s| x |t|).
     :return: the new embeddings for each graph.
     """
-    gradient = jax.grad(_update_embeddings_gradient, argnums=0)  # Only applied on the params
+    gradient = jax.grad(
+        _update_embeddings_gradient, argnums=0
+    )  # Only applied on the params
     # Random initialization
     if starting_embeddings is None:
         x_s = np.random.randn(cost_s.shape[0], node_dim)
@@ -134,15 +165,30 @@ def _update_embeddings(cost_s, cost_t, transport, alpha, beta, node_dim, iterati
     for iteration in range(iterations):
         params["x_s"] = x_s
         params["x_t"] = x_t
-        grad = gradient(params, alpha, beta, cost_s, cost_t, transport, use_cross_cost, cost_st)
+        grad = gradient(
+            params, alpha, beta, cost_s, cost_t, transport, use_cross_cost, cost_st
+        )
         x_s = x_s - descent_step * grad["x_s"]
         x_t = x_t - descent_step * grad["x_t"]
 
     return x_s, x_t
 
 
-def gromov_wasserstein_learning(cost_s, cost_t, mu_s, mu_t, beta, gamma, node_dim, outer_iterations,
-                                inner_iterations, embed_iterations, embed_step, cost_st=None, use_cross_cost=False):
+def gromov_wasserstein_learning(
+    cost_s,
+    cost_t,
+    mu_s,
+    mu_t,
+    beta,
+    gamma,
+    node_dim,
+    outer_iterations,
+    inner_iterations,
+    embed_iterations,
+    embed_step,
+    cost_st=None,
+    use_cross_cost=False,
+):
     """Gromov-Wasserstein Learning method for graph matching.
 
     :param cost_s: the cost matrix for the "source" graph.
@@ -166,12 +212,25 @@ def gromov_wasserstein_learning(cost_s, cost_t, mu_s, mu_t, beta, gamma, node_di
     t_m = None
     for m in range(outer_iterations):
         alpha_m = m / outer_iterations
-        t_m = _gw_proximal_point_solver(cost_s, cost_t, mu_s, mu_t, x_s, x_t, alpha_m, gamma, inner_iterations, 1)
-        x_s, x_t = _update_embeddings(cost_s, cost_t, t_m, alpha_m, beta, node_dim, embed_iterations, embed_step,
-                                      starting_embeddings=(x_s, x_t), cost_st=cost_st, use_cross_cost=use_cross_cost)
+        t_m = _gw_proximal_point_solver(
+            cost_s, cost_t, mu_s, mu_t, x_s, x_t, alpha_m, gamma, inner_iterations, 1
+        )
+        x_s, x_t = _update_embeddings(
+            cost_s,
+            cost_t,
+            t_m,
+            alpha_m,
+            beta,
+            node_dim,
+            embed_iterations,
+            embed_step,
+            starting_embeddings=(x_s, x_t),
+            cost_st=cost_st,
+            use_cross_cost=use_cross_cost,
+        )
 
     # Matching steps
-    matchs = np.zeros((cost_s.shape[0], )) - 1.0
+    matchs = np.zeros((cost_s.shape[0],)) - 1.0
     for i in range(t_m.shape[0]):
         matchs[i] = np.argmax(t_m[i, :])
 

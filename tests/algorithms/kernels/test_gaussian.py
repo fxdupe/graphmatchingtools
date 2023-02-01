@@ -6,7 +6,6 @@ import graph_matching_tools.algorithms.kernels.gaussian as gaussian
 
 
 class TestGaussian(TestCase):
-
     def test_create_gaussian_node_kernel(self):
         graph1 = nx.Graph()
         graph1.add_node(0, weight=1.0)
