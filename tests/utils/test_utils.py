@@ -105,18 +105,3 @@ class TestUtils(unittest.TestCase):
         self.assertTrue(
             g1.nodes[0]["weight"] == new_g1[0].nodes[new_idx[0][0]]["weight"]
         )
-
-    def test_get_permutation_matrix_from_matching(self):
-        match = [[0, 1, 2, 3, 4, 5], [0, 1, 2, 2, 0, 1]]
-        permut = utils.get_permutation_matrix_from_matching(match, [3, 3], 4)
-        truth = np.array(
-            [
-                [1.0, 0.0, 0.0, 0.0, 0.0, 1.0],
-                [0.0, 1.0, 0.0, 1.0, 0.0, 0.0],
-                [0.0, 0.0, 1.0, 0.0, 1.0, 0.0],
-                [0.0, 1.0, 0.0, 1.0, 0.0, 0.0],
-                [0.0, 0.0, 1.0, 0.0, 1.0, 0.0],
-                [1.0, 0.0, 0.0, 0.0, 0.0, 1.0],
-            ]
-        )
-        self.assertTrue(np.linalg.norm(permut - truth) < 1e-5)

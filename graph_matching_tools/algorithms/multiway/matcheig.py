@@ -16,24 +16,11 @@ def matcheig(x, rank, sizes):
     :return: the bulk permutation matrix.
     :rtype: numpy.ndarray
 
-        Here an example using NetworkX and some utils:
+    Here an example using NetworkX and some utils:
 
     .. doctest:
 
-    >>> import numpy as np  # Load the different modules
-    >>> import networkx as nx
-    >>> import graph_matching_tools.algorithms.kernels.gaussian as kern
-    >>> import graph_matching_tools.algorithms.kernels.utils as utils
-    >>> import graph_matching_tools.algorithms.multiway.matcheig as matcheig
     >>> node_kernel = kern.create_gaussian_node_kernel(0.1, "weight")  # Load a Gaussian kernel
-    >>> graph1 = nx.Graph()  # The first graph
-    >>> graph1.add_node(0, weight=1.0)
-    >>> graph1.add_node(1, weight=2.0)
-    >>> graph1.add_edge(0, 1, weight=1.0)
-    >>> graph2 = nx.Graph()  # The second graph
-    >>> graph2.add_node(0, weight=2.0)
-    >>> graph2.add_node(1, weight=1.0)
-    >>> graph2.add_edge(0, 1, weight=1.0)
     >>> graphs = [graph1, graph2]
     >>> sizes = [2, 2]
     >>> s = np.zeros((4, 4))

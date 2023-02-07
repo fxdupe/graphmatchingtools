@@ -8,12 +8,13 @@ import networkx as nx
 import random
 
 
-def get_dim_data_edges(graph, data_edge):
-    """Get the dimension of the data on edges
+def get_dim_data_edges(graph: nx.Graph, data_edge: str) -> int:
+    """Get the dimension of the data on edges.
 
-    :param graph: the graph
-    :param data_edge: the name of the data vector on edges
-    :return: the dimension of the data on edges
+    :param nx.Graph graph: the graph.
+    :param str data_edge: the name of the data vector on edges.
+    :return: the dimension of the data on edges.
+    :rtype: int
     """
     for u, v, data in graph.edges.data(data_edge):
         if np.isscalar(data):
@@ -23,11 +24,12 @@ def get_dim_data_edges(graph, data_edge):
     return 0
 
 
-def create_full_adjacency_matrix(graphs):
+def create_full_adjacency_matrix(graphs: list[nx.Graph]) -> np.ndarray:
     """Create the full adjacency matrix with the matrices on the diagonal.
 
-    :param list graphs: the list of graphs.
+    :param list[nx.Graph] graphs: the list of graphs.
     :return: The bulk adjacency matrix.
+    :rtype: np.ndarray
     """
     sizes = []
     full_size = 0
@@ -47,13 +49,14 @@ def create_full_adjacency_matrix(graphs):
     return a
 
 
-def create_full_weight_matrix(graphs, edge_data, sigma=1.0):
+def create_full_weight_matrix(graphs: list[nx.Graph], edge_data: str, sigma: float = 1.0) -> np.ndarray:
     """Create the full weighted matrix with the matrices on the diagonal using Gaussian weights.
 
-    :param list graphs: the list of graphs.
+    :param list[nx.Graph] graphs: the list of graphs.
     :param str edge_data: the name of the scalar data on edges.
     :param float sigma: the variance of the data.
     :return: The weighted adjacency matrix.
+    :rtype: np.ndarray
     """
     sizes = []
     full_size = 0
@@ -74,11 +77,14 @@ def create_full_weight_matrix(graphs, edge_data, sigma=1.0):
     return w
 
 
-def randomize_nodes_position(graphs):
-    """Randomize the node position inside a graph
+def randomize_nodes_position(
+    graphs: list[nx.Graph],
+) -> tuple[list[nx.Graph], list[list[int]]]:
+    """Randomize the node position inside a graph.
 
-    :param list graphs: a list of graph (networkx format)
-    :return: the list of new graphs and the new index
+    :param list[nx.Graph] graphs: a list of graph (networkx format).
+    :return: the list of new graphs and the new index.
+    :rtype: tuple[list[nx.Graph], list[list[int]]]
     """
     res = []
     new_graphs = []
@@ -90,23 +96,3 @@ def randomize_nodes_position(graphs):
         res.append(nidx)
         new_graphs.append(n_g)
     return new_graphs, res
-
-
-def get_permutation_matrix_from_matching(matching, sizes, max_node):
-    """Create the full permutation matrix from the matching result
-
-    :param matching: the matching result for each graph (nodes number, assignment)
-    :param sizes: the list of the size of the different graph
-    :param max_node: the maximal label for a node
-    :return: the full permutation matrix
-    """
-    f_size = int(np.sum(sizes))
-    res = np.zeros((f_size, max_node))
-
-    idx = 0
-    for g in range(len(sizes)):
-        for s in range(sizes[g]):
-            res[matching[0][idx + matching[1][idx + s]], s] = 1
-        idx += sizes[g]
-
-    return res @ res.T

@@ -12,6 +12,7 @@ import networkx as nx
 import graph_matching_tools.algorithms.kernels.gaussian as gaussian
 import graph_matching_tools.algorithms.kernels.utils as ku
 import graph_matching_tools.utils.utils as utils
+import graph_matching_tools.utils.permutations as perm
 import graph_matching_tools.metrics.matching as measures
 import graph_matching_tools.algorithms.kernels.rff as rff
 import graph_matching_tools.algorithms.multiway.hippi as hippi
@@ -325,7 +326,7 @@ if __name__ == "__main__":
 
     # Compare with groundtruth
     truth = pyg.generate_groundtruth(g_sizes, full_size, len(g_sizes), graph_index)
-    a_truth = utils.get_permutation_matrix_from_matching(truth, g_sizes, 50)
+    a_truth = perm.get_permutation_matrix_from_matching(truth, g_sizes, 50)
 
     if args.robust:
         if args.robust_method == "irgcl":

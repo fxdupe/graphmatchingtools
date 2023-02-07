@@ -6,15 +6,17 @@ Utility function for permutation matrix
 import random
 
 import numpy as np
-import networkx as nx
 
 
-def get_permutation_matrix_from_dictionary(matching, g_sizes):
+def get_permutation_matrix_from_dictionary(
+    matching: dict[str, dict[int, int]], g_sizes: list[int]
+) -> np.ndarray:
     """Create the full permutation matrix from the matching result
 
-    :param matching: the matching result for each graph (nodes number, assignment)
-    :param g_sizes: the list of the size of the different graph
+    :param dict[str, dict[int, int]] matching: the matching result for each graph (nodes number, assignment)
+    :param list[int] g_sizes: the list of the size of the different graph
     :return: the full permutation matrix
+    :rtype: np.ndarray
     """
     f_size = int(np.sum(g_sizes))
     res = np.zeros((f_size, f_size))
@@ -33,19 +35,27 @@ def get_permutation_matrix_from_dictionary(matching, g_sizes):
     return res
 
 
-def randomize_nodes_position(graphs):
-    """Randomize the node position inside a graph
+def get_permutation_matrix_from_matching(
+    matching: np.ndarray, sizes: list[int], max_node: int
+) -> np.ndarray:
+    """Create the full permutation matrix from the matching result.
 
-    :param list graphs: a list of graph (networkx format)
-    :return: the list of new graphs and the new index
+    :param np.ndarray matching: the matching result for each graph (nodes number, assignment).
+    :param list[int] sizes: the list of the size of the different graph.
+    :param int max_node: the maximal label for a node.
+    :return: the full permutation matrix.
+    :rtype: np.ndarray
     """
-    res = []
-    new_graphs = []
-    for g in graphs:
-        nb_nodes = nx.number_of_nodes(g)
-        nidx = list(range(nb_nodes))
-        random.shuffle(nidx)
-        n_g = nx.relabel_nodes(g, dict(zip(g.nodes(), nidx)))
-        res.append(nidx)
-        new_graphs.append(n_g)
-    return new_graphs, res
+    f_size = int(np.sum(sizes))
+    res = np.zeros((f_size, max_node))
+
+    idx = 0
+    for idx_g in range(len(sizes)):
+        for i_s in range(sizes[idx_g]):
+            try:
+                res[idx + matching[idx_g, i_s], i_s] = 1
+            except IndexError:
+                res[idx + i_s, i_s] = 0  # Avoid dummy nodes
+        idx += sizes[idx_g]
+
+    return res @ res.T

@@ -149,7 +149,7 @@ def run_graph_generation(args):
     )
 
     truth = pyg.generate_groundtruth(g_sizes, full_size, len(g_sizes), all_index)
-    a_truth = utils.get_permutation_matrix_from_matching(truth, g_sizes, 5000)
+    a_truth = permut.get_permutation_matrix_from_matching(truth, g_sizes, 5000)
 
     x_init = knode * 0.0
     gradient = matching.create_gradient(phi, knode)

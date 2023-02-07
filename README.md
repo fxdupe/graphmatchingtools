@@ -22,11 +22,11 @@ The scope of this work is to offer reproducible research and alternatives.
 - [Sparse Quadratic Optimisation over the Stiefel Manifold with Application to Permutation Synchronisation](https://openreview.net/forum?id=sl_0rQmHxQk)
 - [IRGCL](https://papers.nips.cc/paper/2020/hash/ae06fbdc519bddaa88aa1b24bace4500-Abstract.html)
 
-### Multiway methods (homemade)
+### Multiway method (homemade)
 
 - Kernelized multi-graph matching
 
-### Mean graph method
+### Mean graph methods
 
 - [MMM method based on pairwise matching](https://www.sciencedirect.com/science/article/abs/pii/S003132031630139X)
 - [Wasserstein barycenter using FGW](https://proceedings.mlr.press/v97/titouan19a.html)
