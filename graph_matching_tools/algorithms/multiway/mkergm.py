@@ -71,7 +71,7 @@ def _rank_projector(
     rank: int,
     sizes: list[int],
     method: str,
-    choice: Optional[Callable[[Any], int]] = None,
+    choice: Optional[int] = None,
 ) -> np.ndarray:
     """Generalized rank projector method.
 
@@ -79,7 +79,7 @@ def _rank_projector(
     :param int rank: the size of the universe of nodes.
     :param list[int] sizes: the size of the graphs.
     :param str method: the projection method.
-    :param callable choice: the function for choosing the reference graph (when needed).
+    :param Optional[int] choice: the reference graph (when needed).
     :return: the projection.
     :rtype: np.ndarray
     """
@@ -94,9 +94,9 @@ def _rank_projector(
         res = matcheig.matcheig(x, rank, sizes)
         res = irgcl.irgcl(
             res,
-            irgcl.beta_t,
-            irgcl.alpha_t,
-            irgcl.lambda_t,
+            irgcl._beta_t,
+            irgcl._alpha_t,
+            irgcl._lambda_t,
             rank,
             len(sizes),
             choice=choice,
@@ -116,7 +116,7 @@ def mkergm(
     iterations: int = 100,
     tolerance: float = 1e-2,
     projection_method: str = "matcheig",
-    choice: Optional[Callable[[Any], int]] = None,
+    choice: Optional[int] = None,
 ) -> np.ndarray:
     """Multi-graph matching extension of KerGM.
 
@@ -127,9 +127,34 @@ def mkergm(
     :param float tolerance: the tolerance for convergence.
     :param np.ndarray init: an initialization for the bulk permutation matrix.
     :param str projection_method: select the projection method for the rank constraints.
-    :param Callable[[int], int] choice: a choosing function for the reference graph.
+    :param Optional[int] choice: a choosing function for the reference graph.
     :return: the bulk permutation matrix.
     :rtype: np.ndarray
+
+    Here an example using NetworkX and some utils:
+
+    .. doctest:
+
+    >>> node_kernel = kern.create_gaussian_node_kernel(10.0, "weight")
+    >>> vectors, offsets = rff.create_random_vectors(1, 100, 1.0)
+    >>> phi1 = rff.compute_phi(graphs[0], "weight", vectors, offsets)
+    >>> phi2 = rff.compute_phi(graphs[1], "weight", vectors, offsets)
+    >>> phi3 = rff.compute_phi(graphs[2], "weight", vectors, offsets)
+    >>> phi = np.zeros((100, 7, 7))
+    >>> phi[:, 0:2, 0:2] = phi1
+    >>> phi[:, 2:4, 2:4] = phi2
+    >>> phi[:, 4:7, 4:7] = phi3
+    >>> knode = utils.create_full_node_affinity_matrix(graphs, node_kernel)
+    >>> gradient = mkergm.create_gradient(phi, knode)
+    >>> res = mkergm.mkergm(gradient, [2, 2, 3], 3, iterations=100, init=knode, choice = 2)
+    >>> res
+    array([[1., 0., 0., 1., 0., 1., 0.],
+           [0., 1., 1., 0., 0., 0., 1.],
+           [0., 1., 1., 0., 0., 0., 1.],
+           [1., 0., 0., 1., 0., 1., 0.],
+           [0., 0., 0., 0., 1., 0., 0.],
+           [1., 0., 0., 1., 0., 1., 0.],
+           [0., 1., 1., 0., 0., 0., 1.]])
     """
     x = init
     x_old = init

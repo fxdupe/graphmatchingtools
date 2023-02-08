@@ -1,4 +1,4 @@
-"""This module contains the quick algorithms for computing an approximation the multigraph matching
+"""This module contains the quick algorithms for computing an approximation the multigraph matching.
 
 Code from paper,
 [1] Tron, R., Zhou, X., Esteves, C., & Daniilidis, K. (2017). Fast multi-image matching via density-based clustering.
@@ -12,14 +12,17 @@ import networkx as nx
 import graph_matching_tools.utils.union as uf
 
 
-def compute_density(graphs, sizes, node_data, rho_den):
-    """Compute the density vector
+def _compute_density(
+    graphs: list[nx.Graph], sizes: list[int], node_data: str, rho_den: float
+) -> np.ndarray:
+    """Compute the density vector.
 
-    :param list graphs: the list of graphs
-    :param list sizes: the sizes of the different graphs
-    :param str node_data: the name of the data vector
-    :param float rho_den: the density parameter (on the variance of the data)
-    :return: the density vector
+    :param list[nx.Graph] graphs: the list of graphs.
+    :param list[int] sizes: the sizes of the different graphs.
+    :param str node_data: the name of the data vector.
+    :param float rho_den: the density parameter (on the variance of the data).
+    :return: the density vector.
+    :rtype: np.ndarray
     """
     full_sizes = np.sum(sizes)
     densities = np.zeros((full_sizes,))
@@ -65,14 +68,17 @@ def compute_density(graphs, sizes, node_data, rho_den):
     return densities
 
 
-def compute_parents(graphs, sizes, node_data, densities):
-    """Compute the parent vector with the distances
+def _compute_parents(
+    graphs: list[nx.Graph], sizes: list[int], node_data: str, densities: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
+    """Compute the parent vector with the distances.
 
-    :param list graphs: the list of graphs
-    :param list sizes: the sizes of the graphs
-    :param str node_data: the name of the node data
-    :param np.ndarray densities: the density vector
-    :return: the parent vector with the associated distances
+    :param list graphs: the list of graphs.
+    :param list sizes: the sizes of the graphs.
+    :param str node_data: the name of the node data.
+    :param np.ndarray densities: the density vector.
+    :return: the parent vector with the associated distances.
+    :rtype: tuple[np.ndarray, np.ndarray]
     """
     full_size = np.sum(sizes)
     parents = np.zeros((full_size,), dtype="i")
@@ -104,14 +110,31 @@ def compute_parents(graphs, sizes, node_data, densities):
     return parents, distances
 
 
-def quickmatch(graphs, node_data, rho_den, rho_edge):
-    """The QuickMatch method for graph matching
+def quickmatch(
+    graphs: list[nx.Graph], node_data: str, rho_den: float, rho_edge: float
+) -> np.ndarray:
+    """The QuickMatch method for graph matching.
 
-    :param list graphs: the list of graphs
-    :param str node_data: the name of the node data vector
-    :param float rho_den: the density parameter
-    :param float rho_edge: the edge merging hyperparameter
-    :return: a node universe for all the graphs
+    :param list[nx.Graph] graphs: the list of graphs.
+    :param str node_data: the name of the node data vector.
+    :param float rho_den: the density parameter.
+    :param float rho_edge: the edge merging hyperparameter.
+    :return: a node universe for all the graphs.
+    :rtype: np.ndarray
+
+    Here an example using NetworkX and some utils:
+
+    .. doctest:
+
+    >>> u = quickmatch.quickmatch(graphs, "weight", 0.25, 0.9)
+    >>> u
+    array([[1., 0., 0.],
+           [0., 1., 0.],
+           [0., 1., 0.],
+           [1., 0., 0.],
+           [0., 0., 1.],
+           [1., 0., 0.],
+           [0., 1., 0.]])
     """
     sizes = []
     for g in graphs:
@@ -126,8 +149,8 @@ def quickmatch(graphs, node_data, rho_den, rho_edge):
             graph_index[index + i, 1] = i
         index += nx.number_of_nodes(graphs[g])
 
-    densities = compute_density(graphs, sizes, node_data, rho_den)
-    parents, distances = compute_parents(graphs, sizes, node_data, densities)
+    densities = _compute_density(graphs, sizes, node_data, rho_den)
+    parents, distances = _compute_parents(graphs, sizes, node_data, densities)
     min_distances = np.zeros((full_size,)) + 1e90
     s_index = np.argsort(distances)
 

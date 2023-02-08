@@ -6,7 +6,6 @@ import networkx as nx
 import graph_matching_tools.algorithms.multiway.mkergm as mkergm
 import graph_matching_tools.algorithms.kernels.gaussian as kern
 import graph_matching_tools.algorithms.kernels.rff as rff
-import graph_matching_tools.utils.utils as utils
 import graph_matching_tools.algorithms.kernels.utils as ku
 
 
@@ -57,9 +56,7 @@ class TestMultiwayKerGM(unittest.TestCase):
         knode = ku.create_full_node_affinity_matrix(graphs, node_kernel)
         gradient = mkergm.create_gradient(phi, knode)
 
-        res = mkergm.mkergm(
-            gradient, sizes, 3, iterations=100, init=knode, choice=lambda x: 2
-        )
+        res = mkergm.mkergm(gradient, sizes, 3, iterations=100, init=knode, choice=2)
 
         truth = [
             [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0],
@@ -79,7 +76,7 @@ class TestMultiwayKerGM(unittest.TestCase):
             3,
             iterations=100,
             init=knode,
-            choice=lambda x: 2,
+            choice=2,
             projection_method="msync",
         )
         self.assertEqual(np.linalg.norm(res - truth) < 1e-3, True)
@@ -90,7 +87,7 @@ class TestMultiwayKerGM(unittest.TestCase):
             3,
             iterations=100,
             init=knode,
-            choice=lambda x: 2,
+            choice=2,
             projection_method="gpow",
         )
         self.assertEqual(np.linalg.norm(res - truth) < 1e-3, True)

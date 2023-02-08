@@ -73,7 +73,7 @@ def create_random_graph_method(
                 )
 
     if shuffle:
-        e_graphs, e_index = permut.randomize_nodes_position(graphs[1:])
+        e_graphs, e_index = utils.randomize_nodes_position(graphs[1:])
         graphs = [
             graphs[0],
         ] + e_graphs

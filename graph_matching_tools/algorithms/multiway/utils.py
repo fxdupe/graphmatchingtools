@@ -1,23 +1,28 @@
 """
-Utility functions for the multiway matching
+Utility functions for the multiway matching.
+
+.. moduleauthor:: François-Xavier Dupé
 """
+from typing import Optional
+
 import numpy as np
 import scipy.optimize as sco
 
 
-def permutation_projector(v, sizes, choice):
-    """Projections over a set of permutation for each graph (with a reference graph)
+def permutation_projector(v: np.ndarray, sizes: list[int], choice: int) -> np.ndarray:
+    """Projections over a set of permutation for each graph (with a reference graph).
 
-    :param np.ndarray v: the current approximation matrix
-    :param list[int] sizes: the sizes of the different graphs
-    :param callable choice: the choosing function for the reference graph
-    :return: the projected version of v
+    :param np.ndarray v: the current approximation matrix.
+    :param list[int] sizes: the sizes of the different graphs.
+    :param int choice: the reference graph.
+    :return: the projected version of v.
+    :rtype: np.ndarray
     """
     u = np.zeros(v.shape)
     index = 0
 
     # Take one graph as reference
-    i_max = choice(range(len(sizes)))
+    i_max = choice
     i_begin = int(np.sum(sizes[0:i_max]))
     ref = v[i_begin : i_begin + sizes[i_max], :]
 
@@ -30,12 +35,13 @@ def permutation_projector(v, sizes, choice):
     return u
 
 
-def u_projector(v, sizes):
-    """Projections over a set of permutation for each graph (without any reference graph)
+def u_projector(v: np.ndarray, sizes: list[int]) -> np.ndarray:
+    """Projections over a set of permutation for each graph (without any reference graph).
 
-    :param v: the current approximation matrix
-    :param sizes: the sizes of the different graphs
-    :return: the projected version of v
+    :param np.ndarray v: the current approximation matrix.
+    :param list[int] sizes: the sizes of the different graphs.
+    :return: the projected version of v.
+    :rtype: np.ndarray
     """
     u = np.zeros(v.shape)
     index = 0

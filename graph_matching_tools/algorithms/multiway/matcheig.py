@@ -7,14 +7,14 @@ import numpy as np
 import scipy.optimize as sco
 
 
-def matcheig(x, rank, sizes):
+def matcheig(x: np.ndarray, rank: int, sizes: list[int]) -> np.ndarray:
     """Spectral way of building the permutation matrix with a given rank.
 
-    :param numpy.ndarray x: the input affinity matrix.
+    :param np.ndarray x: the input affinity matrix.
     :param int rank: the dimension of the universe of nodes.
     :param list[int] sizes: the size of the different graphs.
     :return: the bulk permutation matrix.
-    :rtype: numpy.ndarray
+    :rtype: np.ndarray
 
     Here an example using NetworkX and some utils:
 

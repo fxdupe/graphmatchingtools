@@ -4,17 +4,26 @@ Direct multigraph version of KerGM
 .. moduleauthor:: François-Xavier Dupé
 """
 import numpy as np
+import networkx as nx
 
 import graph_matching_tools.algorithms.kernels.rff as rffo
 import graph_matching_tools.algorithms.pairwise.kergm as kergm
 
 
 def multi_pairwise_kergm(
-    graphs, sizes, knode, name_data_edge, gamma, entropy, nb_alphas, iterations, rff=100
-):
+    graphs: list[nx.Graph],
+    sizes: list[int],
+    knode: np.ndarray,
+    name_data_edge: str,
+    gamma: float,
+    entropy: float,
+    nb_alphas: int,
+    iterations: int,
+    rff: int = 100,
+) -> np.ndarray:
     """Direct pairwise matching on a set of graphs using KerGM.
 
-    :param list graphs: the list of graph to match.
+    :param list[nx.Graph] graphs: the list of graph to match.
     :param list sizes: the sizes of the different graph.
     :param np.ndarray knode: the full node affinity matrix.
     :param str name_data_edge: the name of the data vector on edges.
@@ -24,6 +33,23 @@ def multi_pairwise_kergm(
     :param int iterations: the maximal number of iterations for each alpha.
     :param int rff: the size of the random Fourier features.
     :return: the full permutation matrix.
+    :rtype: np.ndarray
+
+    Here an example using NetworkX and some utils:
+
+    .. doctest:
+
+    >>> node_kernel = kern.create_gaussian_node_kernel(10.0, "weight")
+    >>> knode = utils.create_full_node_affinity_matrix(graphs, node_kernel)
+    >>> res = kergm.multi_pairwise_kergm(graphs, [2, 2, 3], knode, "weight", 1.0, 2.0, 10, 100, rff=100)
+    >>> res
+    array([[1., 0., 0., 1., 0., 1., 0.],
+           [0., 1., 1., 0., 0., 0., 1.],
+           [0., 1., 1., 0., 0., 0., 1.],
+           [1., 0., 0., 1., 0., 1., 0.],
+           [0., 0., 0., 0., 1., 0., 0.],
+           [1., 0., 0., 1., 0., 1., 0.],
+           [0., 1., 1., 0., 0., 0., 1.]])
     """
     vectors, offsets = rffo.create_random_vectors(1, rff, gamma)
 

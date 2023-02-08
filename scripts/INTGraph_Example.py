@@ -13,6 +13,7 @@ import graph_matching_tools.algorithms.multiway.hippi as hippi
 import graph_matching_tools.algorithms.multiway.matcheig as matcheig
 import graph_matching_tools.algorithms.multiway.mkergm as mkergm
 import graph_matching_tools.algorithms.multiway.stiefel as stiefel
+import graph_matching_tools.algorithms.multiway.irgcl as irgcl
 import graph_matching_tools.utils.utils as utils
 import graph_matching_tools.utils.permutations as permutations
 import graph_matching_tools.algorithms.kernels.gaussian as gaussian
@@ -98,7 +99,7 @@ if __name__ == "__main__":
         help="The multi-graph matching method",
         default="new",
         type=str,
-        choices=["mkergm", "hippi", "matcheig", "sqad"],
+        choices=["mkergm", "hippi", "matcheig", "sqad", "irgcl"],
     )
     parser.add_argument(
         "--add_dummy", help="Add dummy nodes", action="store_true", default=False
@@ -135,6 +136,17 @@ if __name__ == "__main__":
     elif args.method == "sqad":
         u_nodes = stiefel.sparse_stiefel_manifold_sync(knode, args.rank, sizes)
         m_res = u_nodes @ u_nodes.T
+    elif args.method == "irgcl":
+        m_res = matcheig.matcheig(knode, args.rank, sizes)
+        m_res = irgcl.irgcl(
+            m_res,
+            irgcl._beta_t,
+            irgcl._alpha_t,
+            irgcl._lambda_t,
+            args.rank,
+            len(sizes),
+        )
+        m_res = m_res @ m_res.T
     else:
         vectors, offsets = rff.create_random_vectors(1, args.rff, args.gamma)
         full_size = knode.shape[0]

@@ -52,23 +52,31 @@ import graph_matching_tools.algorithms.kernels.gaussian as kern
 import graph_matching_tools.algorithms.kernels.utils as utils
 import graph_matching_tools.algorithms.multiway.gwl as gwl
 import graph_matching_tools.algorithms.mean.wasserstein_barycenter as wb
+import graph_matching_tools.algorithms.kernels.rff as rff
 import graph_matching_tools.algorithms.multiway.matcheig as matcheig
+import graph_matching_tools.algorithms.multiway.msync as msync
 import graph_matching_tools.algorithms.multiway.hippi as hippi
+import graph_matching_tools.algorithms.multiway.irgcl as irgcl
+import graph_matching_tools.algorithms.multiway.kergm as kergm
+import graph_matching_tools.algorithms.multiway.kmeans as kmeans
+import graph_matching_tools.algorithms.multiway.mkergm as mkergm
+import graph_matching_tools.algorithms.multiway.quickmatch as quickmatch
+import graph_matching_tools.algorithms.multiway.stiefel as stiefel
 
 
 graph1 = nx.Graph()
 graph1.add_node(0, weight=2.0)
 graph1.add_node(1, weight=5.0)
-graph1.add_edge(0, 1)
+graph1.add_edge(0, 1, weight=np.array([1.0,]))
 graph2 = nx.Graph()
 graph2.add_node(0, weight=5.0)
 graph2.add_node(1, weight=2.0)
-graph2.add_edge(0, 1)
+graph2.add_edge(0, 1, weight=np.array([1.0,]))
 graph3 = nx.Graph()
 graph3.add_node(0, weight=3.0)
 graph3.add_node(1, weight=2.0)
 graph3.add_node(2, weight=5.0)
-graph3.add_edge(1, 2)
+graph3.add_edge(1, 2, weight=np.array([1.0,]))
 
 graphs = [graph1, graph2, graph3]
 """

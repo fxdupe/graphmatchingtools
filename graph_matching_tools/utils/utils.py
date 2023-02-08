@@ -49,7 +49,9 @@ def create_full_adjacency_matrix(graphs: list[nx.Graph]) -> np.ndarray:
     return a
 
 
-def create_full_weight_matrix(graphs: list[nx.Graph], edge_data: str, sigma: float = 1.0) -> np.ndarray:
+def create_full_weight_matrix(
+    graphs: list[nx.Graph], edge_data: str, sigma: float = 1.0
+) -> np.ndarray:
     """Create the full weighted matrix with the matrices on the diagonal using Gaussian weights.
 
     :param list[nx.Graph] graphs: the list of graphs.

@@ -267,7 +267,7 @@ if __name__ == "__main__":
         )
         m_res = u_nodes @ u_nodes.T
     elif args.method == "msync":
-        u_nodes = msync.msync(knode, g_sizes, args.rank, lambda x: args.reference_graph)
+        u_nodes = msync.msync(knode, g_sizes, args.rank, args.reference_graph)
         m_res = u_nodes @ u_nodes.T
     elif args.method == "matcheig":
         m_res = matcheig.matcheig(knode, args.rank, g_sizes)
@@ -321,7 +321,7 @@ if __name__ == "__main__":
             init=x_init,
             tolerance=args.tolerance,
             projection_method=args.proj_method,
-            choice=lambda x: args.reference_graph,
+            choice=args.reference_graph,
         )
 
     # Compare with groundtruth
@@ -332,12 +332,12 @@ if __name__ == "__main__":
         if args.robust_method == "irgcl":
             p = irgcl.irgcl(
                 m_res,
-                irgcl.beta_t,
-                irgcl.alpha_t,
-                irgcl.lambda_t,
+                irgcl._beta_t,
+                irgcl._alpha_t,
+                irgcl._lambda_t,
                 args.rank,
                 len(all_graphs),
-                choice=lambda x: args.reference_graph,
+                choice=args.reference_graph,
             )
         else:
             p = stiefel.sparse_stiefel_manifold_sync(m_res, args.rank, g_sizes)

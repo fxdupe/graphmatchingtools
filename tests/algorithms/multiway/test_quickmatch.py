@@ -28,7 +28,7 @@ class TestQuickMatch(TestCase):
 
         graphs = [graph1, graph2, graph3]
 
-        densities = qm.compute_density(graphs, [2, 2, 3], "weight", 0.7)
+        densities = qm._compute_density(graphs, [2, 2, 3], "weight", 0.7)
         truth = np.array(
             [
                 11.2075169,
@@ -61,8 +61,8 @@ class TestQuickMatch(TestCase):
 
         graphs = [graph1, graph2, graph3]
 
-        densities = qm.compute_density(graphs, [2, 2, 3], "weight", 0.7)
-        p, d = qm.compute_parents(graphs, [2, 2, 3], "weight", densities)
+        densities = qm._compute_density(graphs, [2, 2, 3], "weight", 0.7)
+        p, d = qm._compute_parents(graphs, [2, 2, 3], "weight", densities)
 
         p_truth = np.array([6, 4, 4, 6, 2, 2, 3])
         d_truth = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 10.0, 0.0])

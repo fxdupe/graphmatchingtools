@@ -20,6 +20,7 @@ setup(
         "scripts/KMeans_Example.py",
         "scripts/PyTorchGeo_Example.py",
         "scripts/RandomGraphMatching.py",
+        "scripts/INTGraph_Example.py",
     ],
     packages=find_packages(where=".", exclude=("tests*",)),
     install_requires=[
