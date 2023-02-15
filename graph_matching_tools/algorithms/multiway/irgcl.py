@@ -112,7 +112,7 @@ def irgcl(
     lbd: Callable[[int], float],
     node_number: int,
     graph_number: int,
-    t0: int = 8,
+    t0: int = 5,
     t_max: int = 100,
     choice: Optional[int] = None,
 ) -> np.ndarray:

@@ -2,17 +2,24 @@
 
 .. moduleauthor:: François-Xavier Dupé
 """
+from typing import Callable
+
 import numpy as np
 import networkx as nx
 
 
-def compute_knode(graph1, graph2, kernel):
-    """Compute the affinity matrix between the nodes
+def compute_knode(
+    graph1: nx.Graph,
+    graph2: nx.Graph,
+    kernel: Callable[[nx.Graph, int, nx.Graph, int], float],
+) -> np.ndarray:
+    """Compute the affinity matrix between the nodes.
 
-    :param nx.classes.graph.Graph graph1: the first graph
-    :param nx.classes.graph.Graph graph2: the second graph
-    :param callable kernel: the kernel between nodes
-    :return: the affinity matrix between the nodes
+    :param nx.Graph graph1: the first graph.
+    :param nx.Graph graph2: the second graph.
+    :param Callable[[nx.Graph, int, nx.Graph, int], float] kernel: the kernel between nodes.
+    :return: the affinity matrix between the nodes.
+    :rtype: np.ndarray
     """
     knode = np.zeros((nx.number_of_nodes(graph1), nx.number_of_nodes(graph2)))
     for n1 in graph1:
@@ -21,12 +28,15 @@ def compute_knode(graph1, graph2, kernel):
     return knode
 
 
-def create_full_node_affinity_matrix(graphs, kernel):
-    """Compute the full pairwise matrix from graphs
+def create_full_node_affinity_matrix(
+    graphs: list[nx.Graph], kernel: Callable[[nx.Graph, int, nx.Graph, int], float]
+) -> np.ndarray:
+    """Compute the full pairwise matrix from graphs.
 
-    :param list graphs: the list of graphs (in networkx format)
-    :param callable kernel: the kernel between the node
-    :return: a tuple with the full matrix and the sizes of the different graphs
+    :param list[nx.Graph] graphs: the list of graphs (in networkx format).
+    :param Callable[[nx.Graph, int, nx.Graph, int], float] kernel: the kernel between the node.
+    :return: the full matrix.
+    :rtype: np.ndarray
     """
     full_size = 0
     for graph in graphs:

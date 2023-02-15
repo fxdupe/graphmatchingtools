@@ -5,13 +5,20 @@ This code is from the paper
 
 .. moduleauthor:: François-Xavier Dupé
 """
+from typing import Optional
+
 import numpy as np
 
 import graph_matching_tools.algorithms.multiway.utils as utils
 
 
 def sparse_stiefel_manifold_sync(
-    x: np.ndarray, rank: int, sizes: list[int], iterations: int = 100, power: int = 3
+    x: np.ndarray,
+    rank: int,
+    sizes: list[int],
+    iterations: int = 100,
+    power: int = 3,
+    random_seed: Optional[int] = None,
 ) -> np.ndarray:
     """Sparse quadratic optimization over the Stiefel manifold for permutation synchronization.
 
@@ -20,6 +27,7 @@ def sparse_stiefel_manifold_sync(
     :param list[int] sizes: the size of the different graphs.
     :param int iterations: the maximal number of iterations.
     :param int power: the sparsity constraints (see paper).
+    :param Optional[int] random_seed: the seed for the random generator.
     :return: the universe of nodes.
     :rtype: np.ndarray
 
@@ -32,14 +40,15 @@ def sparse_stiefel_manifold_sync(
     >>> x_base[0, 3] = 1
     >>> x_base[2, 1] = 1
     >>> x_base[1, 2] = 1
-    >>> p = stiefel.sparse_stiefel_manifold_sync(x_base, 3, [2, 2, 3])
+    >>> p = stiefel.sparse_stiefel_manifold_sync(x_base, 2, [2, 2, 3], random_seed=1)
     >>> p
-    array([[0., 1., 0.],
-           [1., 0., 0.],
-           [1., 0., 0.],
-           [0., 1., 0.]])
+    array([[0., 1.],
+           [1., 0.],
+           [1., 0.],
+           [0., 1.]])
     """
-    u = np.random.normal(0, 1, size=(x.shape[0], rank))
+    rng = np.random.default_rng(seed=random_seed)
+    u = rng.normal(loc=0, scale=1, size=(x.shape[0], rank))
 
     for i in range(iterations):
         tmp1 = u.T @ (u ** (power - 1))

@@ -21,6 +21,7 @@ def multi_pairwise_gwl(
     embed_step: float,
     use_cross_cost: bool = False,
     cross_costs: Optional[dict[str, np.ndarray]] = None,
+    random_seed: Optional[int] = None,
 ) -> np.ndarray:
     """Multi-graph version of GWL using only pairwise matching.
 
@@ -35,6 +36,7 @@ def multi_pairwise_gwl(
     :param float embed_step: the descent step for embedding update (gradient descent).
     :param bool use_cross_cost: use the cross cost matrices.
     :param Optional[dict[str, np.ndarray]] cross_costs: the dictionary with the cross cost matrices.
+    :param Optional[int] random_seed: the seed for the random generator.
     :return: the full permutation matrix.
     :rtype: np.ndarray
 
@@ -44,14 +46,14 @@ def multi_pairwise_gwl(
 
     >>> node_kernel = kern.create_gaussian_node_kernel(1.0, "weight")
     >>> mus = [wb._get_degree_distributions(g) for g in graphs]
-    >>> costs = [(1.0 - utils.compute_knode(g, g, node_kernel) * nx.to_numpy_array(g, weight=None)) for g in graphs]
+    >>> costs = [(1.0 - utils.compute_knode(g, g, node_kernel)) for g in graphs]
     >>> cross_costs = dict()
     >>> for i_s in range(len(graphs)):
     ...     for i_t in range(i_s + 1, len(graphs)):
     ...         cost_st = 1.0 - utils.compute_knode(graphs[i_s], graphs[i_t], node_kernel)
     ...         cross_costs["{},{}".format(i_s, i_t)] = cost_st
-    >>> res = gwl.multi_pairwise_gwl(costs, mus, 1.0, 2.0, 5, 20, 20, 2, 0.1,
-    ...     use_cross_cost=True, cross_costs=cross_costs)
+    >>> res = gwl.multi_pairwise_gwl(costs, mus, 1.0, 1.0, 3, 20, 20, 20, 0.01,
+    ...     use_cross_cost=True, cross_costs=cross_costs, random_seed=1)
     >>> res
     array([[1., 0., 0., 1., 0., 1., 0.],
            [0., 1., 1., 0., 0., 0., 1.],
@@ -73,7 +75,7 @@ def multi_pairwise_gwl(
             if use_cross_cost:
                 cost_st = cross_costs["{},{}".format(g_s, g_t)]
 
-            matchs = gwl.gromov_wasserstein_learning(
+            t_m, _, _ = gwl.gromov_wasserstein_learning(
                 costs[g_s],
                 costs[g_t],
                 mus[g_s],
@@ -85,9 +87,15 @@ def multi_pairwise_gwl(
                 inner_iterations,
                 embed_iterations,
                 embed_step,
+                random_seed=random_seed,
                 cost_st=cost_st,
                 use_cross_cost=use_cross_cost,
             )
+
+            matchs = np.zeros((costs[g_s].shape[0],)) - 1.0
+            for i in range(t_m.shape[0]):
+                matchs[i] = np.argmax(t_m[i, :])
+
             for i in range(matchs.shape[0]):
                 if matchs[i] > -1:
                     full_perm[index_s + i, index_t + int(matchs[i])] = 1

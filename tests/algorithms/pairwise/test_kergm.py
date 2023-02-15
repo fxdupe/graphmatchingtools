@@ -14,7 +14,7 @@ class TestKerGM(TestCase):
         knode = np.identity(2)
         x = np.identity(2)
         gradient = kergm.create_fast_gradient(phi1, phi1, knode)
-        grad = gradient(x, alpha=0.1)
+        grad = gradient(x, 0.1)
         true_res = np.array([[-2.2, 0], [0, -2.2]])
         self.assertTrue(
             np.linalg.norm(grad - true_res) < 1e-5, "Testing gradient computation"
@@ -32,7 +32,7 @@ class TestKerGM(TestCase):
             return 3
 
         gradient = kergm.create_gradient(graph1, graph1, kernel, knode)
-        grad = gradient(x, alpha=0.1)
+        grad = gradient(x, 0.1)
         true_res = np.array([[-2.2, 0], [0, -2.2]])
         self.assertTrue(
             np.linalg.norm(grad - true_res) < 1e-5, "Testing gradient computation"
@@ -45,7 +45,7 @@ class TestKerGM(TestCase):
         gradient = kergm.create_fast_gradient(phi1, phi2, knode)
         r, c = kergm.kergm_method(
             gradient,
-            2,
+            (2, 2),
             num_alpha=10,
             entropy_gamma=50.0,
             iterations=4,
@@ -75,7 +75,7 @@ class TestKerGM(TestCase):
 
         r, c = kergm.kergm_method(
             gradient,
-            3,
+            (3, 3),
             num_alpha=20,
             entropy_gamma=50.0,
             iterations=1000,

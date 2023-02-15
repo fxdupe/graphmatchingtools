@@ -13,15 +13,17 @@ import numpy as np
 import graph_matching_tools.algorithms.pairwise.kergm as kergm
 
 
-def _compute_c_constant(cost_s, cost_t, mu_s, mu_t):
-    """
-    Compute the constant matrix that appear in the loss function
+def _compute_c_constant(
+    cost_s: np.ndarray, cost_t: np.ndarray, mu_s: np.ndarray, mu_t: np.ndarray
+) -> np.ndarray:
+    """Compute the constant matrix that appear in the loss function.
 
-    :param cost_s: the cost matrix of the source graph.
-    :param cost_t: the cost matrix of the target graph.
-    :param mu_s: the starting probabilities of the source nodes.
-    :param mu_t: the starting probabilities of the target nodes.
+    :param np.ndarray cost_s: the cost matrix of the source graph.
+    :param np.ndarray cost_t: the cost matrix of the target graph.
+    :param np.ndarray mu_s: the starting probabilities of the source nodes.
+    :param np.ndarray mu_t: the starting probabilities of the target nodes.
     :return: the constant matrix.
+    :rtype: np.ndarray
     """
     const = (cost_s**2) @ mu_s @ np.ones((1, cost_t.shape[0]))
     const += np.ones((cost_s.shape[0], 1)) @ mu_t.T @ (cost_t**2).T
@@ -29,19 +31,25 @@ def _compute_c_constant(cost_s, cost_t, mu_s, mu_t):
 
 
 def _line_search_l2_loss(
-    c_const, distances, cost_s, cost_t, transport, new_transport, alpha
-):
-    """
-    Line search computation for step size.
+    c_const: np.ndarray,
+    distances: np.ndarray,
+    cost_s: np.ndarray,
+    cost_t: np.ndarray,
+    transport: np.ndarray,
+    new_transport: np.ndarray,
+    alpha: float,
+) -> float:
+    """Line search computation for step size.
 
-    :param c_const: the constant matrix for loss computation.
-    :param distances: the matrix of distances between the node features of the two graphs.
-    :param cost_s: the cost matrix of the source graph.
-    :param cost_t: the cost matrix of the target graph.
-    :param transport: the current transportation map.
-    :param new_transport: the new estimated transportation map.
-    :param alpha: the equilibrium between cost and distances.
+    :param np.ndarray c_const: the constant matrix for loss computation.
+    :param np.ndarray distances: the matrix of distances between the node features of the two graphs.
+    :param np.ndarray cost_s: the cost matrix of the source graph.
+    :param np.ndarray cost_t: the cost matrix of the target graph.
+    :param np.ndarray transport: the current transportation map.
+    :param np.ndarray new_transport: the new estimated transportation map.
+    :param float alpha: the equilibrium between cost and distances.
     :return: the new step size.
+    :rtype: float
     """
     a = -2.0 * alpha * np.trace(new_transport.T @ cost_s @ new_transport @ cost_t)
 
@@ -49,7 +57,7 @@ def _line_search_l2_loss(
     b -= 2.0 * alpha * np.trace(transport.T @ cost_s @ new_transport @ cost_t)
     b += np.trace(new_transport.T @ cost_s @ transport @ cost_t)
 
-    # The following line is present in the paper but not used
+    # The following line is present in the paper but not used in formula
     # c = np.trace(transport.T @ ((1.0 - alpha) * (distances ** 2.0) + alpha *
     #                             (c_const - cost_s @ transport @ (2.0 * cost_t).T)))
 
@@ -64,29 +72,44 @@ def _line_search_l2_loss(
 
 
 def fgw_direct_matching(
-    cost_s,
-    cost_t,
-    mu_s,
-    mu_t,
-    distances,
-    alpha,
-    iterations,
-    gamma=1.0,
-    inner_iterations=1000,
-):
-    """
-    Fused Gromov-Wasserstein method for graph matching using optimal transport.
+    cost_s: np.ndarray,
+    cost_t: np.ndarray,
+    mu_s: np.ndarray,
+    mu_t: np.ndarray,
+    distances: np.ndarray,
+    alpha: float,
+    iterations: int,
+    gamma: float = 1.0,
+    inner_iterations: int = 1000,
+) -> np.ndarray:
+    """Fused Gromov-Wasserstein method for graph matching using optimal transport.
 
-    :param cost_s: the cost matrix of the source graph.
-    :param cost_t: the cost matrix of the target graph.
-    :param mu_s: the starting probabilities of the source nodes.
-    :param mu_t: the starting probabilities of the target nodes.
-    :param distances: the matrix of distances between the node features of the two graphs.
-    :param alpha: the equilibrium between cost and distances.
-    :param iterations: the number of iterations for convergence.
-    :param gamma: the strength of the regularization for the OT solver.
-    :param inner_iterations: the number of inner iterations for Sinkhorn-Knopp.
+    :param np.ndarray cost_s: the cost matrix of the source graph.
+    :param np.ndarray cost_t: the cost matrix of the target graph.
+    :param np.ndarray mu_s: the starting probabilities of the source nodes.
+    :param np.ndarray mu_t: the starting probabilities of the target nodes.
+    :param np.ndarray distances: the matrix of distances between the node features of the two graphs.
+    :param float alpha: the equilibrium between cost and distances.
+    :param int iterations: the number of iterations for convergence.
+    :param float gamma: the strength of the regularization for the OT solver.
+    :param int inner_iterations: the number of inner iterations for Sinkhorn-Knopp.
     :return: the transport map.
+    :rtype: np.ndarray
+
+    Here an example using NetworkX and some utils:
+
+    .. doctest:
+
+    >>> node_kernel = kern.create_gaussian_node_kernel(1.0, "weight")
+    >>> cost_s = 1.0 - utils.create_full_node_affinity_matrix([graph1, ], node_kernel)
+    >>> cost_t = 1.0 - utils.create_full_node_affinity_matrix([graph2, ], node_kernel)
+    >>> mu_s = np.ones((nx.number_of_nodes(graph1), )) / nx.number_of_nodes(graph1)
+    >>> mu_t = np.ones((nx.number_of_nodes(graph2), )) / nx.number_of_nodes(graph2)
+    >>> distance = 1.0 - utils.compute_knode(graph1, graph2, node_kernel)
+    >>> transport = fgw_pairwise.fgw_direct_matching(cost_s, cost_t, mu_s, mu_t, distance, 2.0, 10, gamma=0.1)
+    >>> transport
+    array([[5.00000000e-01, 2.91087589e-22],
+           [2.91087589e-22, 5.00000000e-01]])
     """
     # Ensure that we are using vectors
     mu_s = mu_s.reshape((-1, 1))

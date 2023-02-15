@@ -8,6 +8,8 @@ Note: this using the L2 loss (i.e. q=2)
 
 .. moduleauthor:: François-Xavier Dupé
 """
+from typing import Optional
+
 import numpy as np
 import networkx as nx
 
@@ -16,11 +18,12 @@ import graph_matching_tools.algorithms.kernels.gaussian as kern
 import graph_matching_tools.algorithms.kernels.utils as ku
 
 
-def _get_degree_distributions(g):
-    """Create probability vector from the weights on the node
+def _get_degree_distributions(g: nx.Graph) -> np.ndarray:
+    """Create probability vector from the weights on the node.
 
-    :param nx.Graph g: the graph
-    :return: the probability vector for each node
+    :param nx.Graph g: the graph.
+    :return: the probability vector for each node.
+    :rtype: np.ndarray
     """
     degrees = nx.degree(g)
     mu = np.array([degrees[i] for i in range(nx.number_of_nodes(g))])
@@ -28,13 +31,16 @@ def _get_degree_distributions(g):
     return mu
 
 
-def _compute_distance_matrix(mean_data, graph, sigma):
+def _compute_distance_matrix(
+    mean_data: np.ndarray, graph: nx.Graph, sigma: float
+) -> np.ndarray:
     """Compute the distance between of the data on the mean graph and another graph.
 
     :param np.ndarray mean_data: the mean data matrix.
     :param nx.Graph graph: a graph (in NetworkX format).
     :param float sigma: the sigma for the Gaussian kernel used for distance between node data.
     :return: the distance matrix.
+    :rtype: np.ndarray
     """
     distances = np.ones((mean_data.shape[1], nx.number_of_nodes(graph)))
     for i in range(distances.shape[0]):
@@ -44,19 +50,26 @@ def _compute_distance_matrix(mean_data, graph, sigma):
     return distances
 
 
-def _get_data_matrix(graph):
+def _get_data_matrix(graph: nx.Graph) -> np.ndarray:
     """Retrieve the data matrix for a given graph.
 
     :param nx.Graph graph: the input graph.
     :return: the data matrix.
+    :rtype: np.ndarray
     """
-    data = np.ones((graph.nodes[0]["weight"].shape[0], nx.number_of_nodes(graph)))
+    try:
+        data_dim = graph.nodes[0]["weight"].shape[0]
+    except AttributeError:
+        data_dim = 1
+    data = np.ones((data_dim, nx.number_of_nodes(graph)))
     for n in range(data.shape[1]):
         data[:, n] = np.array(graph.nodes[n]["weight"])
     return data
 
 
-def get_adjacency_matrix_from_costs_with_valuation(cost, threshold):
+def get_adjacency_matrix_from_costs_with_valuation(
+    cost: np.ndarray, threshold: float
+) -> tuple[np.ndarray, float]:
     """Compute the adjacency matrix from a cost matrix with a given threshold and compute a quality value.
     The value is computed as the norm of the difference between the cost matrix and the resulting shortest path
     matrix.
@@ -64,6 +77,7 @@ def get_adjacency_matrix_from_costs_with_valuation(cost, threshold):
     :param np.ndarray cost: the cost matrix.
     :param float threshold: the threshold (only value lower than it create edges).
     :return: the adjacency matrix with its valuation.
+    :rtype: tuple[np.ndarray, float]
     """
     adjacency = np.array(cost < threshold, dtype="i")
     adjacency -= np.diag(np.diag(adjacency))
@@ -80,30 +94,68 @@ def get_adjacency_matrix_from_costs_with_valuation(cost, threshold):
 
 
 def fgw_wasserstein_barycenter(
-    graphs,
-    alpha,
-    iterations,
-    fgw_iterations,
-    node_sigma=1.0,
-    weights=None,
-    gamma=1.0,
-    ot_iterations=1000,
-    graph_init=0,
-):
+    graphs: list[nx.Graph],
+    alpha: float,
+    iterations: int,
+    fgw_iterations: int,
+    node_sigma: float = 1.0,
+    weights: Optional[np.ndarray] = None,
+    gamma: float = 1.0,
+    ot_iterations: int = 1000,
+    graph_init: int = 0,
+) -> tuple[np.ndarray, np.ndarray]:
     """Fused Gromov-Wasserstein + Frechet mean for Wasserstein barycenter.
 
     Note: this version assumes vector of data on node only.
+
+    Warning: the graphs must have the same number of nodes.
 
     :param list[nx.Graph] graphs: the list of graphs (in NetworkX format).
     :param float alpha: the equilibrium between the data distance and Wasserstein loss.
     :param int iterations: the number of iterations.
     :param int fgw_iterations: the number of iterations for each matching.
     :param float node_sigma: the sigma for the Gaussian kernel used for distance between node data.
-    :param list | np.ndarray weights: the weight associated to each graph.
+    :param Optional[np.ndarray] weights: the weight associated to each graph.
     :param float gamma: the strength of thr regularization for the OT solver.
     :param int ot_iterations: the maximal number of iteration for the OT solver.
     :param int graph_init: the index of the graph used as initialization (default: 0).
     :return: the cost and data of the barycenter.
+    :rtype: tuple[np.ndarray, np.ndarray]
+
+    Here an example using NetworkX and some utils:
+
+    .. doctest:
+
+    >>> g1 = nx.Graph()
+    >>> g1.add_node(0, weight=np.array((3.0,)))
+    >>> g1.add_node(1, weight=np.array((4.0,)))
+    >>> g1.add_node(2, weight=np.array((1.0,)))
+    >>> g1.add_node(3, weight=np.array((1.0,)))
+    >>> g1.add_edge(0, 1, weight=3.0)
+    >>> g2 = nx.Graph()
+    >>> g2.add_node(0, weight=np.array((5.0,)))
+    >>> g2.add_node(1, weight=np.array((1.0,)))
+    >>> g2.add_node(2, weight=np.array((2.0,)))
+    >>> g2.add_node(3, weight=np.array((1.0,)))
+    >>> g2.add_edge(0, 1, weight=1.0)
+    >>> g2.add_edge(0, 2, weight=4.0)
+    >>> g3 = nx.Graph()
+    >>> g3.add_node(0, weight=np.array((1.0,)))
+    >>> g3.add_node(1, weight=np.array((4.0,)))
+    >>> g3.add_node(2, weight=np.array((2.0,)))
+    >>> g3.add_node(3, weight=np.array((1.0,)))
+    >>> g3.add_edge(0, 1, weight=2.0)
+    >>> g3.add_edge(0, 3, weight=2.0)
+    >>> g3.add_edge(1, 2, weight=3.0)
+    >>> graphs = [g1, g2, g3]
+    >>> mean_cost, mean_data = fgw_barycenter.fgw_wasserstein_barycenter(graphs, 5.0, 10, 30, node_sigma=0.1, gamma=0.1)
+    >>> mean_cost
+    array([[0.40811535, 0.3500874 , 0.24854876, 0.18845473],
+           [0.3500874 , 0.31681839, 0.21378793, 0.14433069],
+           [0.24854876, 0.21378793, 0.15633357, 0.09752863],
+           [0.18845473, 0.14433069, 0.09752863, 0.09992307]])
+    >>> mean_data
+    array([[3.52954563, 2.98772953, 1.00000001, 1.00000001]])
     """
     if weights is None:
         weights = np.ones((len(graphs),)) / len(graphs)

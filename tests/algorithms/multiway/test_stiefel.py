@@ -26,7 +26,7 @@ class TestStiefel(TestCase):
         sizes = [2, 2]
 
         knode = utils.create_full_node_affinity_matrix(graphs, node_kernel)
-        u = stiefel.sparse_stiefel_manifold_sync(knode, 2, sizes)
+        u = stiefel.sparse_stiefel_manifold_sync(knode, 2, sizes, random_seed=1)
         res = u @ u.T
 
         truth = np.array(

@@ -62,21 +62,26 @@ import graph_matching_tools.algorithms.multiway.kmeans as kmeans
 import graph_matching_tools.algorithms.multiway.mkergm as mkergm
 import graph_matching_tools.algorithms.multiway.quickmatch as quickmatch
 import graph_matching_tools.algorithms.multiway.stiefel as stiefel
+import graph_matching_tools.algorithms.mean.wasserstein_barycenter as fgw_barycenter
+import graph_matching_tools.algorithms.mean.mm_mean as mm_mean
+import graph_matching_tools.algorithms.pairwise.fgw as fgw_pairwise
+import graph_matching_tools.algorithms.pairwise.gwl as gwl_pairwise
+import graph_matching_tools.algorithms.pairwise.kergm as kergm_pairwise
 
 
 graph1 = nx.Graph()
-graph1.add_node(0, weight=2.0)
-graph1.add_node(1, weight=5.0)
-graph1.add_edge(0, 1, weight=np.array([1.0,]))
+graph1.add_node(0, weight=np.array([2.0, ]))
+graph1.add_node(1, weight=np.array([5.0, ]))
+graph1.add_edge(0, 1, weight=np.array([1.0, ]))
 graph2 = nx.Graph()
-graph2.add_node(0, weight=5.0)
-graph2.add_node(1, weight=2.0)
-graph2.add_edge(0, 1, weight=np.array([1.0,]))
+graph2.add_node(0, weight=np.array([5.0, ]))
+graph2.add_node(1, weight=np.array([2.0, ]))
+graph2.add_edge(0, 1, weight=np.array([1.0, ]))
 graph3 = nx.Graph()
-graph3.add_node(0, weight=3.0)
-graph3.add_node(1, weight=2.0)
-graph3.add_node(2, weight=5.0)
-graph3.add_edge(1, 2, weight=np.array([1.0,]))
+graph3.add_node(0, weight=np.array([3.0, ]))
+graph3.add_node(1, weight=np.array([2.0, ]))
+graph3.add_node(2, weight=np.array([5.0, ]))
+graph3.add_edge(1, 2, weight=np.array([1.0, ]))
 
 graphs = [graph1, graph2, graph3]
 """

@@ -12,12 +12,17 @@ class GraphDataset:
     Class for a set of graphs
     """
 
-    def __init__(self, path_to_graphs, path_to_groundtruth_ref, suffix=".gpickle"):
+    def __init__(
+        self,
+        path_to_graphs: str,
+        path_to_groundtruth_ref: str,
+        suffix: str = ".gpickle",
+    ) -> None:
         """Constructor
 
-        :param str path_to_graphs: The path ot the directory with all the graphs
-        :param str path_to_groundtruth_ref: The path to the file with the ground truth
-        :param str suffix: the suffix of the graph files
+        :param str path_to_graphs: The path ot the directory with all the graphs.
+        :param str path_to_groundtruth_ref: The path to the file with the ground truth.
+        :param str suffix: the suffix of the graph files.
         """
         g_files = []
         with os.scandir(path_to_graphs) as files:

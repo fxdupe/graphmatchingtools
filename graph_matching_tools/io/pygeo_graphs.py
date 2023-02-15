@@ -1,5 +1,5 @@
 """
-Set of function for Pytorch-Geometrics datasets
+Set of functions for Pytorch-Geometrics datasets
 
 .. moduleauthor:: François-Xavier Dupé
 """
@@ -12,14 +12,18 @@ import torch_geometric.transforms as transforms
 import torch_geometric.utils as tf_utils
 
 
-def generate_groundtruth(graph_sizes, nb_global_nodes, nb_graphs, indexes):
-    """Generate groundtruth for the matching
+def generate_groundtruth(
+    graph_sizes: list[int],
+    nb_global_nodes: int,
+    indexes: list[list[int]],
+) -> np.ndarray:
+    """Generate groundtruth for the matching.
 
-    :param list[int] graph_sizes: the list of the graph sizes
-    :param int nb_global_nodes: the global number of nodes
-    :param int nb_graphs: the number of graphs
-    :param list[list] indexes: the new indexes
-    :return: the correspondence map for each node
+    :param list[int] graph_sizes: the list of the graph sizes.
+    :param int nb_global_nodes: the global number of nodes.
+    :param list[list[int]] indexes: the new indexes.
+    :return: the correspondence map for each node.
+    :rtype: np.ndarray
     """
     res = np.zeros((2, nb_global_nodes), dtype="i")
     res[0, :] = np.arange(nb_global_nodes)
@@ -32,11 +36,12 @@ def generate_groundtruth(graph_sizes, nb_global_nodes, nb_graphs, indexes):
     return res
 
 
-def convert_to_networkx(dataset):
-    """Conversion of the pytorch data to networkx graphs
+def _convert_to_networkx(dataset) -> list[nx.Graph]:
+    """Conversion of the pytorch data to networkx graphs.
 
-    :param dataset: the torch geometric dataset
-    :return: the converted graphs
+    :param dataset: the torch geometric dataset.
+    :return: the converted graphs.
+    :rtype: list[nx.Graph]
     """
     graphs = []
     for idx in range(len(dataset)):
@@ -47,14 +52,17 @@ def convert_to_networkx(dataset):
     return graphs
 
 
-def get_graph_database(name, isotropic, category, repo):
+def get_graph_database(
+    name: str, isotropic: bool, category: str, repo: str
+) -> list[nx.Graph]:
     """Get a given graph dataset
 
-    :param str name: the name of the database to load (PascalVOC, PascalPF or Willow [default])
-    :param bool isotropic: get isotropic graphs
-    :param str category: the category of images
-    :param str repo: the repo for graph (download etc)
-    :return: The graphs of keypoint from the image category
+    :param str name: the name of the database to load (PascalVOC, PascalPF or Willow [default]).
+    :param bool isotropic: get isotropic graphs.
+    :param str category: the category of images.
+    :param str repo: the repo for graph (download etc.).
+    :return: The graphs of keypoint from the image category.
+    :rtype: list[nx.Graph]
     """
     transform = transforms.Compose(
         [
@@ -81,19 +89,19 @@ def get_graph_database(name, isotropic, category, repo):
     else:
         dataset = WILLOWObjectClass(repo, category=category, transform=transform)
 
-    graphs = convert_to_networkx(dataset)
+    graphs = _convert_to_networkx(dataset)
     for idx in range(len(graphs)):
         graphs[idx] = compute_edges_data(graphs[idx])
     return graphs
 
 
-def compute_edges_data(graph, mu=10.0, sigma=60.0):
+def compute_edges_data(graph: nx.Graph, mu: float = 10.0) -> nx.Graph:
     """Compute the distance between the nodes (using Euclidean distance)
 
-    :param graph: the input graph
-    :param float mu: the weights scaling factor (default: 1.0)
-    :param float sigma: the variance of the keypoint distances
-    :return: the new graph with the distance on the edges
+    :param nx.Graph graph: the input graph.
+    :param float mu: the weights scaling factor (default: 1.0).
+    :return: the new graph with the distance on the edges.
+    :rtype: nx.Graph
     """
     distances = np.zeros((nx.number_of_nodes(graph),)) + 10**9
     for u, v in graph.edges:

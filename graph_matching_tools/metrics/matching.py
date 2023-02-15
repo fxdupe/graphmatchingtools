@@ -6,12 +6,15 @@ Score for matching comparison
 import numpy as np
 
 
-def compute_f1score(result, truth):
-    """Compute the F1-score from permutation matrix
+def compute_f1score(
+    result: np.ndarray, truth: np.ndarray
+) -> tuple[float, float, float]:
+    """Compute the F1-score from permutation matrix.
 
-    :param np.ndarray result: the produced bulk permutation matrix
-    :param np.ndarray truth: the ground truth permutation matrix
-    :return: a tuple with the f1-score, the precision and the recall
+    :param np.ndarray result: the produced bulk permutation matrix.
+    :param np.ndarray truth: the ground truth permutation matrix.
+    :return: a tuple with the f1-score, the precision and the recall.
+    :rtype: tuple[float, float, float]
     """
     truth -= np.diag(np.diag(truth))
     result -= np.diag(np.diag(result))

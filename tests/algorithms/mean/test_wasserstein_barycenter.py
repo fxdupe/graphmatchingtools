@@ -74,8 +74,6 @@ class TestWassersteinBarycenter(TestCase):
         mean_cost, mean_data = mean.fgw_wasserstein_barycenter(
             graphs, 0.5, 10, 30, 1.0, gamma=0.01
         )
-        print(mean_cost)
-        print(mean_data)
 
         truth_cost = np.array(
             [

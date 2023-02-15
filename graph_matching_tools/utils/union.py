@@ -7,23 +7,25 @@
 import numpy as np
 
 
-def create_set(numbers_of_elements):
-    """Create a default parents matrix for the union-find method
+def create_set(numbers_of_elements: int) -> np.ndarray:
+    """Create a default parents matrix for the union-find method.
 
-    :param numbers_of_elements: the number of elements
-    :return: the default parent matrix
+    :param numbers_of_elements: the number of elements.
+    :return: the default parent matrix.
+    :rtype: np.ndarray
     """
     res = np.zeros((numbers_of_elements, 2), dtype="i")
     res[:, 0] = np.array(range(numbers_of_elements))
     return res
 
 
-def find(x, parents):
-    """The FIND part of the method
+def find(x: int, parents: np.ndarray) -> int:
+    """The FIND part of the method.
 
-    :param int x: the researched element
-    :param parents: the parents table
-    :return: the label of x
+    :param int x: the researched element.
+    :param np.ndarray parents: the parents table.
+    :return: the label of x.
+    :rtype: int
     """
     if parents[x, 0] == x:
         return x
@@ -32,12 +34,12 @@ def find(x, parents):
     return parents[x, 0]
 
 
-def union(x, y, parents):
-    """The UNION part of the method
+def union(x: int, y: int, parents: np.ndarray) -> None:
+    """The UNION part of the method.
 
-    :param int x: the index of the first element
-    :param int y: the index of the second element
-    :param np.ndarray parents: the parents table
+    :param int x: the index of the first element.
+    :param int y: the index of the second element.
+    :param np.ndarray parents: the parents table.
     """
     x_root = find(x, parents)
     y_root = find(y, parents)

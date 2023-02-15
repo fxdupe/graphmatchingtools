@@ -51,11 +51,14 @@ class TestGWL(TestCase):
         self.assertTrue(np.abs(res - 221.0) < 1.0, "Embedding loss function")
 
     def test_update_embeddings(self):
+        rng = np.random.default_rng(seed=1)
         c_s = 1.0 - np.eye(10, 10)
         c_t = 1.0 - np.eye(11, 11)
         transport = 1.0 - np.eye(10, 11)
 
-        x_s, x_t = gwl._update_embeddings(c_s, c_t, transport, 1.0, 1.0, 11, 10, 0.1)
+        x_s, x_t = gwl._update_embeddings(
+            c_s, c_t, transport, 1.0, 1.0, 11, 10, 0.1, random_generator=rng
+        )
         self.assertEqual(x_s.shape[0], 10, "New source embedding")
         self.assertEqual(x_t.shape[1], 11, "New source embedding")
 
@@ -74,7 +77,7 @@ class TestGWL(TestCase):
         mu_s = np.array([2, 1, 1]) / 4.0
         mu_t = np.array([1, 1, 2]) / 4.0
 
-        match = gwl.gromov_wasserstein_learning(
+        transport = gwl.gromov_wasserstein_learning(
             cost_s,
             cost_t,
             mu_s,
@@ -88,6 +91,9 @@ class TestGWL(TestCase):
             0.001,
             cost_st=cost_st,
             use_cross_cost=True,
+            random_seed=1,
         )
-        permut = np.array([2, 0, 1])
-        self.assertTrue(np.linalg.norm(match - permut) < 1e-7, "Matching comparison")
+        permut = np.array([[0.0, 0.0, 0.5], [0.25, 0.0, 0.0], [0.0, 0.25, 0.0]])
+        self.assertTrue(
+            np.linalg.norm(transport[0] - permut) < 1e-7, "Matching comparison"
+        )

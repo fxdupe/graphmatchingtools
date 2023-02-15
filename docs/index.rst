@@ -50,7 +50,7 @@ Multiway methods (state-of-art)
 Multiway methods (homemade)
 ---------------------------
 
-- Kernelized multi-graph matching
+- [Kernelized multi-graph matching](https://hal.science/hal-03809028v1)
 
 Mean graph methods
 ------------------
@@ -75,6 +75,17 @@ All the examples in the documentation are done with the following imports,
    >>> import graph_matching_tools.algorithms.mean.wasserstein_barycenter as wb
    >>> import graph_matching_tools.algorithms.multiway.matcheig as matcheig
    >>> import graph_matching_tools.algorithms.multiway.hippi as hippi
+   >>> import graph_matching_tools.algorithms.multiway.irgcl as irgcl
+   >>> import graph_matching_tools.algorithms.multiway.kergm as kergm
+   >>> import graph_matching_tools.algorithms.multiway.kmeans as kmeans
+   >>> import graph_matching_tools.algorithms.multiway.mkergm as mkergm
+   >>> import graph_matching_tools.algorithms.multiway.quickmatch as quickmatch
+   >>> import graph_matching_tools.algorithms.multiway.stiefel as stiefel
+   >>> import graph_matching_tools.algorithms.mean.wasserstein_barycenter as fgw_barycenter
+   >>> import graph_matching_tools.algorithms.mean.mm_mean as mm_mean
+   >>> import graph_matching_tools.algorithms.pairwise.fgw as fgw_pairwise
+   >>> import graph_matching_tools.algorithms.pairwise.gwl as gwl_pairwise
+   >>> import graph_matching_tools.algorithms.pairwise.kergm as kergm_pairwise
 
 We use three graphs for illustration purpose. These graphs are build using Networkx using
 the following code:

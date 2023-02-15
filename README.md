@@ -24,7 +24,7 @@ The scope of this work is to offer reproducible research and alternatives.
 
 ### Multiway method (homemade)
 
-- Kernelized multi-graph matching
+- [Kernelized multi-graph matching](https://hal.science/hal-03809028v1)
 
 ### Mean graph methods
 

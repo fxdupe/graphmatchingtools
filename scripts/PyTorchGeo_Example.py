@@ -325,7 +325,7 @@ if __name__ == "__main__":
         )
 
     # Compare with groundtruth
-    truth = pyg.generate_groundtruth(g_sizes, full_size, len(g_sizes), graph_index)
+    truth = pyg.generate_groundtruth(g_sizes, full_size, graph_index)
     a_truth = perm.get_permutation_matrix_from_matching(truth, g_sizes, 50)
 
     if args.robust:

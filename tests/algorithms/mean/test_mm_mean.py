@@ -74,7 +74,13 @@ class TestMMMean(TestCase):
 
         graphs = [g1, g2, g3]
         mean_graph = mean.compute_mean_graph(
-            graphs, "weight", node_kernel, "weight", 1.0, entropy_gamma=10.0
+            graphs,
+            "weight",
+            node_kernel,
+            "weight",
+            1.0,
+            entropy_gamma=10.0,
+            random_seed=10,
         )
         result = np.array(
             [
