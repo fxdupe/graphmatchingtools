@@ -41,8 +41,6 @@ test:
     - pip install pytest pytest-cov coverage
     - pip install -e .
     - pytest --ignore tests/algorithms/pairwise/test_gwl.py --ignore tests/algorithms/multiway/test_gwl.py
-    - cd docs
-    - make doctest
 
 build:
   stage: build

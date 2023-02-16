@@ -55,18 +55,18 @@ def _line_search_l2_loss(
 
     b = np.trace(new_transport.T @ ((1 - alpha) * distances + alpha * c_const))
     b -= 2.0 * alpha * np.trace(transport.T @ cost_s @ new_transport @ cost_t)
-    b += np.trace(new_transport.T @ cost_s @ transport @ cost_t)
+    b -= 2.0 * alpha * np.trace(new_transport.T @ cost_s @ transport @ cost_t)
 
     # The following line is present in the paper but not used in formula
     # c = np.trace(transport.T @ ((1.0 - alpha) * (distances ** 2.0) + alpha *
     #                             (c_const - cost_s @ transport @ (2.0 * cost_t).T)))
 
-    tau = 0
+    tau = 0.0
     if a > 0:
-        tau = np.min([1, np.max([0, -b / (2.0 * a)])])
+        tau = np.min([1.0, np.max([0.0, -b / (2.0 * a)])])
     else:
         if a + b < 0:
-            tau = 1
+            tau = 1.0
 
     return tau
 
@@ -105,11 +105,11 @@ def fgw_direct_matching(
     >>> cost_t = 1.0 - utils.create_full_node_affinity_matrix([graph2, ], node_kernel)
     >>> mu_s = np.ones((nx.number_of_nodes(graph1), )) / nx.number_of_nodes(graph1)
     >>> mu_t = np.ones((nx.number_of_nodes(graph2), )) / nx.number_of_nodes(graph2)
-    >>> distance = 1.0 - utils.compute_knode(graph1, graph2, node_kernel)
-    >>> transport = fgw_pairwise.fgw_direct_matching(cost_s, cost_t, mu_s, mu_t, distance, 2.0, 10, gamma=0.1)
+    >>> distances = 1.0 - utils.compute_knode(graph1, graph2, node_kernel)
+    >>> transport = fgw_pairwise.fgw_direct_matching(cost_s, cost_t, mu_s, mu_t, distances, 0.1, 50, gamma=0.1)
     >>> transport
-    array([[5.00000000e-01, 2.91087589e-22],
-           [2.91087589e-22, 5.00000000e-01]])
+    array([[1.06489980e-05, 4.99989351e-01],
+           [4.99989351e-01, 1.06489980e-05]])
     """
     # Ensure that we are using vectors
     mu_s = mu_s.reshape((-1, 1))
@@ -123,7 +123,7 @@ def fgw_direct_matching(
     for iteration in range(iterations):
         # 1 - Gradient computation
         tmp = c_const - cost_s @ transport @ (2.0 * cost_t).T
-        grad = (1.0 - alpha) * distances_q + 2 * alpha * tmp
+        grad = (1.0 - alpha) * distances_q + 2.0 * alpha * tmp
         # 2 - Apply OT constraints
         new_transport = kergm.sinkhorn_method(
             grad,

@@ -26,18 +26,18 @@ def _get_degree_distributions(g: nx.Graph) -> np.ndarray:
     :rtype: np.ndarray
     """
     degrees = nx.degree(g)
-    mu = np.array([degrees[i] for i in range(nx.number_of_nodes(g))])
-    mu = (1 + mu) / (np.sum(mu) + nx.number_of_nodes(g))
+    mu = np.array([degrees[i] for i in range(nx.number_of_nodes(g))]) + 1
+    mu = mu / np.sum(mu)
     return mu
 
 
 def _compute_distance_matrix(
-    mean_data: np.ndarray, graph: nx.Graph, sigma: float
+    graph: nx.Graph, mean_data: np.ndarray, sigma: float
 ) -> np.ndarray:
     """Compute the distance between of the data on the mean graph and another graph.
 
-    :param np.ndarray mean_data: the mean data matrix.
     :param nx.Graph graph: a graph (in NetworkX format).
+    :param np.ndarray mean_data: the mean data matrix.
     :param float sigma: the sigma for the Gaussian kernel used for distance between node data.
     :return: the distance matrix.
     :rtype: np.ndarray
@@ -46,7 +46,7 @@ def _compute_distance_matrix(
     for i in range(distances.shape[0]):
         for j in range(distances.shape[1]):
             dist = np.linalg.norm(mean_data[:, i] - np.array(graph.nodes[j]["weight"]))
-            distances[i, j] = np.exp(-(dist**2) / (2.0 * sigma**2.0))
+            distances[i, j] = 1.0 - np.exp(-(dist**2) / (2.0 * sigma**2.0))
     return distances
 
 
@@ -148,14 +148,14 @@ def fgw_wasserstein_barycenter(
     >>> g3.add_edge(0, 3, weight=2.0)
     >>> g3.add_edge(1, 2, weight=3.0)
     >>> graphs = [g1, g2, g3]
-    >>> mean_cost, mean_data = fgw_barycenter.fgw_wasserstein_barycenter(graphs, 5.0, 10, 30, node_sigma=0.1, gamma=0.1)
+    >>> mean_cost, mean_data = fgw_barycenter.fgw_wasserstein_barycenter(graphs, 0.1, 10, 100, gamma=0.1)
     >>> mean_cost
-    array([[0.40811535, 0.3500874 , 0.24854876, 0.18845473],
-           [0.3500874 , 0.31681839, 0.21378793, 0.14433069],
-           [0.24854876, 0.21378793, 0.15633357, 0.09752863],
-           [0.18845473, 0.14433069, 0.09752863, 0.09992307]])
+    array([[0.20250774, 0.20250774, 0.10125387, 0.10125387],
+           [0.20250774, 0.20250774, 0.10125387, 0.10125387],
+           [0.10125387, 0.10125387, 0.05062694, 0.05062694],
+           [0.10125387, 0.10125387, 0.05062694, 0.05062694]])
     >>> mean_data
-    array([[3.52954563, 2.98772953, 1.00000001, 1.00000001]])
+    array([[2.47638889, 2.16388889, 3.00555556, 2.38055556]])
     """
     if weights is None:
         weights = np.ones((len(graphs),)) / len(graphs)
@@ -166,10 +166,7 @@ def fgw_wasserstein_barycenter(
     node_kernel = kern.create_gaussian_node_kernel(node_sigma, "weight")
 
     mus = [_get_degree_distributions(g) for g in graphs]
-    costs = [
-        (1.0 - ku.compute_knode(g, g, node_kernel) * nx.to_numpy_array(g, weight=None))
-        for g in graphs
-    ]
+    costs = [(1.0 - ku.compute_knode(g, g, node_kernel)) for g in graphs]
     datas = [_get_data_matrix(g) for g in graphs]
 
     mean_cost = costs[graph_init]
@@ -181,12 +178,12 @@ def fgw_wasserstein_barycenter(
 
         # 1 - Update the transport maps
         for i_g in range(len(graphs)):
-            distances = _compute_distance_matrix(mean_data, graphs[i_g], node_sigma)
+            distances = _compute_distance_matrix(graphs[i_g], mean_data, node_sigma)
             transport = fgw.fgw_direct_matching(
-                mean_cost,
                 costs[i_g],
-                mean_mu,
+                mean_cost,
                 mus[i_g],
+                mean_mu,
                 distances,
                 alpha,
                 fgw_iterations,

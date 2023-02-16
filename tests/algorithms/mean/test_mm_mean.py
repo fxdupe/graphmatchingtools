@@ -40,7 +40,9 @@ class TestMMMean(TestCase):
         t1 = np.reshape(t1, (1, 2, 2))
         t2 = np.array([[-2.0, 0.0], [0.0, 10.0]])
         t2 = np.reshape(t2, (1, 2, 2))
-        r, c = mean.tensor_matching(t1, t2, node_kernel, 0.01, entropy_gamma=1.0)
+        r, c = mean.tensor_matching(
+            t1, t2, node_kernel, 0.01, entropy_gamma=1.0, random_seed=10
+        )
         truth = np.array([1, 0])
         self.assertEqual(np.linalg.norm(c - truth) < 1e-3, True)
 
