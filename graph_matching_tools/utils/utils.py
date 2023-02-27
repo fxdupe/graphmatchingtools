@@ -82,7 +82,7 @@ def create_full_weight_matrix(
 def randomize_nodes_position(
     graphs: list[nx.Graph],
 ) -> tuple[list[nx.Graph], list[list[int]]]:
-    """Randomize the node position inside a graph.
+    """Randomize the node position inside a list of graph.
 
     :param list[nx.Graph] graphs: a list of graph (networkx format).
     :return: the list of new graphs and the new index.

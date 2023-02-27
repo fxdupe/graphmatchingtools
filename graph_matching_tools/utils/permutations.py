@@ -3,8 +3,6 @@ Utility function for permutation matrix
 
 .. moduleauthor:: François-Xavier Dupé
 """
-import random
-
 import numpy as np
 
 
@@ -36,26 +34,23 @@ def get_permutation_matrix_from_dictionary(
 
 
 def get_permutation_matrix_from_matching(
-    matching: np.ndarray, sizes: list[int], max_node: int
+    matching: np.ndarray, g_sizes: list[int]
 ) -> np.ndarray:
     """Create the full permutation matrix from the matching result.
 
     :param np.ndarray matching: the matching result for each graph (nodes number, assignment).
-    :param list[int] sizes: the list of the size of the different graph.
-    :param int max_node: the maximal label for a node.
+    :param list[int] g_sizes: the sizes of the different graphs (in order).
     :return: the full permutation matrix.
     :rtype: np.ndarray
     """
-    f_size = int(np.sum(sizes))
-    res = np.zeros((f_size, max_node))
+    max_node = np.max(matching[1, :])
+    f_size = int(np.sum(g_sizes))
+    res = np.zeros((f_size, max_node+1))
 
     idx = 0
-    for idx_g in range(len(sizes)):
-        for i_s in range(sizes[idx_g]):
-            try:
-                res[idx + matching[idx_g, i_s], i_s] = 1
-            except IndexError:
-                res[idx + i_s, i_s] = 0  # Avoid dummy nodes
-        idx += sizes[idx_g]
+    for g in range(len(g_sizes)):
+        for s in range(g_sizes[g]):
+            res[matching[0, idx + matching[1, idx + s]], s] = 1
+        idx += g_sizes[g]
 
     return res @ res.T

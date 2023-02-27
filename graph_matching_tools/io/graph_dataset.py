@@ -2,8 +2,8 @@
 Module for importing graphs
 """
 import os
+import pickle
 
-import numpy as np
 import networkx as nx
 
 
@@ -31,9 +31,15 @@ class GraphDataset:
                     g_files.append(file.name)
         g_files.sort()
 
-        self.list_graphs = [
-            nx.read_gpickle(path_to_graphs + "/" + graph) for graph in g_files
-        ]
+        self.list_graphs = []
+        for g in g_files:
+            with open(path_to_graphs + "/" + g, "rb") as f:
+                graph = pickle.load(f)
+                self.list_graphs.append(graph)
+                print(graph)
+
         self.sizes = [nx.number_of_nodes(g) for g in self.list_graphs]
         self.nodes = [list(graph.nodes()) for graph in self.list_graphs]
-        self.labels = nx.read_gpickle(path_to_groundtruth_ref)
+
+        with open(path_to_groundtruth_ref, "rb") as f:
+            self.labels = pickle.load(f)

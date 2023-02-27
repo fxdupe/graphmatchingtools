@@ -26,13 +26,16 @@ import graph_matching_tools.algorithms.multiway.irgcl as irgcl
 import graph_matching_tools.io.pygeo_graphs as pyg
 
 
-def add_dummy_nodes(graphs, rank, dimension=1024):
-    """Add dummy nodes to graph to uniform the sizes
+def add_dummy_nodes(
+    graphs: list[nx.Graph], rank: int, dimension: int = 1024
+) -> tuple[list[nx.Graph], list[list[int]], list[list[int]]]:
+    """Add dummy nodes to graph to uniform the sizes.
 
-    :param list[nx.Graph] graphs: the list of graphs
-    :param int rank: the rank of the universe of nodes
-    :param int dimension: the size of the feature space
-    :return: the new list of graph with the new matching index
+    :param list[nx.Graph] graphs: the list of graphs.
+    :param int rank: the rank of the universe of nodes.
+    :param int dimension: the size of the feature space.
+    :return: the new list of graph with the new matching index.
+    :rtype: tuple[list[nx.Graph], list[list[int]], list[list[int]]]
     """
     sizes = [nx.number_of_nodes(g) for g in graphs]
     max_nodes = np.max(sizes)
@@ -326,7 +329,7 @@ if __name__ == "__main__":
 
     # Compare with groundtruth
     truth = pyg.generate_groundtruth(g_sizes, full_size, graph_index)
-    a_truth = perm.get_permutation_matrix_from_matching(truth, g_sizes, 50)
+    a_truth = perm.get_permutation_matrix_from_matching(truth, g_sizes)
 
     if args.robust:
         if args.robust_method == "irgcl":
