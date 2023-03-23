@@ -12,7 +12,7 @@ import graph_matching_tools.algorithms.multiway.msync as msync
 import graph_matching_tools.algorithms.multiway.stiefel as stiefel
 
 
-def _beta_t(t: int) -> int:
+def default_beta_t(t: int) -> int:
     """Example of beta(t).
 
     :param int t: the iteration number.
@@ -22,7 +22,7 @@ def _beta_t(t: int) -> int:
     return np.minimum(2**t, 40)
 
 
-def _alpha_t(t: int) -> int:
+def default_alpha_t(t: int) -> int:
     """Example of alpha(t).
 
     :param int t: the iteration number.
@@ -32,7 +32,7 @@ def _alpha_t(t: int) -> int:
     return np.minimum(1.2 ** (t - 1), 40)
 
 
-def _lambda_t(t: int) -> float:
+def default_lambda_t(t: int) -> float:
     """Example of lambda(t).
 
     :param int t: the iteration number.

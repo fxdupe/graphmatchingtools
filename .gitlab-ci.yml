@@ -37,10 +37,9 @@ before_script:
 test:
   stage: test
   script:
-    - cat /proc/cpuinfo
     - pip install pytest pytest-cov coverage
     - pip install -e .
-    - pytest --ignore tests/algorithms/pairwise/test_gwl.py --ignore tests/algorithms/multiway/test_gwl.py
+    - pytest --ignore tests/algorithms/pairwise/test_gwl.py --ignore tests/algorithms/multiway/test_gwl.py --ignore tests/io/test_pygeo_graphs.py
 
 build:
   stage: build

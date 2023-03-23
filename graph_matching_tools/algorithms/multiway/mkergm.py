@@ -5,7 +5,7 @@ As published in "Kernelized multi-graph matching", ACML 2022
 
 .. moduleauthor:: François-Xavier Dupé
 """
-from typing import Callable, Any, Optional
+from typing import Callable, Optional
 
 import numpy as np
 
@@ -94,9 +94,9 @@ def _rank_projector(
         res = matcheig.matcheig(x, rank, sizes)
         res = irgcl.irgcl(
             res,
-            irgcl._beta_t,
-            irgcl._alpha_t,
-            irgcl._lambda_t,
+            irgcl.default_beta_t,
+            irgcl.default_alpha_t,
+            irgcl.default_lambda_t,
             rank,
             len(sizes),
             choice=choice,

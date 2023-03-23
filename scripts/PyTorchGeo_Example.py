@@ -220,6 +220,7 @@ if __name__ == "__main__":
     all_graphs = pyg.get_graph_database(
         args.database, args.isotropic, args.category, args.repo + "/" + args.database
     )
+
     print("Size dataset: {} graphs".format(len(all_graphs)))
     print([nx.number_of_nodes(g) for g in all_graphs])
 
@@ -228,6 +229,11 @@ if __name__ == "__main__":
             print("Please take a number below the size of the dataset")
             sys.exit(1)
         all_graphs = random.sample(all_graphs, args.random_number)
+
+        print("Size of random dataset: {} graphs".format(len(all_graphs)))
+        print([nx.number_of_nodes(g) for g in all_graphs])
+
+    all_graphs = [g for g in all_graphs if nx.number_of_nodes(g) > 7]
 
     dummy_index = []
     graph_index = []
@@ -335,9 +341,9 @@ if __name__ == "__main__":
         if args.robust_method == "irgcl":
             p = irgcl.irgcl(
                 m_res,
-                irgcl._beta_t,
-                irgcl._alpha_t,
-                irgcl._lambda_t,
+                irgcl.default_beta_t,
+                irgcl.default_alpha_t,
+                irgcl.default_lambda_t,
                 args.rank,
                 len(all_graphs),
                 choice=args.reference_graph,

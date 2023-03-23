@@ -33,7 +33,7 @@ class TestIRGCL(unittest.TestCase):
         p = 1e9
         for i in range(10):
             p = irgcl.irgcl(
-                x_base, irgcl._beta_t, irgcl._alpha_t, irgcl._lambda_t, 2, 2
+                x_base, irgcl.default_beta_t, irgcl.default_alpha_t, irgcl.default_lambda_t, 2, 2
             )
             if np.linalg.norm(p - p_true) < 1e-3:
                 break
@@ -43,9 +43,9 @@ class TestIRGCL(unittest.TestCase):
         for i in range(10):
             p = irgcl.irgcl(
                 x_base,
-                irgcl._beta_t,
-                irgcl._alpha_t,
-                irgcl._lambda_t,
+                irgcl.default_beta_t,
+                irgcl.default_alpha_t,
+                irgcl.default_lambda_t,
                 2,
                 2,
                 choice=0,

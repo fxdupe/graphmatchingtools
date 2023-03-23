@@ -140,9 +140,9 @@ if __name__ == "__main__":
         m_res = matcheig.matcheig(knode, args.rank, sizes)
         m_res = irgcl.irgcl(
             m_res,
-            irgcl._beta_t,
-            irgcl._alpha_t,
-            irgcl._lambda_t,
+            irgcl.default_beta_t,
+            irgcl.default_alpha_t,
+            irgcl.default_lambda_t,
             args.rank,
             len(sizes),
         )

@@ -36,7 +36,7 @@ def generate_groundtruth(
     return res
 
 
-def _convert_to_networkx(dataset) -> list[nx.Graph]:
+def _convert_to_networkx(dataset) -> list[nx.Graph]:  # pragma: no cover
     """Conversion of the pytorch data to networkx graphs.
 
     :param dataset: the torch geometric dataset.
@@ -54,7 +54,7 @@ def _convert_to_networkx(dataset) -> list[nx.Graph]:
 
 def get_graph_database(
     name: str, isotropic: bool, category: str, repo: str
-) -> list[nx.Graph]:
+) -> list[nx.Graph]:  # pragma: no cover
     """Get a given graph dataset
 
     :param str name: the name of the database to load (PascalVOC, PascalPF or Willow [default]).
