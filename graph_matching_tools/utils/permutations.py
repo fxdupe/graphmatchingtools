@@ -45,7 +45,7 @@ def get_permutation_matrix_from_matching(
     """
     max_node = np.max(matching[1, :])
     f_size = int(np.sum(g_sizes))
-    res = np.zeros((f_size, max_node+1))
+    res = np.zeros((f_size, max_node + 1))
 
     idx = 0
     for g in range(len(g_sizes)):
