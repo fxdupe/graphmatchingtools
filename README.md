@@ -21,6 +21,8 @@ The scope of this work is to offer reproducible research and alternatives.
 - [QuickMatch](https://openaccess.thecvf.com/content_iccv_2017/html/Tron_Fast_Multi-Image_Matching_ICCV_2017_paper.html)
 - [Sparse Quadratic Optimisation over the Stiefel Manifold with Application to Permutation Synchronisation](https://openreview.net/forum?id=sl_0rQmHxQk)
 - [IRGCL](https://papers.nips.cc/paper/2020/hash/ae06fbdc519bddaa88aa1b24bace4500-Abstract.html)
+- [GA-MGMC](https://proceedings.neurips.cc/paper/2020/hash/e6384711491713d29bc63fc5eeb5ba4f-Abstract.html)
+- [MatchALS](https://www.cv-foundation.org/openaccess/content_iccv_2015/html/Zhou_Multi-Image_Matching_via_ICCV_2015_paper.html)
 
 ### Multiway method (homemade)
 

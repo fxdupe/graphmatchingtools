@@ -62,6 +62,8 @@ import graph_matching_tools.algorithms.multiway.kmeans as kmeans
 import graph_matching_tools.algorithms.multiway.mkergm as mkergm
 import graph_matching_tools.algorithms.multiway.quickmatch as quickmatch
 import graph_matching_tools.algorithms.multiway.stiefel as stiefel
+import graph_matching_tools.algorithms.multiway.ga_mgmc as ga_mgmc
+import graph_matching_tools.algorithms.multiway.matchals as matchals
 import graph_matching_tools.algorithms.mean.wasserstein_barycenter as fgw_barycenter
 import graph_matching_tools.algorithms.mean.mm_mean as mm_mean
 import graph_matching_tools.algorithms.pairwise.fgw as fgw_pairwise

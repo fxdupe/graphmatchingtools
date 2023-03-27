@@ -23,6 +23,8 @@ import graph_matching_tools.algorithms.multiway.quickmatch as quickmatch
 import graph_matching_tools.algorithms.multiway.kergm as kergm
 import graph_matching_tools.algorithms.multiway.mkergm as mkergm
 import graph_matching_tools.algorithms.multiway.irgcl as irgcl
+import graph_matching_tools.algorithms.multiway.ga_mgmc as ga_mgmc
+import graph_matching_tools.algorithms.multiway.matchals as matchals
 import graph_matching_tools.io.pygeo_graphs as pyg
 
 
@@ -103,13 +105,14 @@ if __name__ == "__main__":
         choices=[
             "mkergm",
             "hippi",
-            "mgm",
             "kergm",
             "quickm",
             "mals",
             "msync",
             "matcheig",
             "sqad",
+            "matchals",
+            "gamgmc",
         ],
         default="mkergm",
     )
@@ -170,11 +173,14 @@ if __name__ == "__main__":
         "--shuffle", help="Shuffle the graphs", action="store_true", default=False
     )
     parser.add_argument(
-        "--entropy", help="The initial entropy for MGM/KerGM", default=2.0, type=float
+        "--entropy",
+        help="The initial entropy for GA-MGM/KerGM",
+        default=2.0,
+        type=float,
     )
     parser.add_argument(
-        "--mgm_tau_min",
-        help="The minimal value for the entropy for MGM",
+        "--gamgm_tau_min",
+        help="The minimal value for the entropy for GA-MGM",
         default=1e-2,
         type=float,
     )
@@ -275,6 +281,26 @@ if __name__ == "__main__":
             tolerance=args.tolerance,
         )
         m_res = u_nodes @ u_nodes.T
+    elif args.method == "gamgmc":
+        u_nodes = ga_mgmc.ga_mgmc(
+            all_graphs,
+            knode,
+            args.rank,
+            "weight",
+            tau=args.entropy,
+            tau_min=args.gamgm_tau_min,
+            iterations=args.iterations,
+        )
+        m_res = u_nodes @ u_nodes.T
+    elif args.method == "matchals":
+        m_res = matchals.matchals(
+            knode,
+            g_sizes,
+            args.rank,
+            alpha=args.mals_alpha,
+            beta=args.mals_beta,
+            iterations=args.iterations,
+        )
     elif args.method == "msync":
         u_nodes = msync.msync(knode, g_sizes, args.rank, args.reference_graph)
         m_res = u_nodes @ u_nodes.T

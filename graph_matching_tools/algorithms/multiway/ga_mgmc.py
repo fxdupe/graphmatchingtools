@@ -1,8 +1,8 @@
 """
-Graduated Assignement Multigraph Matching as proposed in
+Multigraph matching method proposed in
 Wang, R., Yan, J., & Yang, X. (2020). Graduated Assignment for Joint Multi-Graph Matching and Clustering
- with Application to Unsupervised Graph Matching Network Learning.
- Advances in Neural Information Processing Systems, 33.
+with Application to Unsupervised Graph Matching Network Learning.
+Advances in Neural Information Processing Systems, 33.
 
 .. moduleauthor:: François-Xavier Dupé
 """
@@ -11,9 +11,9 @@ from typing import Optional
 import numpy as np
 import networkx as nx
 import scipy.optimize as sco
+import ot
 
 import graph_matching_tools.utils.utils as utils
-import graph_matching_tools.algorithms.pairwise.kergm as kergm
 
 
 def ga_mgmc(
@@ -27,29 +27,46 @@ def ga_mgmc(
     tau_min: float = 1e-3,
     gamma: float = 0.8,
     sigma: float = 1.0,
-    iterations: int = 100,
+    iterations: int = 200,
     init: Optional[np.ndarray] = None,
     normalize_aff: bool = False,
-    inner_iterations: int = 100000,
+    inner_iterations: int = 10,
 ) -> np.ndarray:
     """
-    Graduated assignment multi-graph matching (GA-MGM)
+    Graduated assignment multi-graph matching (GA-MGM).
 
-    :param list[nx.Graph] graphs: the list of graphs
-    :param np.ndarray aff_node: the affinity matrix between all the nodes
-    :param int u_dim: the dimension of the universe of nodes
-    :param str edge_data: the name of the data on edges
-    :param float mu: the equilibrium between the node affinities and the matching score
-    :param float tau_node: the entropy for the first node assignment using Sinkhorn (applied on parts of knode)
-    :param float tau: the initial entropy for Sinkhorn
-    :param float tau_min: the minimal value for tau
-    :param float gamma: the descent factor
-    :param float sigma: the variance of the value on edge
-    :param int iterations: the maximal number of iterations
-    :param np.ndarray init: an initialization (optional)
-    :param bool normalize_aff: True to normalize the affinity node matrix
-    :param int inner_iterations: The number of iterations for Sinkhorn
-    :return np.ndarray: the list the node projections (graph by graph)
+    :param list[nx.Graph] graphs: the list of graphs.
+    :param np.ndarray aff_node: the affinity matrix between all the nodes.
+    :param int u_dim: the dimension of the universe of nodes.
+    :param str edge_data: the name of the data on edges.
+    :param float mu: the equilibrium between the node affinities and the matching score.
+    :param float tau_node: the entropy for the first node assignment using Sinkhorn (applied on parts of knode).
+    :param float tau: the initial entropy for Sinkhorn.
+    :param float tau_min: the minimal value for tau.
+    :param float gamma: the descent factor.
+    :param float sigma: the variance of the value on edge.
+    :param int iterations: the maximal number of iterations.
+    :param np.ndarray init: an initialization (optional).
+    :param bool normalize_aff: True to normalize the affinity node matrix.
+    :param int inner_iterations: The number of iterations for Sinkhorn.
+    :return np.ndarray: the list the node projections (graph by graph).
+
+    Here an example using NetworkX and some utils:
+
+    .. doctest:
+
+    >>> node_kernel = kern.create_gaussian_node_kernel(2.0, "weight")
+    >>> knode = utils.create_full_node_affinity_matrix(graphs, node_kernel)
+    >>> u = ga_mgmc.ga_mgmc(graphs, knode, 3, "weight", tau=0.1, tau_min=1e-2)
+    >>> u @ u.T
+    array([[1., 0., 0., 1., 0., 1., 0.],
+           [0., 1., 1., 0., 0., 0., 1.],
+           [0., 1., 1., 0., 0., 0., 1.],
+           [1., 0., 0., 1., 0., 1., 0.],
+           [0., 0., 0., 0., 1., 0., 0.],
+           [1., 0., 0., 1., 0., 1., 0.],
+           [0., 1., 1., 0., 0., 0., 1.]])
+
     """
     rng = np.random.default_rng()
     # 0 - Initialization of the different matrices and lists
@@ -73,16 +90,16 @@ def ga_mgmc(
                 weights = aff_node[
                     index_i : index_i + sizes[i], index_j : index_j + sizes[j]
                 ]
-                # res = ot.bregman.sinkhorn_epsilon_scaling(
-                #     np.ones(weights.shape[0]),
-                #     np.ones(weights.shape[1]),
-                #     weights,
-                #     reg=tau_node,
-                #     numItermax=inner_iterations,
-                # )
-                res = kergm.sinkhorn_method(
-                    weights, gamma=tau_node, iterations=inner_iterations
+                res = ot.bregman.sinkhorn_log(
+                    np.ones(weights.shape[0]),
+                    np.ones(weights.shape[1]),
+                    weights,
+                    reg=tau_node,
+                    numItermax=inner_iterations,
                 )
+                # res = kergm.sinkhorn_method(
+                #     weights, gamma=tau_node, iterations=inner_iterations
+                # )
                 knode[index_i : index_i + sizes[i], index_j : index_j + sizes[j]] = res
                 knode[
                     index_j : index_j + sizes[j], index_i : index_i + sizes[i]
@@ -93,34 +110,25 @@ def ga_mgmc(
 
     # 2 - The optimization loop
     final_stage = False
-    for iteration in range(iterations):
-        # Update step
-        v = mu * a @ u @ u.T @ a @ u + knode @ u
+    while not final_stage:
+        for iteration in range(iterations):
+            # Update step
+            v = mu * a @ u @ u.T @ a @ u + knode @ u
 
-        # Projection step
-        if not final_stage:
+            # Projection step
             index = 0
             for i in range(len(sizes)):
                 vi = v[index : index + sizes[i], :]
-                # u[index : index + sizes[i], :] = ot.bregman.sinkhorn_epsilon_scaling(
-                #     np.ones(vi.shape[0]),
-                #     np.ones(vi.shape[1]),
-                #     vi,
-                #     reg=tau,
-                #     numItermax=inner_iterations,
-                # )
-                u[index : index + sizes[i], :] = kergm.sinkhorn_method(
-                    vi, gamma=tau, iterations=inner_iterations
+                u[index : index + sizes[i], :] = ot.bregman.sinkhorn_log(
+                    np.ones(vi.shape[0]),
+                    np.ones(vi.shape[1]),
+                    vi,
+                    reg=tau,
+                    numItermax=inner_iterations,
                 )
-                index += sizes[i]
-        else:
-            u *= 0
-            index = 0
-            for i in range(len(sizes)):
-                vi = v[index : index + sizes[i], :]
-                r, c = sco.linear_sum_assignment(-vi)
-                for j in range(r.shape[0]):
-                    u[index + r[j], c[j]] = 1
+                # u[index : index + sizes[i], :] = kergm.sinkhorn_method(
+                #     vi, gamma=tau, iterations=inner_iterations
+                # )
                 index += sizes[i]
 
         # Managing tau
@@ -130,5 +138,17 @@ def ga_mgmc(
             final_stage = True
         else:
             break
+
+    # Final step
+    for iteration in range(iterations):
+        v = mu * a @ u @ u.T @ a @ u + knode @ u
+        u *= 0.0
+        index = 0
+        for i in range(len(sizes)):
+            vi = v[index : index + sizes[i], :]
+            r, c = sco.linear_sum_assignment(-vi)
+            for j in range(r.shape[0]):
+                u[index + r[j], c[j]] = 1
+            index += sizes[i]
 
     return u

@@ -21,6 +21,7 @@ networkx = ">=2.7"
 scikit-learn = ">=1.0"
 jax = ">=0.3.24"
 jaxlib = ">=0.3.24"
+pot = ">=0.8.0"
 
 [tool.poetry.dev-dependencies]
 pytest = ">=7.0"

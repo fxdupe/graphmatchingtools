@@ -141,7 +141,7 @@ def irgcl(
     >>> x_base[0, 3] = 1
     >>> x_base[2, 1] = 1
     >>> x_base[1, 2] = 1
-    >>> p = irgcl.irgcl(x_base, irgcl._beta_t, irgcl._alpha_t, irgcl._lambda_t, 2, 2, choice = 1)
+    >>> p = irgcl.irgcl(x_base, irgcl.default_beta_t, irgcl.default_alpha_t, irgcl.default_lambda_t, 2, 2, choice = 1)
     >>> p
     array([[0., 1.],
            [1., 0.],

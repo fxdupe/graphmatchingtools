@@ -10,7 +10,7 @@ import graph_matching_tools.algorithms.kernels.utils as utils
 
 class TestGA_MGMC(TestCase):
     def test_ga_mgmc(self):
-        node_kernel = kern.create_gaussian_node_kernel(0.1, "weight")
+        node_kernel = kern.create_gaussian_node_kernel(2.0, "weight")
 
         graph1 = nx.Graph()
         graph1.add_node(0, weight=2.0)
@@ -30,7 +30,7 @@ class TestGA_MGMC(TestCase):
         graphs = [graph1, graph2, graph3]
 
         knode = utils.create_full_node_affinity_matrix(graphs, node_kernel)
-        u = ga_mgmc.ga_mgmc(graphs, knode, 3, "weight", tau_min=1e-2)
+        u = ga_mgmc.ga_mgmc(graphs, knode, 3, "weight", tau=0.1, tau_min=1e-2)
         res = u @ u.T
 
         truth = [
@@ -66,9 +66,21 @@ class TestGA_MGMC(TestCase):
             ]
         )
 
-        init = [[1., 0.], [0., 1.], [0., 1.], [1., 0.]]
+        init = [[1.0, 0.0], [0.0, 1.0], [0.0, 1.0], [1.0, 0.0]]
+        node_kernel = kern.create_gaussian_node_kernel(0.1, "weight")
         knode = utils.create_full_node_affinity_matrix(graphs, node_kernel)
-        u = ga_mgmc.ga_mgmc(graphs, knode, 3, "weight", init=np.array(init))
+        u = ga_mgmc.ga_mgmc(
+            graphs, knode, 2, "weight", init=np.array(init), tau=0.1, tau_min=1e-2
+        )
         self.assertEqual(np.linalg.norm(u @ u.T - truth) < 1e-3, True)
-        u = ga_mgmc.ga_mgmc(graphs, knode, 3, "weight", normalize_aff=True, init=np.array(init))
+        u = ga_mgmc.ga_mgmc(
+            graphs,
+            knode,
+            3,
+            "weight",
+            normalize_aff=True,
+            init=np.array(init),
+            tau=0.1,
+            tau_min=1e-2,
+        )
         self.assertEqual(np.linalg.norm(u @ u.T - truth) < 1e-3, True)
