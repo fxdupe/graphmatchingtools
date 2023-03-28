@@ -31,7 +31,6 @@ setup(
         "scikit-learn",
         "jax",
         "jaxlib",
-        "pot",
     ],
     python_requires=">=3.9",
 )

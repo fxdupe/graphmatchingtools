@@ -1,8 +1,8 @@
 # Graph Matching Tools
 
-This toolbox propose a common ground for several graph matching methods. 
+This toolbox propose a common ground for several graph matching methods.
 We propose our methods with a set of state-of-art methods using our own implementation.
-The scope of this work is to offer reproducible research and alternatives. 
+The scope of this work is to offer reproducible research and alternatives.
 
 ## Current available methods
 
