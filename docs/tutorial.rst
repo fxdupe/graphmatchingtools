@@ -1,7 +1,8 @@
 Tutorial
 ========
 
-In this tutorial we explain how to use our toolbox on the Willow dataset.
+In this tutorial we explain how to use our toolbox on the Willow dataset. We add the imports when
+we need new functions.
 
 1 - Load the Willow dataset
 ---------------------------
@@ -11,6 +12,7 @@ We propose a module to download and build the graphs (in NetworkX format).
 The following lines will load the *car* category from Willow using isotropic graph,
 
 >>> import numpy as np
+>>> import networkx as nx
 >>> import graph_matching_tools.io.pygeo_graphs as pyg
 >>> graphs = pyg.get_graph_database("Willow", True, "car", "/tmp/willow")
 
@@ -25,7 +27,7 @@ Now, we must build the bulk node affinity matrix. First, we need to build a kern
 a Gaussian kernel,
 
 >>> import graph_matching_tools.algorithms.kernels.gaussian as gaussian
->>> node_kernel = gaussian.create_gaussian_node_kernel(2.0, "x")
+>>> node_kernel = gaussian.create_gaussian_node_kernel(70.0, "x")
 
 The arguments are, :math:`\sigma^2`, the variance of the Gaussian kernel and the name of the data
 vector for the nodes. Then we can build the bulk node affinity matrix,
@@ -40,7 +42,7 @@ The next step is the construction of the edge tensors. We begin by building the 
 approximate a Gaussian kernel while keeping a linear scalar product.
 
 >>> import graph_matching_tools.algorithms.kernels.rff as rff
->>> vectors, offsets = rff.create_random_vectors(1, 100, 0.1)
+>>> vectors, offsets = rff.create_random_vectors(1, 100, 0.01)
 
 The parameters are the following.
 
@@ -64,5 +66,44 @@ Then we can build the tensors for each graph.
 4 - Compute the multiple graph matching
 ---------------------------------------
 
+First in order to equilibrate the nodes versus the edge, we normalize the node affinity matrix by dividing it
+by the median size of the graphs,
+
+>>> norm_knode = np.median(sizes)
+>>> knode /= norm_knode
+
+Once both the node affinity matrix and edge tensors built, we can create the gradient linked to the objective
+function to optimize.
+
+>>> import graph_matching_tools.algorithms.multiway.mkergm as mkergm
+>>> gradient = mkergm.create_gradient(phi, knode)
+
+Then we can apply the multigraph matching algorithm using a uniform initialization.
+
+>>> x_init = np.ones(knode.shape) / knode.shape[0]  # Uniform initialization
+>>> m_res = mkergm.mkergm(
+...     gradient,
+...     sizes,
+...     10,  # The dimension of the universe of nodes (i.e. the rank)
+...     iterations=20,
+...     init=x_init,
+...     tolerance=1e-3,
+...     projection_method="matcheig",  # This is default projector
+... )
+
 5 - Evaluate the results
 ------------------------
+
+To evaluate the results, we first need to generate the ground truth (this is specific for Willow).
+
+>>> import graph_matching_tools.utils.permutations as perm
+>>> graph_index = [list(range(nx.number_of_nodes(g))) for g in graphs]
+>>> match_truth = pyg.generate_groundtruth(sizes, full_size, graph_index)
+>>> truth = perm.get_permutation_matrix_from_matching(match_truth, sizes)
+
+Then we can compute the precision, recall and F1-score.
+
+>>> import graph_matching_tools.metrics.matching as measures
+>>> f1_score, precision, recall = measures.compute_f1score(m_res, truth)
+
+You should expect a F1-score around 0.89 (with some fluctuation due to the randomness of the Fourier Features).

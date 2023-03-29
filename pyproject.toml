@@ -1,6 +1,34 @@
+[project]
+name = "graphmatchingtools"
+version = "0.7.0"
+authors = [
+    { name="François-Xavier Dupé", email="francois-xavier.dupe@univ-amu.fr" },
+    { name="Rohit Yadav", email="rohit.yadav@univ-amu.fr" },
+]
+description = "Unsupervised multiple graphs matching methods"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    'numpy>=1.10',
+    'scipy>=1.7',
+    'networkx>=2.7',
+    'scikit-learn>=1.0',
+    'jax>=0.4',
+    'jaxlib>=0.4',
+]
+
+[project.urls]
+"Homepage" = "https://github.com/fxdupe/graphmatchingtools"
+"Bug Tracker" = "https://github.com/fxdupe/graphmatchingtools/issues"
+
 [build-system]
 requires = [
-    "setuptools>=60",
+    "setuptools>=61",
     "wheel"
 ]
 build-backend = "setuptools.build_meta"
@@ -16,7 +44,6 @@ authors = ["François-Xavier Dupé <francois-xavier.dupe@univ-amu.fr>",
 python = ">=3.9"
 numpy = ">1.10"
 scipy = ">=1.7"
-matplotlib = ">=3.4"
 networkx = ">=2.7"
 scikit-learn = ">=1.0"
 jax = ">=0.3.24"
