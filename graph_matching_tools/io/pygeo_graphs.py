@@ -122,3 +122,47 @@ def compute_edges_data(graph: nx.Graph, mu: float = 10.0) -> nx.Graph:
         )
 
     return graph
+
+
+def add_dummy_nodes(
+    graphs: list[nx.Graph], rank: int, dimension: int = 1024
+) -> tuple[list[nx.Graph], list[list[int]], list[list[int]]]:
+    """Add dummy nodes to graph to uniform the sizes.
+
+    :param list[nx.Graph] graphs: the list of graphs.
+    :param int rank: the rank of the universe of nodes.
+    :param int dimension: the size of the feature space.
+    :return: the new list of graph with the new matching index.
+    :rtype: tuple[list[nx.Graph], list[list[int]], list[list[int]]]
+    """
+    sizes = [nx.number_of_nodes(g) for g in graphs]
+    max_nodes = np.max(sizes)
+    new_graphs = []
+    new_index = []
+    new_dummy_index = []
+
+    # Add dummy even in large graphs
+    if max_nodes < rank:
+        max_nodes = rank
+
+    for idx_g in range(len(sizes)):
+        match_index_node = list(range(sizes[idx_g]))
+        dummy_index_node = []
+
+        g = graphs[idx_g].copy()
+        if sizes[idx_g] < max_nodes:
+            for idn in range(max_nodes - sizes[idx_g]):
+                # Add dummy nodes
+                g.add_node(
+                    sizes[idx_g] + idn,
+                    x=(np.zeros((dimension,)) + 1e8),
+                    pos=(-1e3, -1e3),
+                )
+                match_index_node.append(sizes[idx_g] + idn)
+                dummy_index_node.append(sizes[idx_g] + idn)
+
+        new_graphs.append(g)
+        new_index.append(match_index_node)
+        new_dummy_index.append(dummy_index_node)
+
+    return new_graphs, new_index, new_dummy_index
