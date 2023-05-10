@@ -22,6 +22,7 @@ import graph_matching_tools.algorithms.multiway.stiefel as stiefel
 import graph_matching_tools.algorithms.multiway.quickmatch as quickmatch
 import graph_matching_tools.algorithms.multiway.kergm as kergm
 import graph_matching_tools.algorithms.multiway.mkergm as mkergm
+import graph_matching_tools.algorithms.multiway.dist_mkergm as dist_mkergm
 import graph_matching_tools.algorithms.multiway.irgcl as irgcl
 import graph_matching_tools.algorithms.multiway.ga_mgmc as ga_mgmc
 import graph_matching_tools.algorithms.multiway.matchals as matchals
@@ -69,6 +70,7 @@ if __name__ == "__main__":
             "sqad",
             "matchals",
             "gamgmc",
+            "dist_mkergm",
         ],
         default="mkergm",
     )
@@ -217,7 +219,7 @@ if __name__ == "__main__":
     node_kernel = None
     knode = None
 
-    if args.method != "quickm":
+    if args.method != "quickm" and args.method != "dist_mkergm":
         node_kernel = gaussian.create_gaussian_node_kernel(
             args.sigma, "pos" if args.database == "PascalPF" else "x"
         )
@@ -283,6 +285,28 @@ if __name__ == "__main__":
             args.iterations,
             rff=args.rff,
         )
+    elif args.method == "dist_mkergm":
+        node_kernel = gaussian.create_gaussian_node_kernel(
+            args.sigma, "pos" if args.database == "PascalPF" else "x"
+        )
+
+        vectors, offsets = rff.create_random_vectors(1, args.rff, args.gamma)
+        d_phi = list()
+        for i in range(len(all_graphs)):
+            g_phi = rff.compute_phi(all_graphs[i], "weight", vectors, offsets)
+            d_phi.append(g_phi)
+
+        d_knodes = dict()
+        for i_g1 in range(len(all_graphs)):
+            for i_g2 in range(i_g1 + 1, len(all_graphs)):
+                d_knodes["{},{}".format(i_g1, i_g2)] = ku.compute_knode(
+                    all_graphs[i_g1], all_graphs[i_g2], node_kernel
+                )
+
+        d_perms = dist_mkergm.stochastic_dist_mkergm(
+            all_graphs, d_knodes, d_phi, args.rank, 20, 20, args.iterations
+        )
+        m_res = dist_mkergm.get_bulk_permutations_from_dict(d_perms, g_sizes)
     else:
         # Compute the big phi matrix
         vectors, offsets = rff.create_random_vectors(1, args.rff, args.gamma)
