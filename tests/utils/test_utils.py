@@ -105,3 +105,19 @@ class TestUtils(unittest.TestCase):
         self.assertTrue(
             g1.nodes[0]["weight"] == new_g1[0].nodes[new_idx[0][0]]["weight"]
         )
+
+    def test_normalized_softperm_matrix(self):
+        test_matrix = [
+            [0.0, 2.0, 0.0, 0.0],
+            [0.0, 0.0, 3.0, 0.0],
+            [4.0, 0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0, 5.0],
+        ]
+        res = utils.normalized_softperm_matrix(np.array(test_matrix), [2, 2], 0.001)
+        truth_matrix = [
+            [0.5, 0.0, 0.5, 0.0],
+            [0.0, 0.5, 0.0, 0.5],
+            [0.5, 0.0, 0.0, 0.5],
+            [0.0, 0.5, 0.5, 0.0],
+        ]
+        self.assertTrue(np.linalg.norm(res - np.array(truth_matrix)) < 1e-2)

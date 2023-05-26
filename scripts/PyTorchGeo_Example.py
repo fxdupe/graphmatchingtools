@@ -176,6 +176,18 @@ if __name__ == "__main__":
         type=str,
         choices=["matcheig", "msync", "irgcl", "gpow"],
     )
+    parser.add_argument(
+        "--dist_batch_size",
+        help="Size of a batch (number of graph)",
+        default=10,
+        type=int,
+    )
+    parser.add_argument(
+        "--dist_batch_number",
+        help="Number of batches",
+        default=10,
+        type=int,
+    )
     args = parser.parse_args()
 
     all_graphs = pyg.get_graph_database(
@@ -299,12 +311,19 @@ if __name__ == "__main__":
         d_knodes = dict()
         for i_g1 in range(len(all_graphs)):
             for i_g2 in range(i_g1 + 1, len(all_graphs)):
-                d_knodes["{},{}".format(i_g1, i_g2)] = ku.compute_knode(
-                    all_graphs[i_g1], all_graphs[i_g2], node_kernel
+                d_knodes["{},{}".format(i_g1, i_g2)] = (
+                    ku.compute_knode(all_graphs[i_g1], all_graphs[i_g2], node_kernel)
+                    * args.rank
                 )
 
         d_perms = dist_mkergm.stochastic_dist_mkergm(
-            all_graphs, d_knodes, d_phi, args.rank, 20, 20, args.iterations
+            all_graphs,
+            d_knodes,
+            d_phi,
+            args.rank,
+            args.dist_batch_number,
+            args.dist_batch_size,
+            args.iterations,
         )
         m_res = dist_mkergm.get_bulk_permutations_from_dict(d_perms, g_sizes)
     else:
@@ -320,8 +339,9 @@ if __name__ == "__main__":
         x_init = np.ones(knode.shape) / knode.shape[0]
 
         # Normalize for the tradeoff between nodes and edges
-        norm_knode = np.median(g_sizes)
-        knode /= norm_knode
+        # norm_knode = np.median(g_sizes)
+        # knode /= norm_knode
+        knode *= args.rank
 
         gradient = mkergm.create_gradient(phi, knode)
 
