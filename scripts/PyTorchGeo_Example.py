@@ -26,6 +26,7 @@ import graph_matching_tools.algorithms.multiway.dist_mkergm as dist_mkergm
 import graph_matching_tools.algorithms.multiway.irgcl as irgcl
 import graph_matching_tools.algorithms.multiway.ga_mgmc as ga_mgmc
 import graph_matching_tools.algorithms.multiway.matchals as matchals
+import graph_matching_tools.algorithms.multiway.boolean_nmf as nmf
 import graph_matching_tools.io.pygeo_graphs as pyg
 
 
@@ -121,7 +122,7 @@ if __name__ == "__main__":
         "--robust_method",
         help="Select the robust projection method",
         type=str,
-        choices=["sqad", "irgcl"],
+        choices=["sqad", "irgcl", "nmf"],
         default="irgcl",
     )
     parser.add_argument(
@@ -371,6 +372,8 @@ if __name__ == "__main__":
                 len(all_graphs),
                 choice=args.reference_graph,
             )
+        elif args.robust_method == "nmf":
+            p = nmf.boolean_nmf(m_res, args.rank, 1)
         else:
             p = stiefel.sparse_stiefel_manifold_sync(m_res, args.rank, g_sizes)
         m_res = p @ p.T

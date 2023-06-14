@@ -48,6 +48,7 @@ Multiway methods (state-of-art)
 - `IRGCL <https://papers.nips.cc/paper/2020/hash/ae06fbdc519bddaa88aa1b24bace4500-Abstract.html>`_
 - `GA-MGM <https://proceedings.neurips.cc/paper/2020/hash/e6384711491713d29bc63fc5eeb5ba4f-Abstract.html>`_
 - `MatchALS <https://www.cv-foundation.org/openaccess/content_iccv_2015/html/Zhou_Multi-Image_Matching_via_ICCV_2015_paper.html>`_
+- `Symmetric Sparse Boolean Matrix Factorization <https://arxiv.org/abs/2102.01570>`_
 
 Multiway methods (homemade)
 ---------------------------
@@ -83,6 +84,7 @@ All the examples in the documentation are done with the following imports,
    >>> import graph_matching_tools.algorithms.multiway.mkergm as mkergm
    >>> import graph_matching_tools.algorithms.multiway.quickmatch as quickmatch
    >>> import graph_matching_tools.algorithms.multiway.stiefel as stiefel
+   >>> import graph_matching_tools.algorithms.multiway.boolean_nmf as nmf
    >>> import graph_matching_tools.algorithms.mean.wasserstein_barycenter as fgw_barycenter
    >>> import graph_matching_tools.algorithms.mean.mm_mean as mm_mean
    >>> import graph_matching_tools.algorithms.pairwise.fgw as fgw_pairwise

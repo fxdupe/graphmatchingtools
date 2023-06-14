@@ -36,7 +36,7 @@ def _get_tensor_value(
     count = 0
     a, b, c = position
     for idx in range(x.shape[0]):
-        if x[a, idx] and x[b, idx] and x[c, idx]:
+        if x[a, idx] == 0 and x[b, idx] == 0 and x[c, idx] == 0:
             count += 1
 
     mu_abc = count / x.shape[0]
@@ -44,7 +44,7 @@ def _get_tensor_value(
     # Compute t_abc
     value = 1e99
     t_abc = 0
-    for i_t in range(rank - sparsity):
+    for i_t in range(rank - sparsity + 1):
         mu_t = (
             _factorial(rank - i_t)
             * _factorial(rank - sparsity)
@@ -97,16 +97,42 @@ def boolean_nmf(x: np.ndarray, rank: int, sparsity: int) -> np.ndarray:
     :param int sparsity: the sparsity of the lines of the factor matrix.
     :return: the factor matrix.
     :rtype: np.ndarray
+
+    Here an example:
+
+    .. doctest:
+
+    >>> perm = np.array(
+    ...         [
+    ...             [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0],
+    ...             [0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0],
+    ...             [0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0],
+    ...             [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0],
+    ...             [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
+    ...             [0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0],
+    ...             [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0],
+    ...          ]
+    ...     )
+    >>> u = nmf.boolean_nmf(perm, 3, 1)
     """
     # The two random vectors on the unit sphere needed for the approximation
-    v1 = np.random.randn(1, x.shape[0])
-    v2 = np.random.randn(1, x.shape[0])
+    v1 = np.random.randn(x.shape[0])
+    v2 = np.random.randn(x.shape[0])
     v1 /= np.linalg.norm(v1)
     v2 /= np.linalg.norm(v2)
 
     # We now compute the two matrices M1 and M2
     m1, m2 = _compute_intermediate_matrix(x, v1, v2, rank, sparsity)
-    sigma, w = np.linalg.eig(m1 @ np.linalg.pinv(m2))
 
-    # TODO: change the output
-    return sigma, w
+    # Compute the eigenvectors
+    sigma, w = np.linalg.eig(m1 @ np.linalg.pinv(m2))
+    s_idx = np.argsort(np.abs(sigma))
+    w_r = w[:, s_idx[x.shape[0] - rank : x.shape[0]]]
+
+    # Get the "closest" boolean vectors
+    res = np.zeros(w_r.shape)
+    for line in range(x.shape[0]):
+        i_max = np.argmax(np.squeeze(np.abs(w_r[line, :])))
+        res[line, i_max] = 1
+
+    return res
