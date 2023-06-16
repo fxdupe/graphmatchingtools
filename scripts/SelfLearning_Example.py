@@ -18,6 +18,7 @@ import graph_matching_tools.algorithms.kernels.utils as kutils
 import graph_matching_tools.algorithms.kernels.gaussian as gaussian
 import graph_matching_tools.algorithms.kernels.rff as rff
 import graph_matching_tools.algorithms.multiway.mkergm as mkergm
+import graph_matching_tools.algorithms.multiway.matcheig as matcheig
 import graph_matching_tools.utils.utils as utils
 import graph_matching_tools.metrics.matching as measures
 import graph_matching_tools.io.pygeo_graphs as pyg
@@ -35,7 +36,7 @@ class GCN(torch.nn.Module):
         noise = torch.randn(graph.x.shape) * 0.1
         x = self.conv1(graph.x + noise, graph.edge_index)
         x = x.relu()
-        # x = func.dropout(x, p=0.4)
+        x = func.dropout(x, p=0.1)
         x = self.conv2(x, graph.edge_index)
         x = func.softmax(x, dim=1)
         return x
@@ -45,13 +46,17 @@ def test_model(model, dataloader):
     model.eval()
     loss = 0
     for batch, sample in enumerate(dataloader):
-        out = model(sample)
-        loss += torch.nn.functional.mse_loss(
-            out @ out.T,
-            torch.squeeze(
-                tgeo.utils.to_dense_adj(sample.edge_index, batch=sample.batch)
-            ),
+        out = model(sample)  # Perform a single forward pass.
+        adj_tensor = torch.squeeze(
+            tgeo.utils.to_dense_adj(sample.edge_index, batch=sample.batch)
         )
+        for graph in range(sample.batch[-1]):
+            embedding = out[sample.batch == graph, :]
+            loss += torch.nn.functional.mse_loss(
+                embedding @ embedding.T,
+                adj_tensor[graph, :, :],
+            )  # Compute the loss solely based on the training nodes.
+
     return loss / len(dataloader)
 
 
@@ -79,28 +84,33 @@ def run_learning(dataset):
         data.to(device_d)
         data_t.append(data)
 
-    train_loader = DataLoader(data_t[0:30], batch_size=1, shuffle=True)
-    test_loader = DataLoader(data_t[30:], batch_size=1)
+    train_loader = DataLoader(data_t[0:30], batch_size=10, shuffle=True)
+    test_loader = DataLoader(data_t[30:], batch_size=5)
 
     # Define model and optimization environment
     model = GCN(1024, 256, 64)
     model.to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=3e-6)  # , weight_decay=5e-4)
+    optimizer = torch.optim.Adam(model.parameters(), lr=5e-6)  # , weight_decay=5e-4)
     criterion = torch.nn.CrossEntropyLoss()
 
     # Training loop
-    for epoch in range(200):
+    for epoch in range(500):
         # noinspection PyTypeChecker
         for batch, sample in enumerate(train_loader):
             model.train()
             optimizer.zero_grad()  # Clear gradients.
             out = model(sample)  # Perform a single forward pass.
-            loss = criterion(
-                out @ out.T,
-                torch.squeeze(
-                    tgeo.utils.to_dense_adj(sample.edge_index, batch=sample.batch)
-                ),
-            )  # Compute the loss solely based on the training nodes.
+            adj_tensor = torch.squeeze(
+                tgeo.utils.to_dense_adj(sample.edge_index, batch=sample.batch)
+            )
+            loss = None
+            for graph in range(sample.batch[-1]):
+                embedding = out[sample.batch == graph, :]
+                loss = criterion(
+                    embedding @ embedding.T,
+                    adj_tensor[graph, :, :],
+                )  # Compute the loss solely based on the training nodes.
+
             loss.backward()  # Derive gradients.
             optimizer.step()  # Update parameters based on gradients.
 
@@ -144,7 +154,7 @@ if __name__ == "__main__":
         "--tolerance", help="The tolerance for convergence", type=float, default=1e-3
     )
     parser.add_argument(
-        "--iterations", help="The maximal number of iterations", type=int, default=100
+        "--iterations", help="The maximal number of iterations", type=int, default=20
     )
     parser.add_argument(
         "--database",
@@ -279,6 +289,7 @@ if __name__ == "__main__":
         tolerance=args.tolerance,
         projection_method=args.proj_method,
     )
+    # m_res = matcheig.matcheig(knode, args.rank, g_sizes)
 
     # Compare with groundtruth
     truth = pyg.generate_groundtruth(g_sizes, full_size, graph_index)
