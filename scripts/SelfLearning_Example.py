@@ -4,15 +4,10 @@ Example of matching with self learning (for improving the features)
 .. moduleauthor: François-Xavier Dupé
 """
 import argparse
-import copy
 
 import numpy as np
 import networkx as nx
-import torch
-import torch_geometric as tgeo
-from torch_geometric.loader import DataLoader
-from torch_geometric.nn import GCNConv
-import torch.nn.functional as func
+import sklearn.decomposition as skld
 
 import graph_matching_tools.algorithms.kernels.utils as kutils
 import graph_matching_tools.algorithms.kernels.gaussian as gaussian
@@ -25,103 +20,17 @@ import graph_matching_tools.io.pygeo_graphs as pyg
 import graph_matching_tools.utils.permutations as perm
 
 
-class GCN(torch.nn.Module):
-    def __init__(self, num_features, hidden_channels, output_dim):
-        super().__init__()
-        # torch.manual_seed(1234567)
-        self.conv1 = GCNConv(num_features, hidden_channels)
-        self.conv2 = GCNConv(hidden_channels, output_dim)
+def get_node_data_matrix(graph: nx.Graph, data_name: str):
+    """Get the node data matrix from a current graph.
 
-    def forward(self, graph):
-        noise = torch.randn(graph.x.shape) * 0.1
-        x = self.conv1(graph.x + noise, graph.edge_index)
-        x = x.relu()
-        x = func.dropout(x, p=0.1)
-        x = self.conv2(x, graph.edge_index)
-        x = func.softmax(x, dim=1)
-        return x
-
-
-def test_model(model, dataloader):
-    model.eval()
-    loss = 0
-    for batch, sample in enumerate(dataloader):
-        out = model(sample)  # Perform a single forward pass.
-        adj_tensor = torch.squeeze(
-            tgeo.utils.to_dense_adj(sample.edge_index, batch=sample.batch)
-        )
-        for graph in range(sample.batch[-1]):
-            embedding = out[sample.batch == graph, :]
-            loss += torch.nn.functional.mse_loss(
-                embedding @ embedding.T,
-                adj_tensor[graph, :, :],
-            )  # Compute the loss solely based on the training nodes.
-
-    return loss / len(dataloader)
-
-
-def update_graphs(graphs, model):
-    new_graphs = copy.deepcopy(graphs)
-
-    for graph in new_graphs:
-        data = tgeo.utils.from_networkx(graph, ["x"], None)
-        new_representation = model(data)
-        for i_n in range(nx.number_of_nodes(graph)):
-            graph.nodes[i_n]["x"] = np.squeeze(
-                new_representation[i_n, :].detach().numpy()
-            )
-
-    return new_graphs
-
-
-def run_learning(dataset):
-    device_d = "cuda" if torch.cuda.is_available() else "cpu"
-    device = torch.device(device_d)
-
-    data_t = list()
-    for graph in dataset:
-        data = tgeo.utils.from_networkx(graph, ["x"], None)
-        data.to(device_d)
-        data_t.append(data)
-
-    train_loader = DataLoader(data_t[0:30], batch_size=10, shuffle=True)
-    test_loader = DataLoader(data_t[30:], batch_size=5)
-
-    # Define model and optimization environment
-    model = GCN(1024, 256, 64)
-    model.to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=5e-6)  # , weight_decay=5e-4)
-    criterion = torch.nn.CrossEntropyLoss()
-
-    # Training loop
-    for epoch in range(500):
-        # noinspection PyTypeChecker
-        for batch, sample in enumerate(train_loader):
-            model.train()
-            optimizer.zero_grad()  # Clear gradients.
-            out = model(sample)  # Perform a single forward pass.
-            adj_tensor = torch.squeeze(
-                tgeo.utils.to_dense_adj(sample.edge_index, batch=sample.batch)
-            )
-            loss = None
-            for graph in range(sample.batch[-1]):
-                embedding = out[sample.batch == graph, :]
-                loss = criterion(
-                    embedding @ embedding.T,
-                    adj_tensor[graph, :, :],
-                )  # Compute the loss solely based on the training nodes.
-
-            loss.backward()  # Derive gradients.
-            optimizer.step()  # Update parameters based on gradients.
-
-        # noinspection PyTypeChecker
-        print(
-            "Epoch {}, mse train = {}, mse test = {}".format(
-                epoch, test_model(model, train_loader), test_model(model, test_loader)
-            )
-        )
-
-    return model
+    :param nx.Graph graph: a graph.
+    :param str data_name: the name of the data vector.
+    :return:
+    """
+    data = np.zeros((nx.number_of_nodes(graph), len(graph.nodes[0][data_name])))
+    for node in range(nx.number_of_nodes(graph)):
+        data[node, :] = graph.nodes[node][data_name]
+    return data
 
 
 if __name__ == "__main__":
@@ -208,58 +117,57 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
+    # Take all the graphs for the learning step
     all_graphs = pyg.get_graph_database(
         args.database, args.isotropic, args.category, args.repo + "/" + args.database
     )
 
     print("Size dataset: {} graphs".format(len(all_graphs)))
     print([nx.number_of_nodes(g) for g in all_graphs])
-    all_graphs = [g for g in all_graphs]
 
     dummy_index = []
     graph_index = []
 
+    data_matrices = [get_node_data_matrix(g, "x") for g in all_graphs]
+    data_matrices = np.concatenate(data_matrices, axis=0)
+
+    pca = skld.PCA(n_components=30)
+    pca.fit(data_matrices)
+    data_reduced = pca.transform(data_matrices)
+
+    new_graphs = []
+    for graph in all_graphs:
+        new_graph = graph.copy()
+        for i_n in range(nx.number_of_nodes(graph)):
+            new_graph.nodes[i_n]["x"] = np.squeeze(
+                pca.transform(np.array(graph.nodes[i_n]["x"])[np.newaxis, :])
+            )
+        new_graphs.append(new_graph)
+
+    if args.add_dummy:
+        new_graphs, graph_index, dummy_index = pyg.add_dummy_nodes(
+            new_graphs, args.rank, dimension=30
+        )
+
     if args.shuffle:
-        all_graphs, graph_index = utils.randomize_nodes_position(all_graphs)
+        new_graphs, graph_index = utils.randomize_nodes_position(new_graphs)
 
     if not args.add_dummy and not args.shuffle:
         graph_index = [list(range(nx.number_of_nodes(g))) for g in all_graphs]
 
-    g_sizes = [nx.number_of_nodes(g) for g in all_graphs]
+    g_sizes = [nx.number_of_nodes(g) for g in new_graphs]
     full_size = int(np.sum(g_sizes))
     print("Full-size: {} nodes".format(full_size))
-
-    gnn_model = None
-    if args.load_model is None:
-        gnn_model = run_learning(all_graphs)
-        if args.model_name is not None:
-            torch.save(gnn_model.state_dict(), args.model_name)
-    elif args.model_name is not None:
-        gnn_model = GCN(1024, 256, 64)
-        # noinspection PyArgumentList
-        gnn_model.state_dict(torch.load(args.model_name, map_location="cpu"))
-
-    new_graphs = all_graphs
-    if gnn_model is not None:
-        gnn_model.eval()
-        new_graphs = update_graphs(all_graphs, gnn_model)
-
-    if args.add_dummy:
-        dim = new_graphs[0].nodes[0]["x"].shape[0]
-        all_graphs, graph_index, dummy_index = pyg.add_dummy_nodes(
-            all_graphs, args.rank, dimension=dim
-        )
 
     node_kernel = gaussian.create_gaussian_node_kernel(
         args.sigma, "pos" if args.database == "PascalPF" else "x"
     )
     knode = kutils.create_full_node_affinity_matrix(new_graphs, node_kernel)
 
-    import matplotlib.pyplot as plt
-
-    plt.imshow(knode)
-    plt.colorbar()
-    plt.show()
+    # import matplotlib.pyplot as plt
+    # plt.imshow(knode)
+    # plt.colorbar()
+    # plt.show()
 
     # Compute the big phi matrix
     vectors, offsets = rff.create_random_vectors(1, args.rff, args.gamma)

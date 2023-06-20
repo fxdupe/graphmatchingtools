@@ -1,4 +1,4 @@
-""""
+"""
 This code is from the paper
 "Symmetric Sparse Boolean Matrix Factorization and Applications" (ITCS 2022) by
 Chen, S., Song, Z., Tao, R., & Zhang, R.

@@ -1,4 +1,4 @@
-""""
+"""
 This code is from the paper
 "Sparse Quadratic Optimisation over the Stiefel Manifold with Application to Permutation Synchronisation"
 (NeurIPS 2021).
