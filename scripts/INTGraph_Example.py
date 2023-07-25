@@ -12,6 +12,7 @@ import networkx as nx
 import graph_matching_tools.algorithms.multiway.hippi as hippi
 import graph_matching_tools.algorithms.multiway.matcheig as matcheig
 import graph_matching_tools.algorithms.multiway.mkergm as mkergm
+import graph_matching_tools.algorithms.multiway.dist_mkergm as dist_mkergm
 import graph_matching_tools.algorithms.multiway.stiefel as stiefel
 import graph_matching_tools.algorithms.multiway.irgcl as irgcl
 import graph_matching_tools.utils.utils as utils
@@ -99,7 +100,19 @@ if __name__ == "__main__":
         help="The multi-graph matching method",
         default="new",
         type=str,
-        choices=["mkergm", "hippi", "matcheig", "sqad", "irgcl"],
+        choices=["dist_mkergm", "mkergm", "hippi", "matcheig", "sqad", "irgcl"],
+    )
+    parser.add_argument(
+        "--dist_batch_size",
+        help="Size of a batch (number of graph)",
+        default=10,
+        type=int,
+    )
+    parser.add_argument(
+        "--dist_batch_number",
+        help="Number of batches",
+        default=10,
+        type=int,
     )
     parser.add_argument(
         "--add_dummy", help="Add dummy nodes", action="store_true", default=False
@@ -121,6 +134,7 @@ if __name__ == "__main__":
         all_graphs, dummy_index = add_dummy_nodes(all_graphs, args.rank)
 
     sizes = [nx.number_of_nodes(g) for g in all_graphs]
+    print(sizes)
 
     node_kernel = gaussian.create_gaussian_node_kernel(args.sigma, "coord")
     knode = kutils.create_full_node_affinity_matrix(all_graphs, node_kernel)
@@ -147,6 +161,35 @@ if __name__ == "__main__":
             len(sizes),
         )
         m_res = m_res @ m_res.T
+    elif args.method == "dist_mkergm":
+        vectors, offsets = rff.create_random_vectors(1, args.rff, args.gamma)
+        d_phi = list()
+        for i in range(len(all_graphs)):
+            g_phi = rff.compute_phi(
+                all_graphs[i], "geodesic_distance", vectors, offsets
+            )
+            d_phi.append(g_phi)
+
+        d_knodes = dict()
+        for i_g1 in range(len(all_graphs)):
+            for i_g2 in range(i_g1 + 1, len(all_graphs)):
+                d_knodes["{},{}".format(i_g1, i_g2)] = (
+                    kutils.compute_knode(
+                        all_graphs[i_g1], all_graphs[i_g2], node_kernel
+                    )
+                    * args.rank
+                )
+
+        d_perms = dist_mkergm.stochastic_dist_mkergm(
+            all_graphs,
+            d_knodes,
+            d_phi,
+            args.rank,
+            args.dist_batch_number,
+            args.dist_batch_size,
+            args.iterations,
+        )
+        m_res = dist_mkergm.get_bulk_permutations_from_dict(d_perms, sizes)
     else:
         vectors, offsets = rff.create_random_vectors(1, args.rff, args.gamma)
         full_size = knode.shape[0]
@@ -159,7 +202,8 @@ if __name__ == "__main__":
             phi[:, index : index + sizes[i], index : index + sizes[i]] = g_phi
             index += sizes[i]
 
-        knode /= np.max(sizes)
+        # knode /= np.max(sizes)
+        knode *= args.rank
 
         x_init = knode * 0.0
         gradient = mkergm.create_gradient(phi, knode)

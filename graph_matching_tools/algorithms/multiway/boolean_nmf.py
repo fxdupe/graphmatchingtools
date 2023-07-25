@@ -3,6 +3,8 @@ This code is from the paper
 "Symmetric Sparse Boolean Matrix Factorization and Applications" (ITCS 2022) by
 Chen, S., Song, Z., Tao, R., & Zhang, R.
 
+TODO: use JAX instead of Numpy (must check the compatibility of the code)
+
 .. moduleauthor:: François-Xavier Dupé
 """
 import numpy as np

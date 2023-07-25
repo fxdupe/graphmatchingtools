@@ -156,7 +156,7 @@ def stochastic_dist_mkergm(
                 i_size += b_sizes[i]
 
             # Apply the projection step
-            res = mkergm._rank_projector(bulk, rank, b_sizes, "gpow")
+            res = mkergm._rank_projector(bulk, rank, b_sizes, "matcheig")
 
             i_size = 0
             for i in range(index.shape[0]):
