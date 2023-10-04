@@ -114,7 +114,7 @@ def tensor_matching(
     knode = np.zeros((t1.shape[1], t2.shape[1]))
     for i in range(knode.shape[0]):
         for j in range(knode.shape[1]):
-            knode[i, j] = node_kernel(t1[:, i, i], t2[:, j, j])
+            knode[i, j] = np.squeeze(node_kernel(t1[:, i, i], t2[:, j, j]))
 
     # Get the gradient
     gradient = kergm.create_fast_gradient(phi1, phi2, knode)
@@ -209,6 +209,7 @@ def compute_mean_graph(
                 mean_graph,
                 node_kernel,
                 edge_gamma,
+                rff_dim=rff_dim,
                 num_alpha=num_alpha,
                 entropy_gamma=entropy_gamma,
                 random_seed=random_seed,

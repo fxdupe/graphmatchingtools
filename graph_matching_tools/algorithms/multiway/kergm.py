@@ -20,6 +20,7 @@ def multi_pairwise_kergm(
     nb_alphas: int,
     iterations: int,
     rff: int = 100,
+    epsilon: float = 1e-16,
 ) -> np.ndarray:
     """Direct pairwise matching on a set of graphs using KerGM.
 
@@ -32,6 +33,7 @@ def multi_pairwise_kergm(
     :param int nb_alphas: the number of alpha values.
     :param int iterations: the maximal number of iterations for each alpha.
     :param int rff: the size of the random Fourier features.
+    :param float epsilon: an additional term to avoid division by 0.
     :return: the full permutation matrix.
     :rtype: np.ndarray
 
@@ -75,6 +77,7 @@ def multi_pairwise_kergm(
                 entropy_gamma=entropy,
                 iterations=iterations,
                 num_alpha=nb_alphas,
+                epsilon=epsilon,
             )
 
             m_res = np.zeros((sizes[i_g1], sizes[i_g2]))
