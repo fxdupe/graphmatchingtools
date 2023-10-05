@@ -1,6 +1,17 @@
 Changelog
 =========
 
+0.8.0
+-----
+
+Here the most important changes:
+
+* Add the factorized multi-graph matching method.
+* Add the factorized version of the RRWM pairwise matching.
+* Update documentation.
+* Update tools.
+
+
 0.7.0
 -----
 

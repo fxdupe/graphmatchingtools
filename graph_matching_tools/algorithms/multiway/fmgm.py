@@ -4,47 +4,13 @@ This code is directly from the paper
 
 .. moduleauthor:: François-Xavier Dupé
 """
+from typing import Callable
+
 import numpy as np
-import scipy.optimize as sco
 import networkx as nx
 
 import graph_matching_tools.algorithms.kernels.utils as ku
-
-
-def create_pairwise_gradient(
-    inc_g1: np.ndarray, inc_g2: np.ndarray, knode: np.ndarray, kedge: np.ndarray
-) -> callable:
-    """Create the gradient function for pairwise graph matching
-
-    :param np.ndarray inc_g1: the incident matrix of the first graph.
-    :param np.ndarray inc_g2: the incident matrix of the second graph.
-    :param np.ndarray knode: the node affinity matrix between the two graphs.
-    :param np.ndarray kedge: the edge affinity matrix between the two graphs.
-    :return: the gradient function.
-    :rtype: callable
-    """
-    v1 = np.hstack((inc_g1, np.identity(inc_g1.shape[0])))
-    v2 = np.hstack((inc_g2, np.identity(inc_g2.shape[0])))
-
-    d_mat = np.zeros(
-        (inc_g1.shape[0] + inc_g1.shape[1], inc_g2.shape[0] + inc_g2.shape[1])
-    )
-    d_mat[0 : kedge.shape[0], 0 : kedge.shape[1]] = kedge
-    d_mat[0 : kedge.shape[0], kedge.shape[1] :] = -kedge @ inc_g2.T
-    d_mat[kedge.shape[0] :, 0 : kedge.shape[1]] = -inc_g1 @ kedge
-    d_mat[kedge.shape[0] :, kedge.shape[1] :] = inc_g1 @ kedge @ inc_g2.T + knode
-
-    def gradient(x: np.ndarray) -> np.ndarray:
-        """The gradient at a given point.
-
-        :param np.ndarray x: the current permutation matrix.
-        :return: the gradient at x.
-        :rtype: np.ndarray
-        """
-        tmp = v1.T @ x @ v2
-        return 2 * v1 @ (d_mat * tmp) @ v2.T
-
-    return gradient
+import graph_matching_tools.algorithms.pairwise.rrwm as rrwm
 
 
 def create_multiway_gradient(
@@ -53,7 +19,7 @@ def create_multiway_gradient(
     incs: list[np.ndarray],
     knodes: list[np.ndarray],
     kedges: list[np.ndarray],
-) -> callable:
+) -> Callable[[np.ndarray], np.ndarray]:
     """Create the gradient function for multiway graph matching
 
     :param int n_graph: the current graph (the gradient depends on this graph).
@@ -62,7 +28,7 @@ def create_multiway_gradient(
     :param list[np.ndarray] knodes: the node affinity matrices (against the current graph).
     :param list[np.ndarray] kedges: the edge affinity matrices (against the current graph).
     :return: the gradient function.
-    :rtype: callable
+    :rtype: Callable[[np.ndarray], np.ndarray]
     """
     v = []
     for inc in incs:
@@ -157,54 +123,104 @@ def compute_multiway_objective(
     return value
 
 
-def rrwm(
-    gradient: callable,
-    size: tuple[int, int],
-    alpha: float = 0.2,
-    beta: float = 30,
-    iterations: int = 100,
-    tolerance: float = 1e-3,
-) -> np.ndarray:
-    """The reweighted random walks for graph matching method.
+def create_multiway_local_gradient(
+    source_graph: int,
+    target_graph: int,
+    perms: list[np.ndarray],
+    incs: list[np.ndarray],
+    knodes: list[np.ndarray],
+    kedges: list[np.ndarray],
+) -> Callable[[np.ndarray], np.ndarray]:
+    """Create the local gradient function for multiway graph matching
 
-    :param callable gradient: the gradient of the current objective function.
-    :param tuple[int, int] size: the size the permutation matrix.
-    :param float alpha: the mixing parameter for convergence.
-    :param float beta: the scaling parameter when reweighting.
-    :param int iterations: the maximal number of iterations.
-    :param float tolerance: the tolerance for convergence.
-    :return: the permutation matrix.
-    :rtype: np.ndarray
+    :param int source_graph: the source graph (the gradient depends on this graph).
+    :param int target_graph: the target graph (the gradient depends on this graph).
+    :param list[np.ndarray] perms: the current permutation matrices.
+    :param list[np.ndarray] incs: the incident matrices.
+    :param list[np.ndarray] knodes: the node affinity matrices (against the source graph).
+    :param list[np.ndarray] kedges: the edge affinity matrices (against the source graph).
+    :return: the gradient function.
+    :rtype: Callable[[np.ndarray], np.ndarray]
     """
-    x = np.ones(size)
-    grad = gradient(x)
-    y = np.exp(beta * grad / np.max(grad))
-    for iter1 in range(iterations):
-        for iter2 in range(iterations):
-            y = y / y.sum(axis=1).reshape(-1, 1)
-            y = y / y.sum(axis=0)
-        x_new = alpha * grad + (1 - alpha) * y
-        if np.linalg.norm(x - x_new) < tolerance:
-            break
-        x = x_new
+    v = []
+    for inc in incs:
+        v1 = np.hstack((inc, np.identity(inc.shape[0])))
+        v.append(v1)
 
-    # Discretization using Hungarian method
-    res = np.zeros(size)
-    r, c = sco.linear_sum_assignment(-x)
-    for j in range(r.shape[0]):
-        res[r[j], c[j]] = 1
+    d_mat = np.zeros(
+        (
+            incs[source_graph].shape[0] + incs[source_graph].shape[1],
+            incs[target_graph].shape[0] + incs[target_graph].shape[1],
+        )
+    )
+    d_mat[
+        0 : kedges[target_graph].shape[0], 0 : kedges[target_graph].shape[1]
+    ] = kedges[target_graph]
+    d_mat[0 : kedges[target_graph].shape[0], kedges[target_graph].shape[1] :] = (
+        -kedges[target_graph] @ incs[target_graph].T
+    )
+    d_mat[kedges[target_graph].shape[0] :, 0 : kedges[target_graph].shape[1]] = (
+        -incs[source_graph] @ kedges[target_graph]
+    )
+    d_mat[kedges[target_graph].shape[0] :, kedges[target_graph].shape[1] :] = (
+        incs[source_graph] @ kedges[target_graph] @ incs[target_graph].T
+        + knodes[target_graph]
+    )
 
-    return res
+    def gradient(x: np.ndarray) -> np.ndarray:
+        """The gradient at a given point.
+
+        :param np.ndarray x: the current permutation matrix.
+        :return: the gradient at x.
+        :rtype: np.ndarray
+        """
+        tmp = v[source_graph].T @ x @ perms[target_graph].T @ v[target_graph]
+        res = v[source_graph] @ (d_mat * tmp) @ v[target_graph].T @ perms[target_graph]
+        return 2 * res
+
+    return gradient
 
 
 def factorized_multigraph_matching(
     graphs: list[nx.Graph],
     reference: int,
-    node_kernel: callable,
-    edge_kernel: callable,
+    node_kernel: Callable[[nx.Graph, int, nx.Graph, int], float],
+    edge_kernel: Callable[
+        [nx.Graph, nx.Graph, tuple[int, int], tuple[int, int]], float
+    ],
     iterations: int = 100,
-    tolerance: float = 1e-3,
-):
+    tolerance: float = 1e-2,
+) -> np.ndarray:
+    """Factorized Multi-Graph Matching
+
+    :param list[nx.Graph] graphs: the list of graphs.
+    :param int reference: the index of the reference graph.
+    :param Callable[[nx.Graph, int, nx.Graph, int], float] node_kernel: the kernel between node attributes.
+    :param Callable[[nx.Graph, nx.Graph, tuple[int, int], tuple[int, int]], float] edge_kernel: the kernel between edge attributes.
+    :param int iterations: the maximal number of iterations.
+    :param float tolerance: the tolerance for convergence.
+    :return: the bulk permutation matrix.
+    :rtype: np.ndarray
+
+    Here an example using NetworkX and some utils:
+
+    .. doctest:
+
+    >>> node_kernel = kern.create_gaussian_node_kernel(2.0, "weight")
+    >>> def edge_kernel(g1, g2, e1, e2):
+    ...     w1 = g1.edges[e1[0], e1[1]]["weight"]
+    ...     w2 = g2.edges[e2[0], e2[1]]["weight"]
+    ...     return w1 * w2
+    >>> res = fmgm.factorized_multigraph_matching(graphs, 2, node_kernel, edge_kernel)
+    >>> res
+    array([[1., 0., 0., 1., 0., 1., 0.],
+           [0., 1., 1., 0., 0., 0., 1.],
+           [0., 1., 1., 0., 0., 0., 1.],
+           [1., 0., 0., 1., 0., 1., 0.],
+           [0., 0., 0., 0., 1., 0., 0.],
+           [1., 0., 0., 1., 0., 1., 0.],
+           [0., 1., 1., 0., 0., 0., 1.]])
+    """
     # Get the node affinity matrices for all pairs
     knodes = []
     for i_g1 in range(len(graphs)):
@@ -253,13 +269,13 @@ def factorized_multigraph_matching(
             u.append(np.identity(knodes[i_g][0].shape[0]))
             continue
 
-        grad = create_pairwise_gradient(
+        grad = rrwm.create_pairwise_gradient(
             incidence_mat[i_g],
             incidence_mat[reference],
             knodes[i_g][reference],
             kedges[i_g][reference],
         )
-        pair_perm = rrwm(
+        pair_perm = rrwm.rrwm(
             grad,
             (knodes[i_g][0].shape[0], knodes[i_g][reference].shape[1]),
             iterations=iterations,
@@ -278,7 +294,7 @@ def factorized_multigraph_matching(
             grad = create_multiway_gradient(
                 i_g, u, incidence_mat, knodes[i_g], kedges[i_g]
             )
-            new_perm = rrwm(
+            new_perm = rrwm.rrwm(
                 grad,
                 (knodes[i_g][0].shape[0], knodes[i_g][reference].shape[1]),
                 iterations=iterations,
@@ -288,7 +304,7 @@ def factorized_multigraph_matching(
             old_perm = u[i_g]
             u[i_g] = new_perm
             new_val = compute_multiway_objective(u, incidence_mat, knodes, kedges)
-            if np.linalg.norm(new_perm - u[i_g]) > 1e-3 and new_val < prev_val:
+            if new_val < prev_val:
                 prev_val = new_val
                 modification = True
             else:
@@ -299,6 +315,38 @@ def factorized_multigraph_matching(
             break
 
     # Local updating
+    for l_iter in range(iterations):
+        modification = False
+        for i_g1 in range(len(graphs)):
+            if i_g1 == reference:
+                continue
+
+            for i_g2 in range(len(graphs)):
+                if i_g2 == i_g1:
+                    continue
+
+                grad = create_multiway_local_gradient(
+                    i_g1, i_g2, u, incidence_mat, knodes[i_g1], kedges[i_g1]
+                )
+                new_perm = rrwm.rrwm(
+                    grad,
+                    (knodes[i_g1][0].shape[0], knodes[i_g1][reference].shape[1]),
+                    iterations=iterations,
+                    tolerance=tolerance,
+                )
+
+                old_perm = u[i_g1]
+                u[i_g1] = new_perm
+                new_val = compute_multiway_objective(u, incidence_mat, knodes, kedges)
+                if new_val < prev_val:
+                    prev_val = new_val
+                    modification = True
+                else:
+                    u[i_g1] = old_perm
+
+        # No modification means convergence
+        if not modification:
+            break
 
     # Final result (removing reference dependency)
     res = np.concatenate(u, axis=0)

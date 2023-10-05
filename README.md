@@ -1,6 +1,6 @@
 # Graph Matching Tools
 
-This toolbox propose a common ground for several graph matching methods.
+This toolbox proposes a common ground for several graph matching methods.
 We propose our methods with a set of state-of-art methods using our own implementation.
 The scope of this work is to offer reproducible research and alternatives.
 
@@ -11,6 +11,7 @@ The scope of this work is to offer reproducible research and alternatives.
 - [KerGM](https://papers.nips.cc/paper/2019/hash/cd63a3eec3319fd9c84c942a08316e00-Abstract.html)
 - [GWL](https://proceedings.mlr.press/v97/xu19b.html)
 - [FGW](https://proceedings.mlr.press/v97/titouan19a.html)
+- [Factorized RRWM](https://www.sciencedirect.com/science/article/abs/pii/S0031320323002984)
 
 ### Multiway methods (state-of-art)
 
@@ -24,6 +25,7 @@ The scope of this work is to offer reproducible research and alternatives.
 - [GA-MGMC](https://proceedings.neurips.cc/paper/2020/hash/e6384711491713d29bc63fc5eeb5ba4f-Abstract.html)
 - [MatchALS](https://www.cv-foundation.org/openaccess/content_iccv_2015/html/Zhou_Multi-Image_Matching_via_ICCV_2015_paper.html)
 - [Symmetric Sparse Boolean Matrix Factorization](https://arxiv.org/abs/2102.01570)
+- [Factorized multi-graph matching](https://www.sciencedirect.com/science/article/abs/pii/S0031320323002984)
 
 ### Multiway method (homemade)
 

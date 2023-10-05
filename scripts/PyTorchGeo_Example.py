@@ -27,6 +27,7 @@ import graph_matching_tools.algorithms.multiway.irgcl as irgcl
 import graph_matching_tools.algorithms.multiway.ga_mgmc as ga_mgmc
 import graph_matching_tools.algorithms.multiway.matchals as matchals
 import graph_matching_tools.algorithms.multiway.boolean_nmf as nmf
+import graph_matching_tools.algorithms.multiway.fmgm as fmgm
 import graph_matching_tools.io.pygeo_graphs as pyg
 
 
@@ -72,6 +73,7 @@ if __name__ == "__main__":
             "matchals",
             "gamgmc",
             "dist_mkergm",
+            "fmgm",
         ],
         default="mkergm",
     )
@@ -232,7 +234,11 @@ if __name__ == "__main__":
     node_kernel = None
     knode = None
 
-    if args.method != "quickm" and args.method != "dist_mkergm":
+    if (
+        args.method != "quickm"
+        and args.method != "dist_mkergm"
+        and args.method != "fmgm"
+    ):
         node_kernel = gaussian.create_gaussian_node_kernel(
             args.sigma, "pos" if args.database == "PascalPF" else "x"
         )
@@ -327,6 +333,24 @@ if __name__ == "__main__":
             args.iterations,
         )
         m_res = dist_mkergm.get_bulk_permutations_from_dict(d_perms, g_sizes)
+    elif args.method == "fmgm":
+        node_kernel = gaussian.create_gaussian_node_kernel(
+            args.sigma, "pos" if args.database == "PascalPF" else "x"
+        )
+
+        def edge_kernel(g1, g2, e1, e2):
+            w1 = g1.edges[e1[0], e1[1]]["weight"]
+            w2 = g2.edges[e2[0], e2[1]]["weight"]
+            return np.exp(-args.gamma * (np.abs(w1 - w2) ** 2.0))
+
+        m_res = fmgm.factorized_multigraph_matching(
+            all_graphs,
+            args.reference_graph,
+            node_kernel,
+            edge_kernel,
+            iterations=args.iterations,
+            tolerance=args.tolerance,
+        )
     else:
         # Compute the big phi matrix
         vectors, offsets = rff.create_random_vectors(1, args.rff, args.gamma)

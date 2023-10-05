@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.abspath("../"))
 project = "GraphMatchingTools"
 copyright = "2023, François-Xavier Dupé, Rohit Yadav"
 author = "François-Xavier Dupé, Rohit Yadav"
-release = "0.7.0"
+release = "0.8.0"
 show_authors = True
 
 # -- General configuration ---------------------------------------------------
@@ -69,7 +69,9 @@ import graph_matching_tools.algorithms.mean.wasserstein_barycenter as fgw_baryce
 import graph_matching_tools.algorithms.mean.mm_mean as mm_mean
 import graph_matching_tools.algorithms.pairwise.fgw as fgw_pairwise
 import graph_matching_tools.algorithms.pairwise.gwl as gwl_pairwise
+import graph_matching_tools.algorithms.pairwise.rrwm as rrwm
 import graph_matching_tools.algorithms.pairwise.kergm as kergm_pairwise
+import graph_matching_tools.algorithms.multiway.fmgm as fmgm
 
 
 graph1 = nx.Graph()

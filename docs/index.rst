@@ -35,6 +35,7 @@ Pairwise method
 - `KerGM <https://papers.nips.cc/paper/2019/hash/cd63a3eec3319fd9c84c942a08316e00-Abstract.html>`_
 - `GWL <https://proceedings.mlr.press/v97/xu19b.html>`_
 - `FGW <https://proceedings.mlr.press/v97/titouan19a.html>`_
+- `Factorized RRWM <https://www.sciencedirect.com/science/article/abs/pii/S0031320323002984>`_
 
 Multiway methods (state-of-art)
 -------------------------------
@@ -49,6 +50,7 @@ Multiway methods (state-of-art)
 - `GA-MGM <https://proceedings.neurips.cc/paper/2020/hash/e6384711491713d29bc63fc5eeb5ba4f-Abstract.html>`_
 - `MatchALS <https://www.cv-foundation.org/openaccess/content_iccv_2015/html/Zhou_Multi-Image_Matching_via_ICCV_2015_paper.html>`_
 - `Symmetric Sparse Boolean Matrix Factorization <https://arxiv.org/abs/2102.01570>`_
+- `Factorized Multi-Graph Matching <https://www.sciencedirect.com/science/article/abs/pii/S0031320323002984>`_
 
 Multiway methods (homemade)
 ---------------------------
@@ -90,8 +92,10 @@ All the examples in the documentation are done with the following imports,
    >>> import graph_matching_tools.algorithms.pairwise.fgw as fgw_pairwise
    >>> import graph_matching_tools.algorithms.pairwise.gwl as gwl_pairwise
    >>> import graph_matching_tools.algorithms.pairwise.kergm as kergm_pairwise
+   >>> import graph_matching_tools.algorithms.pairwise.rrwm as rrwm
    >>> import graph_matching_tools.algorithms.multiway.ga_mgmc as ga_mgmc
    >>> import graph_matching_tools.algorithms.multiway.matchals as matchals
+   >>> import graph_matching_tools.algorithms.multiway.fmgm as fmgm
 
 We use three graphs for illustration purpose. These graphs are build using Networkx using
 the following code:
