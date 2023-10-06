@@ -304,7 +304,7 @@ def factorized_multigraph_matching(
             old_perm = u[i_g]
             u[i_g] = new_perm
             new_val = compute_multiway_objective(u, incidence_mat, knodes, kedges)
-            if new_val < prev_val:
+            if new_val > prev_val:
                 prev_val = new_val
                 modification = True
             else:
@@ -338,7 +338,7 @@ def factorized_multigraph_matching(
                 old_perm = u[i_g1]
                 u[i_g1] = new_perm
                 new_val = compute_multiway_objective(u, incidence_mat, knodes, kedges)
-                if new_val < prev_val:
+                if new_val > prev_val:
                     prev_val = new_val
                     modification = True
                 else:
