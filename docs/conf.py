@@ -72,6 +72,7 @@ import graph_matching_tools.algorithms.pairwise.gwl as gwl_pairwise
 import graph_matching_tools.algorithms.pairwise.rrwm as rrwm
 import graph_matching_tools.algorithms.pairwise.kergm as kergm_pairwise
 import graph_matching_tools.algorithms.multiway.fmgm as fmgm
+import graph_matching_tools.algorithms.multiway.mixer as mixer
 
 
 graph1 = nx.Graph()

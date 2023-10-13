@@ -26,6 +26,7 @@ The scope of this work is to offer reproducible research and alternatives.
 - [MatchALS](https://www.cv-foundation.org/openaccess/content_iccv_2015/html/Zhou_Multi-Image_Matching_via_ICCV_2015_paper.html)
 - [Symmetric Sparse Boolean Matrix Factorization](https://arxiv.org/abs/2102.01570)
 - [Factorized multi-graph matching](https://www.sciencedirect.com/science/article/abs/pii/S0031320323002984)
+- [MIXER: Multiattribute, Multiway Fusion of Uncertain Pairwise Affinities](https://ieeexplore.ieee.org/abstract/document/10058986/)
 
 ### Multiway method (homemade)
 

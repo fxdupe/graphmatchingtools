@@ -28,6 +28,7 @@ import graph_matching_tools.algorithms.multiway.ga_mgmc as ga_mgmc
 import graph_matching_tools.algorithms.multiway.matchals as matchals
 import graph_matching_tools.algorithms.multiway.boolean_nmf as nmf
 import graph_matching_tools.algorithms.multiway.fmgm as fmgm
+import graph_matching_tools.algorithms.multiway.mixer as mixer
 import graph_matching_tools.io.pygeo_graphs as pyg
 
 
@@ -74,6 +75,7 @@ if __name__ == "__main__":
             "gamgmc",
             "dist_mkergm",
             "fmgm",
+            "mixer",
         ],
         default="mkergm",
     )
@@ -282,6 +284,9 @@ if __name__ == "__main__":
         m_res = matcheig.matcheig(knode, args.rank, g_sizes)
     elif args.method == "sqad":
         u_nodes = stiefel.sparse_stiefel_manifold_sync(knode, args.rank, g_sizes)
+        m_res = u_nodes @ u_nodes.T
+    elif args.method == "mixer":
+        u_nodes = mixer.mixer(knode, g_sizes, args.mu_init, args.iterations)
         m_res = u_nodes @ u_nodes.T
     elif args.method == "quickm":
         u_nodes = quickmatch.quickmatch(

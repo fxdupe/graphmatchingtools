@@ -51,6 +51,7 @@ Multiway methods (state-of-art)
 - `MatchALS <https://www.cv-foundation.org/openaccess/content_iccv_2015/html/Zhou_Multi-Image_Matching_via_ICCV_2015_paper.html>`_
 - `Symmetric Sparse Boolean Matrix Factorization <https://arxiv.org/abs/2102.01570>`_
 - `Factorized Multi-Graph Matching <https://www.sciencedirect.com/science/article/abs/pii/S0031320323002984>`_
+- `MIXER: Multiattribute, Multiway Fusion of Uncertain Pairwise Affinities <https://ieeexplore.ieee.org/abstract/document/10058986/>`_
 
 Multiway methods (homemade)
 ---------------------------
@@ -96,6 +97,7 @@ All the examples in the documentation are done with the following imports,
    >>> import graph_matching_tools.algorithms.multiway.ga_mgmc as ga_mgmc
    >>> import graph_matching_tools.algorithms.multiway.matchals as matchals
    >>> import graph_matching_tools.algorithms.multiway.fmgm as fmgm
+   >>> import graph_matching_tools.algorithms.multiway.mixer as mixer
 
 We use three graphs for illustration purpose. These graphs are build using Networkx using
 the following code:
