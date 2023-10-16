@@ -61,9 +61,9 @@ def mixer(
 
     .. doctest:
 
-    >>> node_kernel = kern.create_gaussian_node_kernel(2.0, "weight")
+    >>> node_kernel = kern.create_gaussian_node_kernel(0.1, "weight")
     >>> knode = utils.create_full_node_affinity_matrix(graphs, node_kernel)
-    >>> res = mixer.mixer(knode, [2, 2, 3], 1.0, 100)
+    >>> res = mixer.mixer(knode, [2, 2, 3], 0.1, 100)
     >>> res @ res.T
     array([[1., 0., 0., 1., 0., 1., 0.],
            [0., 1., 1., 0., 0., 0., 1.],
@@ -73,12 +73,12 @@ def mixer(
            [1., 0., 0., 1., 0., 1., 0.],
            [0., 1., 1., 0., 0., 0., 1.]])
     """
-    aff = 1 - 2.0 * knode
+    aff = 1.0 - 2.0 * knode
     _, eigv = np.linalg.eigh(aff)
     u = line_matrix_projector(eigv.T)
 
-    po = np.ones(knode.shape) - np.identity(knode.shape[0]) + 1e-1
-    pd = np.zeros(knode.shape) + 1e-1
+    po = np.ones(knode.shape) - np.identity(knode.shape[0])
+    pd = np.zeros(knode.shape)
     cum_idx = 0
     for size in sizes:
         pd[cum_idx : cum_idx + size, cum_idx : cum_idx + size] = 1
@@ -93,7 +93,10 @@ def mixer(
 
     while d < knode.shape[0] + 1:
         for ite in range(iterations):
-            grad = 2.0 * aff @ u + 2 * d * (u @ po + pd @ u)
+            grad = 2.0 * aff @ u + 2 * d * (
+                u @ (po + np.random.uniform(0, 0.1, size=po.shape))
+                + (pd + np.random.uniform(0, 0.1, size=pd.shape)) @ u
+            )
             u = line_matrix_projector(u - step * grad)
         d *= 2.0
 

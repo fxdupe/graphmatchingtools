@@ -24,7 +24,7 @@ class TestMixer(unittest.TestCase):
         self.assertTrue(np.linalg.norm(res - [[0, 0, 0, 1.0], [0.5, 0, 0, 0.5]]) < 1e-4)
 
     def test_mixer(self):
-        node_kernel = kern.create_gaussian_node_kernel(2.0, "weight")
+        node_kernel = kern.create_gaussian_node_kernel(10.0, "weight")
 
         graph1 = nx.Graph()
         graph1.add_node(0, weight=2.0)
@@ -44,15 +44,15 @@ class TestMixer(unittest.TestCase):
         graphs = [graph1, graph2, graph3]
 
         knode = utils.create_full_node_affinity_matrix(graphs, node_kernel)
-        res = mixer.mixer(knode, [2, 2, 3], 0.03, 10)
+        res = mixer.mixer(knode, [2, 2, 3], 0.5, 100)
 
         truth = [
             [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0],
-            [0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0],
-            [0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0],
+            [0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0],
+            [0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0],
             [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0],
             [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
-            [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+            [0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0],
             [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0],
         ]
 
