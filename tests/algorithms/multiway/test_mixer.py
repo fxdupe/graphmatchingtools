@@ -10,17 +10,8 @@ import graph_matching_tools.algorithms.kernels.utils as utils
 
 class TestMixer(unittest.TestCase):
     def test_probability_simplex_projector(self):
-        t = np.array([1, 2, 0, 4])
-        res = mixer.probability_simplex_projector(t)
-        self.assertTrue(np.linalg.norm(res - np.array([0, 0, 0, 1.0])) < 1e-4)
-
-        t = np.array([4, 2, 3, 4])
-        res = mixer.probability_simplex_projector(t)
-        self.assertTrue(np.linalg.norm(res - np.array([0.5, 0, 0, 0.5])) < 1e-4)
-
-    def test_line_matrix_projector(self):
         t = np.array([[1, 2, 0, 4], [4, 2, 3, 4]])
-        res = mixer.line_matrix_projector(t)
+        res = mixer.probability_simplex_projector(t)
         self.assertTrue(np.linalg.norm(res - [[0, 0, 0, 1.0], [0.5, 0, 0, 0.5]]) < 1e-4)
 
     def test_mixer(self):
@@ -44,7 +35,8 @@ class TestMixer(unittest.TestCase):
         graphs = [graph1, graph2, graph3]
 
         knode = utils.create_full_node_affinity_matrix(graphs, node_kernel)
-        res = mixer.mixer(knode, [2, 2, 3], 0.5, 100)
+        res = mixer.mixer(knode, [2, 2, 3], 0.1, 10)
+        print(res @ res.T)
 
         truth = [
             [1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0],

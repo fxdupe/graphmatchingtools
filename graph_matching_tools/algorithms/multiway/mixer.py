@@ -9,40 +9,37 @@ import numpy as np
 
 
 def probability_simplex_projector(x: np.ndarray) -> np.ndarray:
-    """Projector onto the probability simplex (vector version)
+    """Projector onto the probability simplex (each line of a matrix)
 
-    :param np.ndarray x: the vector to project.
+    :param np.ndarray x: the matrix to project.
     :return: the projection.
     :rtype: np.ndarray
     """
-    u = np.sort(x)[::-1]
-
-    rho = 0
-    cumul = 0.0
-    optim = 0.0
-    for i in range(u.shape[0]):
-        cumul += u[i]
-        tmp = u[i] + 1.0 / (i + 1) * (1.0 - cumul)
-        if tmp > 0:
-            optim = cumul
-            rho = i
-
-    lbd = 1.0 / (rho + 1) * (1 - optim)
-    res = np.maximum(x + lbd, 0)
+    tmp1 = np.sort(x, axis=1)[:, ::-1]
+    sum_t = np.cumsum(tmp1, axis=1)
+    tmp2 = tmp1 + (1 - sum_t) / np.arange(1, x.shape[1] + 1)
+    rho = x.shape[1] - np.argmax(tmp2[:, ::-1] > 0, axis=1)
+    lbd = (1 - sum_t[np.arange(0, x.shape[0]), rho - 1]) / rho
+    res = np.maximum(x + lbd.reshape(-1, 1), 0)
     return res
 
 
-def line_matrix_projector(x: np.ndarray) -> np.ndarray:
-    """Project each line of a matrix onto the probability simplex
+def _objective_function(
+    u: np.ndarray, s: np.ndarray, po: np.ndarray, pd: np.ndarray, d: float
+):
+    """The MIXER objective function.
 
-    :param np.ndarray x: the input matrix.
-    :return: the projection.
-    :rtype: np.ndarray
+    :param np.ndarray u: the universe of node matrix.
+    :param np.ndarray s: the affinity matrix.
+    :param np.ndarray po: the orthogonality penalty matrix.
+    :param np.ndarray pd: the distinctivness penalty matrix.
+    :param float d: the strength of the penalty.
+    :return: the value at the current point.
+    :rtype: float
     """
-    res = np.zeros(x.shape)
-    for i_line in range(x.shape[0]):
-        res[i_line, :] = probability_simplex_projector(x[i_line, :])
-    return res
+    t1 = np.trace(u.T @ u @ (1 - 2.0 * s))
+    t2 = np.trace((u.T @ u).T @ po) + np.trace((u @ u.T).T @ pd)
+    return t1 + d * t2
 
 
 def mixer(
@@ -52,7 +49,7 @@ def mixer(
 
     :param np.ndarray knode: the attributes/nodes affinity matrix.
     :param list[int] sizes: the size of the different elements.
-    :param float step: the step of the gradient descent.
+    :param float step: the initial step of the gradient descent.
     :param int iterations: the number of iterations for convergence.
     :return: the permutation matrix (in the universe of nodes).
     :rtype: np.ndarray
@@ -75,7 +72,7 @@ def mixer(
     """
     aff = 1.0 - 2.0 * knode
     _, eigv = np.linalg.eigh(aff)
-    u = line_matrix_projector(eigv.T)
+    u = probability_simplex_projector(eigv.T)
 
     po = np.ones(knode.shape) - np.identity(knode.shape[0])
     pd = np.zeros(knode.shape)
@@ -85,19 +82,39 @@ def mixer(
         pd[cum_idx : cum_idx + size, cum_idx : cum_idx + size] -= np.identity(size)
         cum_idx += size
 
-    div = u @ po + pd @ u
-    not_null_idx = (div.flat > 0) & (u.flat > 0)
-    d = np.median(-aff.flat[not_null_idx] / div.flat[not_null_idx])
-    if d < 0:
-        d *= -1
+    # div = u @ po + pd @ u
+    # not_null_idx = (div.flat > 0) & (u.flat > 0)
+    # d = np.median(-aff.flat[not_null_idx] / div.flat[not_null_idx])
+    # if d < 0:
+    #     d *= -1
+    d = 0.01
 
     while d < knode.shape[0] + 1:
+        current_value = _objective_function(u, knode, po, pd, d)
+
         for ite in range(iterations):
             grad = 2.0 * aff @ u + 2 * d * (
                 u @ (po + np.random.uniform(0, 0.1, size=po.shape))
                 + (pd + np.random.uniform(0, 0.1, size=pd.shape)) @ u
             )
-            u = line_matrix_projector(u - step * grad)
+
+            step *= 2.0
+            u_new = probability_simplex_projector(u - step * grad)
+            new_value = _objective_function(u_new, knode, po, pd, d)
+            while new_value > current_value:
+                step /= 2
+                u_new = probability_simplex_projector(u - step * grad)
+                new_value = _objective_function(u_new, knode, po, pd, d)
+                if step < 1e-5:
+                    break
+
+            # Detect convergence
+            if np.abs(current_value - new_value) < 1e-9:
+                break
+
+            current_value = new_value
+            u = probability_simplex_projector(u - step * grad)
+
         d *= 2.0
 
         # Check orthogonality and distinctiveness
