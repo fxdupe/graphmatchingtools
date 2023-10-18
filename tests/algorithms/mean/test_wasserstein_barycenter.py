@@ -17,7 +17,6 @@ class TestWassersteinBarycenter(TestCase):
         g1.add_edge(1, 2, weight=3.0)
 
         degrees = mean._get_degree_distributions(g1)
-        print(degrees)
         self.assertTrue(
             np.linalg.norm(degrees - np.array([0.25, 0.375, 0.25, 0.125])) < 1e-4
         )

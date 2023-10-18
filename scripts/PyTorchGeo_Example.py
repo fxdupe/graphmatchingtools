@@ -246,6 +246,13 @@ if __name__ == "__main__":
         )
         knode = ku.create_full_node_affinity_matrix(all_graphs, node_kernel)
 
+        cum_idx = 0
+        for size in g_sizes:
+            knode[cum_idx : cum_idx + size, cum_idx : cum_idx + size] = np.identity(
+                size
+            )
+            cum_idx += size
+
     if args.method == "hippi":
         a = utils.create_full_weight_matrix(all_graphs, "weight", sigma=args.gamma)
         u_nodes = hippi.hippi_multiway_matching(

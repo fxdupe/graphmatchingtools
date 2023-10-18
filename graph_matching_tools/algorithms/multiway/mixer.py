@@ -38,7 +38,7 @@ def _objective_function(
     :rtype: float
     """
     t1 = np.trace(u.T @ u @ (1 - 2.0 * s))
-    t2 = np.trace((u.T @ u).T @ po) + np.trace((u @ u.T).T @ pd)
+    t2 = np.trace((u.T @ u) @ po) + np.trace((u @ u.T) @ pd)
     return t1 + d * t2
 
 
@@ -105,20 +105,20 @@ def mixer(
                 step /= 2
                 u_new = probability_simplex_projector(u - step * grad)
                 new_value = _objective_function(u_new, knode, po, pd, d)
-                if step < 1e-5:
+                if step < 1e-6:
                     break
 
             # Detect convergence
-            if np.abs(current_value - new_value) < 1e-9:
+            if np.abs(current_value - new_value) < 1e-12:
                 break
 
             current_value = new_value
-            u = probability_simplex_projector(u - step * grad)
+            u = u_new
 
         d *= 2.0
 
         # Check orthogonality and distinctiveness
-        if np.trace((u.T @ u).T @ po) < 1e-6 and np.trace((u @ u.T).T @ pd) < 1e-6:
+        if np.trace((u.T @ u) @ po) < 1e-12 and np.trace((u @ u.T) @ pd) < 1e-12:
             break
 
     return u

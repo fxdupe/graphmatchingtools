@@ -34,8 +34,7 @@ def ga_mgmc(
     normalize_aff: bool = False,
     inner_iterations: int = 10,
 ) -> np.ndarray:
-    """
-    Graduated assignment multi-graph matching (GA-MGM).
+    """Graduated assignment multi-graph matching (GA-MGM).
 
     :param list[nx.Graph] graphs: the list of graphs.
     :param np.ndarray aff_node: the affinity matrix between all the nodes.
@@ -51,7 +50,8 @@ def ga_mgmc(
     :param np.ndarray init: an initialization (optional).
     :param bool normalize_aff: True to normalize the affinity node matrix.
     :param int inner_iterations: The number of iterations for Sinkhorn.
-    :return np.ndarray: the list the node projections (graph by graph).
+    :return: the list the node projections (graph by graph).
+    :rtype: np.ndarray
 
     Here an example using NetworkX and some utils:
 

@@ -55,5 +55,4 @@ class TestRRWM(unittest.TestCase):
         ]
 
         res = rrwm.factorized_rrwm(graph1, graph2, node_kernel, edge_kernel)
-        print(res)
         self.assertTrue(np.linalg.norm(res - np.array(truth)) < 1e-3)

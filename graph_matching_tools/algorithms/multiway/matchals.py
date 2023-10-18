@@ -13,13 +13,13 @@ import scipy.linalg as scl
 def _diagonal_projection(
     diag: np.ndarray, sum_target: float, tolerance: float = 1e-6
 ) -> np.ndarray:
-    """
-    Project a vector to the closed positive vector with a given sum.
+    """Project a vector to the closed positive vector with a given sum.
 
     :param np.ndarray diag: the vector to project.
     :param float sum_target: the targeted sum.
     :param float tolerance: the tolerance for convergence.
-    :return np.ndarray: the projection.
+    :return: the projection.
+    :rtype: np.ndarray
     """
     x = diag
     for i in range(1000):
@@ -34,13 +34,13 @@ def _diagonal_projection(
 def _apply_constraints(
     x: np.ndarray, sizes: list[int], p_select: float = 1.0
 ) -> np.ndarray:
-    """
-    Apply the constraints for having true assignment.
+    """Apply the constraints for having true assignment.
 
     :param np.ndarray x: the current estimate.
     :param list[int] sizes: the different size of the graphs.
     :param float p_select: the percentage of the element on diagonals.
-    :return np.ndarray: the projection of x onto the constraint set.
+    :return: the projection of x onto the constraint set.
+    :rtype: np.ndarray
     """
     index = 0
     # Constraint on diagonals
@@ -71,8 +71,7 @@ def matchals(
     tolerance: float = 5e-4,
     random_seed: Optional[int] = None,
 ) -> np.ndarray:
-    """
-    MatchALS algorithm for multiple graph matching (python version).
+    """MatchALS algorithm for multiple graph matching (python version).
 
     This version follows the Matlab code in https://github.com/zju-3dv/multiway/blob/master/utils/mmatch_CVX_ALS.m
 
@@ -84,8 +83,9 @@ def matchals(
     :param float p_select: percentage of non-null element on the diagonal.
     :param int iterations: the number of iterations.
     :param float tolerance: the tolerance for convergence.
-    :param Optional[float] random_seed: the seed for the random generator.
-    :return np.ndarray: the full assignment matrix.
+    :param Optional[int] random_seed: the seed for the random generator.
+    :return: the full assignment matrix.
+    :rtype: np.ndarray
 
 
     Here an example using NetworkX and some utils:
@@ -103,9 +103,6 @@ def matchals(
            [0., 0., 0., 0., 1., 0., 0.],
            [1., 0., 0., 1., 0., 1., 0.],
            [0., 1., 1., 0., 0., 0., 1.]])
-
-
-
     """
     rng = np.random.default_rng(seed=random_seed)
     mu = 64.0

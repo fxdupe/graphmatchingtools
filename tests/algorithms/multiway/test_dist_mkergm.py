@@ -63,9 +63,6 @@ class TestDistributedMultiwayKerGM(unittest.TestCase):
         res = mkergm.stochastic_dist_mkergm(
             graphs, knodes, [phi1, phi2, phi3], 2, 10, 2, 20
         )
-        print(res["0,1"])
-        print(res["0,2"])
-
         truth_01 = [[0.0, 1.0], [1.0, 0.0]]
         truth_02 = [[0.0, 0.0, 1.0], [0.0, 1.0, 0.0]]
 

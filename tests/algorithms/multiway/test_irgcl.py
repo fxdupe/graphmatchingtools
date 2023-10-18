@@ -57,5 +57,4 @@ class TestIRGCL(unittest.TestCase):
             )
             if np.linalg.norm(p - p_true) < 1e-3:
                 break
-        print(p)
         self.assertTrue(np.linalg.norm(p - p_true) < 1e-3)
