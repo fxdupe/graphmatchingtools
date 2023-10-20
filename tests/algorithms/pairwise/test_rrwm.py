@@ -26,7 +26,7 @@ class TestRRWM(unittest.TestCase):
         kedge = np.array([[0.0, 1.0], [0.2, 2.0]])
 
         grad = rrwm.create_pairwise_gradient(inc1, inc2, knode, kedge)
-        perm = rrwm.rrwm(grad, (3, 3))
+        perm = rrwm._rrwm(grad, (3, 3))
         truth = np.array([[0.0, 0.0, 1.0], [0.0, 1.0, 0.0], [1.0, 0.0, 0.0]])
         self.assertTrue(np.linalg.norm(perm - truth) < 1e-2)
 
@@ -55,4 +55,26 @@ class TestRRWM(unittest.TestCase):
         ]
 
         res = rrwm.factorized_rrwm(graph1, graph2, node_kernel, edge_kernel)
+        self.assertTrue(np.linalg.norm(res - np.array(truth)) < 1e-3)
+
+    def test_classical_rrwm(self):
+        node_kernel = kern.create_gaussian_node_kernel(20.0, "weight")
+
+        graph1 = nx.Graph()
+        graph1.add_node(0, weight=2.0)
+        graph1.add_node(1, weight=20.0)
+        graph1.add_edge(0, 1, weight=1.0)
+
+        graph2 = nx.Graph()
+        graph2.add_node(0, weight=-5.0)
+        graph2.add_node(1, weight=30.0)
+        graph2.add_node(2, weight=2.0)
+        graph2.add_edge(1, 2, weight=1.0)
+
+        truth = [
+            [0.0, 0.0, 1.0],
+            [0.0, 1.0, 0.0],
+        ]
+
+        res = rrwm.classical_rrwm(graph1, graph2, node_kernel)
         self.assertTrue(np.linalg.norm(res - np.array(truth)) < 1e-3)

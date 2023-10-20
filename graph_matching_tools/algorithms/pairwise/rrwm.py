@@ -1,6 +1,7 @@
 """
-This code is directly from the paper
-"Factorized multi-graph matching" by Zhu et al (Pattern Recognition 2023).
+This code is directly from two papers
+"Reweighted Random Walks for Graph Matching" by Cho et al (ECCV 2010) for the classical version and
+"Factorized multi-graph matching" by Zhu et al (Pattern Recognition 2023) for the factorized version.
 
 .. moduleauthor:: François-Xavier Dupé
 """
@@ -49,7 +50,7 @@ def create_pairwise_gradient(
     return gradient
 
 
-def rrwm(
+def _rrwm(
     gradient: Callable[[np.ndarray], np.ndarray],
     size: tuple[int, int],
     alpha: float = 0.2,
@@ -89,6 +90,85 @@ def rrwm(
     return res
 
 
+def classical_rrwm(
+    source_graph: nx.Graph,
+    target_graph: nx.Graph,
+    node_kernel: Callable[[nx.Graph, int, nx.Graph, int], float],
+    alpha: float = 0.2,
+    beta: float = 30,
+    iterations: int = 100,
+    tolerance: float = 1e-2,
+) -> np.ndarray:
+    """Classical version of RRWM (with only attribute on node).
+
+    :param nx.Graph source_graph: the source graph.
+    :param nx.Graph target_graph: the target graph.
+    :param Callable[[nx.Graph, int, nx.Graph, int], float] node_kernel: the kernel between nodes.
+    :param float alpha: the mixing parameter for convergence.
+    :param float beta: the scaling parameter when reweighting.
+    :param int iterations: the maximal number of iterations.
+    :param float tolerance: the tolerance for convergence.
+    :return: the permutation matrix between the two graphs.
+    :rtype: np.ndarray
+
+    Here an example using NetworkX and some utils:
+
+    .. doctest:
+
+    >>> node_kernel = kern.create_gaussian_node_kernel(10.0, "weight")
+    >>> res = rrwm.classical_rrwm(graph1, graph2, node_kernel)
+    >>> res
+    array([[0., 1.],
+           [1., 0.]])
+    """
+
+    m = nx.number_of_nodes(source_graph)
+    n = nx.number_of_nodes(target_graph)
+
+    knode = np.zeros((m * n, m * n))  # Beware this could be a huge matrix
+    node_pairs = [(i, j) for i in range(m) for j in range(n)]
+    for p_source in node_pairs:
+        for p_target in node_pairs:
+            # Check edges
+            if (p_source[0], p_target[0]) not in source_graph.edges:
+                continue
+            if (p_source[1], p_target[1]) not in target_graph.edges:
+                continue
+            # Compute affinity
+            knode[
+                p_source[0] * n + p_source[1], p_target[0] * n + p_target[1]
+            ] = node_kernel(
+                source_graph, p_source[0], target_graph, p_source[1]
+            ) * node_kernel(
+                source_graph, p_target[0], target_graph, p_target[1]
+            )
+
+    x = np.ones((m, n)) / (m * n)
+    for iter1 in range(iterations):
+        x_bar = x.reshape(1, -1) @ knode
+        x_bar = x_bar.reshape(m, n)
+        y = np.exp(beta * x_bar / np.max(x_bar))
+
+        for iter2 in range(iterations):
+            y = y / y.sum(axis=1).reshape(-1, 1)
+            y = y / y.sum(axis=0)
+
+        y /= np.sum(y)
+        x_new = alpha * x_bar + (1 - alpha) * y
+        if np.linalg.norm(x - x_new) < tolerance:
+            break
+        x = x_new
+        x /= np.sum(x)
+
+    # Discretization using Hungarian method
+    res = np.zeros((m, n))
+    r, c = sco.linear_sum_assignment(-x)
+    for j in range(r.shape[0]):
+        res[r[j], c[j]] = 1
+
+    return res
+
+
 def factorized_rrwm(
     source_graph: nx.Graph,
     target_graph: nx.Graph,
@@ -96,6 +176,8 @@ def factorized_rrwm(
     edge_kernel: Callable[
         [nx.Graph, nx.Graph, tuple[int, int], tuple[int, int]], float
     ],
+    alpha: float = 0.2,
+    beta: float = 30,
     iterations: int = 100,
     tolerance: float = 1e-2,
 ) -> np.ndarray:
@@ -164,9 +246,11 @@ def factorized_rrwm(
         knode,
         kedge,
     )
-    pair_perm = rrwm(
+    pair_perm = _rrwm(
         grad,
         (knode.shape[0], knode.shape[1]),
+        alpha=alpha,
+        beta=beta,
         iterations=iterations,
         tolerance=tolerance,
     )

@@ -11,7 +11,9 @@ The scope of this work is to offer reproducible research and alternatives.
 - [KerGM](https://papers.nips.cc/paper/2019/hash/cd63a3eec3319fd9c84c942a08316e00-Abstract.html)
 - [GWL](https://proceedings.mlr.press/v97/xu19b.html)
 - [FGW](https://proceedings.mlr.press/v97/titouan19a.html)
+- [RRWM](https://link.springer.com/chapter/10.1007/978-3-642-15555-0_36)
 - [Factorized RRWM](https://www.sciencedirect.com/science/article/abs/pii/S0031320323002984)
+- [GRASP](https://dl.acm.org/doi/abs/10.1145/3561058)
 
 ### Multiway methods (state-of-art)
 

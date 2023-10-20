@@ -126,7 +126,7 @@ def compute_edges_data(graph: nx.Graph, mu: float = 10.0) -> nx.Graph:
 
 def add_dummy_nodes(
     graphs: list[nx.Graph], rank: int, dimension: int = 1024
-) -> tuple[list[nx.Graph], list[list[int]], list[list[int]]]:
+) -> tuple[list[nx.Graph], list[list[int]], list[list[int]]]:  # pragma: no cover
     """Add dummy nodes to graph to uniform the sizes.
 
     :param list[nx.Graph] graphs: the list of graphs.

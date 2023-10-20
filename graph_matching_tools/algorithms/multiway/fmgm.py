@@ -275,7 +275,7 @@ def factorized_multigraph_matching(
             knodes[i_g][reference],
             kedges[i_g][reference],
         )
-        pair_perm = rrwm.rrwm(
+        pair_perm = rrwm._rrwm(
             grad,
             (knodes[i_g][0].shape[0], knodes[i_g][reference].shape[1]),
             iterations=iterations,
@@ -294,7 +294,7 @@ def factorized_multigraph_matching(
             grad = create_multiway_gradient(
                 i_g, u, incidence_mat, knodes[i_g], kedges[i_g]
             )
-            new_perm = rrwm.rrwm(
+            new_perm = rrwm._rrwm(
                 grad,
                 (knodes[i_g][0].shape[0], knodes[i_g][reference].shape[1]),
                 iterations=iterations,
@@ -328,7 +328,7 @@ def factorized_multigraph_matching(
                 grad = create_multiway_local_gradient(
                     i_g1, i_g2, u, incidence_mat, knodes[i_g1], kedges[i_g1]
                 )
-                new_perm = rrwm.rrwm(
+                new_perm = rrwm._rrwm(
                     grad,
                     (knodes[i_g1][0].shape[0], knodes[i_g1][reference].shape[1]),
                     iterations=iterations,

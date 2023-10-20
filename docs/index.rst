@@ -35,7 +35,9 @@ Pairwise method
 - `KerGM <https://papers.nips.cc/paper/2019/hash/cd63a3eec3319fd9c84c942a08316e00-Abstract.html>`_
 - `GWL <https://proceedings.mlr.press/v97/xu19b.html>`_
 - `FGW <https://proceedings.mlr.press/v97/titouan19a.html>`_
+- `RRWM <https://link.springer.com/chapter/10.1007/978-3-642-15555-0_36>`_
 - `Factorized RRWM <https://www.sciencedirect.com/science/article/abs/pii/S0031320323002984>`_
+- `GRASP <https://dl.acm.org/doi/abs/10.1145/3561058>`_
 
 Multiway methods (state-of-art)
 -------------------------------
