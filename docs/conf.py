@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.abspath("../"))
 project = "GraphMatchingTools"
 copyright = "2023, François-Xavier Dupé, Rohit Yadav"
 author = "François-Xavier Dupé, Rohit Yadav"
-release = "0.8.0"
+release = "0.9.0"
 show_authors = True
 
 # -- General configuration ---------------------------------------------------
@@ -71,6 +71,7 @@ import graph_matching_tools.algorithms.pairwise.fgw as fgw_pairwise
 import graph_matching_tools.algorithms.pairwise.gwl as gwl_pairwise
 import graph_matching_tools.algorithms.pairwise.rrwm as rrwm
 import graph_matching_tools.algorithms.pairwise.kergm as kergm_pairwise
+import graph_matching_tools.algorithms.pairwise.grasp as grasp
 import graph_matching_tools.algorithms.multiway.fmgm as fmgm
 import graph_matching_tools.algorithms.multiway.mixer as mixer
 

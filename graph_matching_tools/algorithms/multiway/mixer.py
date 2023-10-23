@@ -43,7 +43,11 @@ def _objective_function(
 
 
 def mixer(
-    knode: np.ndarray, sizes: list[int], step: float, iterations: int
+    knode: np.ndarray,
+    sizes: list[int],
+    step: float,
+    iterations: int,
+    binarized: bool = False,
 ) -> np.ndarray:
     """MIXER method for attributes alignment
 
@@ -51,6 +55,7 @@ def mixer(
     :param list[int] sizes: the size of the different elements.
     :param float step: the initial step of the gradient descent.
     :param int iterations: the number of iterations for convergence.
+    :param bool binarized: if True return a binarized matrix.
     :return: the permutation matrix (in the universe of nodes).
     :rtype: np.ndarray
 
@@ -120,5 +125,10 @@ def mixer(
         # Check orthogonality and distinctiveness
         if np.trace((u.T @ u) @ po) < 1e-12 and np.trace((u @ u.T) @ pd) < 1e-12:
             break
+
+    # Force binary matrix
+    if binarized:
+        u[u > 0.1] = 1.0
+        u[u < 0.2] = 0.0
 
     return u

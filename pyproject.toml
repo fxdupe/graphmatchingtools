@@ -1,6 +1,6 @@
 [project]
 name = "graphmatchingtools"
-version = "0.8.0"
+version = "0.9.0"
 authors = [
     { name="François-Xavier Dupé", email="francois-xavier.dupe@univ-amu.fr" },
     { name="Rohit Yadav", email="rohit.yadav@univ-amu.fr" },

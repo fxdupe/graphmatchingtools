@@ -293,7 +293,9 @@ if __name__ == "__main__":
         u_nodes = stiefel.sparse_stiefel_manifold_sync(knode, args.rank, g_sizes)
         m_res = u_nodes @ u_nodes.T
     elif args.method == "mixer":
-        u_nodes = mixer.mixer(knode, g_sizes, args.mu_init, args.iterations)
+        u_nodes = mixer.mixer(
+            knode, g_sizes, args.mu_init, args.iterations, binarized=True
+        )
         m_res = u_nodes @ u_nodes.T
     elif args.method == "quickm":
         u_nodes = quickmatch.quickmatch(

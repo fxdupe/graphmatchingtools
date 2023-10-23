@@ -96,6 +96,7 @@ All the examples in the documentation are done with the following imports,
    >>> import graph_matching_tools.algorithms.pairwise.gwl as gwl_pairwise
    >>> import graph_matching_tools.algorithms.pairwise.kergm as kergm_pairwise
    >>> import graph_matching_tools.algorithms.pairwise.rrwm as rrwm
+   >>> import graph_matching_tools.algorithms.pairwise.grasp as grasp
    >>> import graph_matching_tools.algorithms.multiway.ga_mgmc as ga_mgmc
    >>> import graph_matching_tools.algorithms.multiway.matchals as matchals
    >>> import graph_matching_tools.algorithms.multiway.fmgm as fmgm

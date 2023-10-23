@@ -99,7 +99,7 @@ def compute_edges_data(graph: nx.Graph, mu: float = 10.0) -> nx.Graph:
     """Compute the distance between the nodes (using Euclidean distance)
 
     :param nx.Graph graph: the input graph.
-    :param float mu: the weights scaling factor (default: 1.0).
+    :param float mu: the weights scaling factor (default: 10.0).
     :return: the new graph with the distance on the edges.
     :rtype: nx.Graph
     """
