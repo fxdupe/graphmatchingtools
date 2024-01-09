@@ -12,6 +12,7 @@ import numpy as np
 import graph_matching_tools.algorithms.multiway.matcheig as matcheig
 import graph_matching_tools.algorithms.multiway.msync as msync
 import graph_matching_tools.algorithms.multiway.irgcl as irgcl
+import graph_matching_tools.algorithms.multiway.stiefel as sqad
 
 
 def _iterative_rank_projection(
@@ -104,6 +105,9 @@ def _rank_projector(
         res = res @ res.T
     elif method == "gpow":
         res = _iterative_rank_projection(x, rank, sizes)
+    elif method == "sqad":
+        res = sqad.sparse_stiefel_manifold_sync(x, rank, sizes)
+        res = res @ res.T
 
     return res
 

@@ -2,25 +2,50 @@
 name = "graphmatchingtools"
 version = "0.9.0"
 authors = [
-    { name="François-Xavier Dupé", email="francois-xavier.dupe@univ-amu.fr" },
-    { name="Rohit Yadav", email="rohit.yadav@univ-amu.fr" },
+    { name = "François-Xavier Dupé", email = "francois-xavier.dupe@univ-amu.fr" },
+    { name = "Rohit Yadav", email = "rohit.yadav@univ-amu.fr" },
+    { name = "Guillaume Auzias", email = "guillaume.auzais@univ-amu.fr"},
+    { name = "Sylvain Takerkart", email = "sylvain.takerkart@univ-amu.fr"},
 ]
 description = "Unsupervised multiple graphs matching methods"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
+keywords = ["graph matching", "multiway matching", "multigraph matching", "pairwise matching"]
 classifiers = [
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3",
+    "Development Status :: 4 - Beta",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Image Processing",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    'numpy>=1.10',
-    'scipy>=1.7',
-    'networkx>=2.7',
-    'scikit-learn>=1.0',
-    'jax>=0.4',
-    'jaxlib>=0.4',
+    "numpy >= 1.10",
+    "scipy >= 1.7",
+    "networkx >= 2.7",
+    "scikit-learn >= 1.0",
+    "jax >= 0.4",
+    "jaxlib >= 0.4",
+    "matplotlib >= 3.5.0",
 ]
+
+[project.optional-dependencies]
+dev = [
+    "pytest >= 7.0",
+    "pytest-cov >= 3.0",
+    "coverage >= 6.0",
+    "sphinx >= 6.0",
+    "sphinx-autoapi >= 2.0",
+    "furo >= 2022.12.7",
+    "tox >= 4.0",
+    "black >= 23.12.1",
+    "pre-commit >= 3.2.0",
+]
+
+[project.scripts]
+gmt_torchgeo = "graph_matching_tools.scripts.PyTorchGeo_Example:main"
 
 [project.urls]
 "Homepage" = "https://github.com/fxdupe/graphmatchingtools"
@@ -28,34 +53,77 @@ dependencies = [
 
 [build-system]
 requires = [
-    "setuptools>=61",
+    "setuptools >= 62",
     "wheel"
 ]
 build-backend = "setuptools.build_meta"
 
-[tool.poetry]
-name = "Graph Matching Tools"
-version = "0.8.0"
-description = "Tools for multiple graph matching with coherence"
-authors = ["François-Xavier Dupé <francois-xavier.dupe@univ-amu.fr>",
-    "Rohit Yadav <rohit.yadav@univ-amu.fr>"]
+[tool.setuptools.packages.find]
+where = ["."]
+exclude = ["test*"]
+namespaces = false
 
-[tool.poetry.dependencies]
-python = ">=3.9"
-numpy = ">1.10"
-scipy = ">=1.7"
-networkx = ">=2.7"
-scikit-learn = ">=1.0"
-jax = ">=0.3.24"
-jaxlib = ">=0.3.24"
+[tool.coverage.run]
+branch = true
+omit = [
+    # omit anything in a .local directory anywhere
+    "*/.local/*",
+    # omit everything in /usr
+    "/usr/*",
+    # omit this single file
+    "tests/*",
+    # omit scripts
+    "graph_matching_tools/scripts/*",
+    # omit GAE for the moment
+    "graph_matching_tools/learning/GAE.py",
+]
 
-[tool.poetry.dev-dependencies]
-pytest = ">=7.0"
-pytest-cov = ">=3.0"
-coverage = ">=6.0"
-sphinx = ">=6.0"
-sphinx-autoapi = ">=2.0"
-furo = ">=2022.12.7"
-tox = ">=4.0"
-black = ">=23.9"
-pre-commit = ">=3.2.0"
+[tool.coverage.report]
+# Regexes for lines to exclude from consideration
+exclude_also = [
+    # Don't complain about missing debug-only code:
+    "def __repr__",
+    "if self\\.debug",
+    # Don't complain if tests don't hit defensive assertion code:
+    "raise AssertionError",
+    "raise NotImplementedError",
+    # Don't complain if non-runnable code isn't run:
+    "if 0:",
+    "if __name__ == .__main__.:",
+    # Don't complain about abstract methods, they aren't run:
+    "@(abc\\.)?abstractmethod",
+]
+ignore_errors = true
+show_missing = true
+skip_covered = true
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "--cov=graph_matching_tools"
+
+#[tool.poetry]
+#name = "Graph Matching Tools"
+#version = "0.9.0"
+#description = "Tools for multiple graph matching with coherence"
+#authors = ["François-Xavier Dupé <francois-xavier.dupe@univ-amu.fr>",
+#    "Rohit Yadav <rohit.yadav@univ-amu.fr>"]
+#
+#[tool.poetry.dependencies]
+#python = ">=3.9"
+#numpy = ">1.10"
+#scipy = ">=1.7"
+#networkx = ">=2.7"
+#scikit-learn = ">=1.0"
+#jax = ">=0.4"
+#jaxlib = ">=0.4"
+#
+#[tool.poetry.dev-dependencies]
+#pytest = ">=7.0"
+#pytest-cov = ">=3.0"
+#coverage = ">=6.0"
+#sphinx = ">=6.0"
+#sphinx-autoapi = ">=2.0"
+#furo = ">=2022.12.7"
+#tox = ">=4.0"
+#black = ">=23.12.1"
+#pre-commit = ">=3.2.0"

@@ -118,7 +118,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Take all the graphs for the learning step
-    all_graphs = pyg.get_graph_database(
+    all_graphs = pyg.get_pascalvoc_graph_database(
         args.database, args.isotropic, args.category, args.repo + "/" + args.database
     )
 

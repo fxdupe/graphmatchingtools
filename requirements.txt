@@ -1,0 +1,7 @@
+numpy >= 1.10
+scipy >= 1.7
+networkx >= 2.7
+scikit-learn >= 1.0
+jax >= 0.4
+jaxlib >= 0.4
+matplotlib >= 3.5.0

@@ -1,6 +1,18 @@
 Changelog
 =========
 
+0.9.0
+-----
+
+New methods:
+
+* Classical version of RRWM.
+* GRASP (version without any trick).
+* New utils: optimization on Group Orthogonal and Stiefel manifold.
+* Update documentation.
+* Update tools.
+
+
 0.8.0
 -----
 

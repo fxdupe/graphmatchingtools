@@ -26,7 +26,7 @@ class TestGRASP(unittest.TestCase):
         graph2.add_edge(2, 3, weight=1.0)
         graph2.add_edge(3, 1, weight=1.0)
 
-        res = grasp.grasp(graph1, graph2, 3)
+        res = grasp.grasp(graph1, graph2, 2)
         truth = np.array(
             [
                 [0.0, 1.0, 0.0, 0.0],

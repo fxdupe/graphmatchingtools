@@ -14,7 +14,21 @@ The following lines will load the *car* category from Willow using isotropic gra
 >>> import numpy as np
 >>> import networkx as nx
 >>> import graph_matching_tools.io.pygeo_graphs as pyg
->>> graphs = pyg.get_graph_database("Willow", True, "car", "/tmp/willow")
+>>> graphs = pyg.get_pascalvoc_graph_database("Willow", True, "car", "/tmp/willow")
+
+Notice that in this example, we default the repository for the graphs to
+
+>>> import numpy as np
+>>> import networkx as nx
+>>> import graph_matching_tools.io.pygeo_graphs as pyg
+>>> graphs = pyg.get_pascalvoc_graph_database("Willow", True, "car", "/tmp/willow")
+
+Notice that in this example, we default the repository for the graphs to
+
+>>> import numpy as np
+>>> import networkx as nx
+>>> import graph_matching_tools.io.pygeo_graphs as pyg
+>>> graphs = pyg.get_pascalvoc_graph_database("Willow", True, "car", "/tmp/willow")
 
 Notice that in this example, we default the repository for the graphs to */tmp/willow*. The graphs
 will have attributes on nodes (named *x*) and edges (named *weight*).

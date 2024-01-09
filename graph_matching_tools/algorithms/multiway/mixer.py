@@ -37,8 +37,9 @@ def _objective_function(
     :return: the value at the current point.
     :rtype: float
     """
-    t1 = np.trace(u.T @ u @ (1 - 2.0 * s))
-    t2 = np.trace((u.T @ u) @ po) + np.trace((u @ u.T) @ pd)
+    perm = u @ u.T
+    t1 = np.sum(perm * (1 - 2.0 * s))
+    t2 = np.sum(perm * po) + np.sum(perm.T * pd)
     return t1 + d * t2
 
 
@@ -47,7 +48,6 @@ def mixer(
     sizes: list[int],
     step: float,
     iterations: int,
-    binarized: bool = False,
 ) -> np.ndarray:
     """MIXER method for attributes alignment
 
@@ -55,7 +55,6 @@ def mixer(
     :param list[int] sizes: the size of the different elements.
     :param float step: the initial step of the gradient descent.
     :param int iterations: the number of iterations for convergence.
-    :param bool binarized: if True return a binarized matrix.
     :return: the permutation matrix (in the universe of nodes).
     :rtype: np.ndarray
 
@@ -100,18 +99,20 @@ def mixer(
         for ite in range(iterations):
             grad = 2.0 * aff @ u + 2 * d * (
                 u @ (po + np.random.uniform(0, 0.1, size=po.shape))
-                + (pd + np.random.uniform(0, 0.1, size=pd.shape)) @ u
+                + (pd + np.random.uniform(0, 0.1, size=po.shape)) @ u
             )
 
-            step *= 2.0
-            u_new = probability_simplex_projector(u - step * grad)
+            # step *= 2.0
+            # u_new = probability_simplex_projector(u - step * grad)
+            # new_value = _objective_function(u_new, knode, po, pd, d)
+            # while new_value > current_value:
+            #     step /= 2
+            #     u_new = probability_simplex_projector(u - step * grad)
+            #     new_value = _objective_function(u_new, knode, po, pd, d)
+            #     if step < 1e-20:
+            #         break
+            u_new = probability_simplex_projector(-grad)
             new_value = _objective_function(u_new, knode, po, pd, d)
-            while new_value > current_value:
-                step /= 2
-                u_new = probability_simplex_projector(u - step * grad)
-                new_value = _objective_function(u_new, knode, po, pd, d)
-                if step < 1e-6:
-                    break
 
             # Detect convergence
             if np.abs(current_value - new_value) < 1e-12:
@@ -123,12 +124,7 @@ def mixer(
         d *= 2.0
 
         # Check orthogonality and distinctiveness
-        if np.trace((u.T @ u) @ po) < 1e-12 and np.trace((u @ u.T) @ pd) < 1e-12:
+        if np.sum((u.T @ u) * po) < 1e-20 and np.sum((u @ u.T) * pd) < 1e-20:
             break
-
-    # Force binary matrix
-    if binarized:
-        u[u > 0.1] = 1.0
-        u[u < 0.2] = 0.0
 
     return u

@@ -8,6 +8,7 @@ import networkx as nx
 from torch_geometric.datasets import WILLOWObjectClass
 from torch_geometric.datasets import PascalVOCKeypoints as PascalVOC
 from torch_geometric.datasets import PascalPF
+from torch_geometric.datasets import TUDataset
 import torch_geometric.transforms as transforms
 import torch_geometric.utils as tf_utils
 
@@ -52,10 +53,30 @@ def _convert_to_networkx(dataset) -> list[nx.Graph]:  # pragma: no cover
     return graphs
 
 
-def get_graph_database(
+def get_letter_graph_database(repo: str) -> list[nx.Graph]:  # pragma: no cover
+    """Get one of the letter graph dataset
+
+    :param str repo: the repo for graph (download etc.).
+    :return: The graphs corresponding to letters.
+    :rtype: list[nx.Graph]
+    """
+    dataset = TUDataset(repo, "Letter-low", use_node_attr=True)
+    graphs = []
+    for idx in range(len(dataset)):
+        g = tf_utils.to_networkx(
+            dataset[idx],
+            node_attrs=["x"],
+            graph_attrs=["y"],
+            to_undirected=True,
+        )
+        graphs.append(g)
+    return graphs
+
+
+def get_pascalvoc_graph_database(
     name: str, isotropic: bool, category: str, repo: str
 ) -> list[nx.Graph]:  # pragma: no cover
-    """Get a given graph dataset
+    """Get one of the Pascal VOC graph dataset
 
     :param str name: the name of the database to load (PascalVOC, PascalPF or Willow [default]).
     :param bool isotropic: get isotropic graphs.

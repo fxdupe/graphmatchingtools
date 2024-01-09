@@ -1,0 +1,12 @@
+# MANIFEST.in -- just for illustration
+graft graph_matching_tools
+graft scripts
+graft docs
+# `-> adds all files inside a directory
+
+include LICENSE
+include README.md
+# `-> matches file paths relative to the root of the project
+
+global-exclude *~ *.py[cod] *.so
+# `-> matches file names (regardless of directory)

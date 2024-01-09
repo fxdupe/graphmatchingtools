@@ -32,7 +32,7 @@ import graph_matching_tools.algorithms.multiway.mixer as mixer
 import graph_matching_tools.io.pygeo_graphs as pyg
 
 
-if __name__ == "__main__":
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--isotropic", help="Build isotropic graphs", action="store_true", default=False
@@ -179,7 +179,7 @@ if __name__ == "__main__":
         help="Projection method",
         default="matcheig",
         type=str,
-        choices=["matcheig", "msync", "irgcl", "gpow"],
+        choices=["matcheig", "msync", "irgcl", "gpow", "sqad"],
     )
     parser.add_argument(
         "--dist_batch_size",
@@ -195,7 +195,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    all_graphs = pyg.get_graph_database(
+    all_graphs = pyg.get_pascalvoc_graph_database(
         args.database, args.isotropic, args.category, args.repo + "/" + args.database
     )
 
@@ -294,9 +294,15 @@ if __name__ == "__main__":
         m_res = u_nodes @ u_nodes.T
     elif args.method == "mixer":
         u_nodes = mixer.mixer(
-            knode, g_sizes, args.mu_init, args.iterations, binarized=True
+            knode,
+            g_sizes,
+            args.mu_init,
+            args.iterations,
         )
         m_res = u_nodes @ u_nodes.T
+        # Force binary matrix
+        m_res[m_res > 0.1] = 1.0
+        m_res[m_res < 1.0] = 0.0
     elif args.method == "quickm":
         u_nodes = quickmatch.quickmatch(
             all_graphs,
@@ -380,7 +386,8 @@ if __name__ == "__main__":
         # Normalize for the tradeoff between nodes and edges
         # norm_knode = np.median(g_sizes)
         # knode /= norm_knode
-        knode *= args.rank
+        # knode *= args.rank
+        knode *= len(g_sizes) * 2
 
         gradient = mkergm.create_gradient(phi, knode)
 
@@ -432,3 +439,7 @@ if __name__ == "__main__":
     print("Precision = {:.3f}".format(precision))
     print("Recall = {:.3f}".format(recall))
     print("F1-Score = {:.3f}".format(f1_score))
+
+
+if __name__ == "__main__":
+    main()
