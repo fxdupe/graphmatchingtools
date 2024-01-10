@@ -12,8 +12,10 @@ sys.path.insert(0, os.path.abspath("../"))
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "GraphMatchingTools"
-copyright = "2023, François-Xavier Dupé, Rohit Yadav"
-author = "François-Xavier Dupé, Rohit Yadav"
+copyright = (
+    "2023-2024, François-Xavier Dupé, Rohit Yadav, Guillaume Auzias, Sylvain Takerkart"
+)
+author = "François-Xavier Dupé, Rohit Yadav, Guillaume Auzias, Sylvain Takerkart"
 release = "0.9.0"
 show_authors = True
 

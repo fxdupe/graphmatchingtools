@@ -1,5 +1,5 @@
 """
-Example of matching with self learning (for improving the features)
+Example of matching with self learning (for improving the features).
 
 .. moduleauthor: François-Xavier Dupé
 """
@@ -13,19 +13,19 @@ import graph_matching_tools.algorithms.kernels.utils as kutils
 import graph_matching_tools.algorithms.kernels.gaussian as gaussian
 import graph_matching_tools.algorithms.kernels.rff as rff
 import graph_matching_tools.algorithms.multiway.mkergm as mkergm
-import graph_matching_tools.algorithms.multiway.matcheig as matcheig
 import graph_matching_tools.utils.utils as utils
 import graph_matching_tools.metrics.matching as measures
 import graph_matching_tools.io.pygeo_graphs as pyg
 import graph_matching_tools.utils.permutations as perm
 
 
-def get_node_data_matrix(graph: nx.Graph, data_name: str):
+def get_node_data_matrix(graph: nx.Graph, data_name: str) -> np.ndarray:
     """Get the node data matrix from a current graph.
 
     :param nx.Graph graph: a graph.
     :param str data_name: the name of the data vector.
-    :return:
+    :return: the data matrix.
+    :rtype: np.ndarray
     """
     data = np.zeros((nx.number_of_nodes(graph), len(graph.nodes[0][data_name])))
     for node in range(nx.number_of_nodes(graph)):
@@ -33,7 +33,7 @@ def get_node_data_matrix(graph: nx.Graph, data_name: str):
     return data
 
 
-if __name__ == "__main__":
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--isotropic", help="Build isotropic graphs", action="store_true", default=False
@@ -133,7 +133,7 @@ if __name__ == "__main__":
 
     pca = skld.PCA(n_components=30)
     pca.fit(data_matrices)
-    data_reduced = pca.transform(data_matrices)
+    # data_reduced = pca.transform(data_matrices)
 
     new_graphs = []
     for graph in all_graphs:
@@ -219,3 +219,7 @@ if __name__ == "__main__":
     print("Precision = {:.3f}".format(precision))
     print("Recall = {:.3f}".format(recall))
     print("F1-Score = {:.3f}".format(f1_score))
+
+
+if __name__ == "__main__":
+    main()

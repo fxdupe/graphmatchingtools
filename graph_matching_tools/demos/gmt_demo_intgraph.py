@@ -26,13 +26,15 @@ import graph_matching_tools.algorithms.kernels.rff as rff
 import graph_matching_tools.metrics.matching as measures
 
 
-def add_dummy_nodes(graphs, rank):
+def add_dummy_nodes(
+    graphs: list[nx.Graph], rank: int
+) -> tuple[list[nx.Graph], list[list[int]]]:
     """Add dummy nodes to graph to uniform the sizes.
 
     :param list[nx.Graph] graphs: the list of graphs.
     :param int rank: the rank of the universe of nodes.
     :return: the new list of graph with the new matching index.
-    :rtype: np.ndarray
+    :rtype: tuple[list[nx.Graph], list[list[int]]]
     """
     g_sizes = [nx.number_of_nodes(gr) for gr in graphs]
     max_nodes = np.max(g_sizes)
@@ -59,7 +61,7 @@ def add_dummy_nodes(graphs, rank):
     return new_graphs, new_dummy_index
 
 
-if __name__ == "__main__":
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="Multiway matching for INT graph example."
     )
@@ -387,3 +389,7 @@ if __name__ == "__main__":
         print("Precision = {:.3f}".format(precision))
         print("Recall = {:.3f}".format(recall))
         print("F1-Score = {:.3f}".format(f1_score))
+
+
+if __name__ == "__main__":
+    main()

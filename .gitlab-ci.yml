@@ -40,7 +40,8 @@ test:
 build:
   stage: build
   script:
-    - python setup.py bdist_wheel
+    - pip install -q build[virtualenv]
+    - python -m build
   artifacts:
     paths:
       - dist/*.whl

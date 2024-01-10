@@ -41,7 +41,7 @@ The scope of this work is to offer reproducible research and alternatives.
 
 ## Installation
 
-The package can be installed in editable mode using the following command in the same repertory as *setup.py*,
+The package can be installed in editable mode using the following command from the base directory,
 ```shell
 pip install -e .
 ```
@@ -64,7 +64,7 @@ We provide 3 examples based on this toolbox,
 [Pytorch-Geometrics](https://pytorch-geometric.readthedocs.io/). For example to run
 the MKerGM method on the *duck* class from Willow we can execute,
 ```shell
-python scripts/PyTorchGeo_Example.py --category duck --sigma 70.0 --gamma 0.01  --rff 200 --iterations 20 --rank 10
+gmt_demo_pytorchdata --category duck --sigma 70.0 --gamma 0.01  --rff 200 --iterations 20 --rank 10
 ```
 
 These examples may require modules that are not required in the setup.

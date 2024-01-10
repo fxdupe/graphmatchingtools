@@ -2,6 +2,7 @@
 graft graph_matching_tools
 graft scripts
 graft docs
+graft data
 # `-> adds all files inside a directory
 
 include LICENSE

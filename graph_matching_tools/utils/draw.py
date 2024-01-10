@@ -7,10 +7,10 @@ import matplotlib.pyplot as plt
 import networkx as nx
 
 
-def draw_letter(graph: nx.Graph) -> None:
+def draw_letter(graph: nx.Graph) -> None:  # pragma: no cover
     """Draw a letter in blue.
 
-    :param nx.Graph graph: the graph representing a letter
+    :param nx.Graph graph: the graph representing a letter.
     """
 
     plt.title("Letter")

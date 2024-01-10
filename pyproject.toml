@@ -4,11 +4,11 @@ version = "0.9.0"
 authors = [
     { name = "François-Xavier Dupé", email = "francois-xavier.dupe@univ-amu.fr" },
     { name = "Rohit Yadav", email = "rohit.yadav@univ-amu.fr" },
-    { name = "Guillaume Auzias", email = "guillaume.auzais@univ-amu.fr"},
-    { name = "Sylvain Takerkart", email = "sylvain.takerkart@univ-amu.fr"},
+    { name = "Guillaume Auzias", email = "guillaume.auzais@univ-amu.fr" },
+    { name = "Sylvain Takerkart", email = "sylvain.takerkart@univ-amu.fr" },
 ]
+dynamic = ["dependencies", "readme"]
 description = "Unsupervised multiple graphs matching methods"
-readme = "README.md"
 requires-python = ">=3.10"
 keywords = ["graph matching", "multiway matching", "multigraph matching", "pairwise matching"]
 classifiers = [
@@ -20,15 +20,6 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Image Processing",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
-]
-dependencies = [
-    "numpy >= 1.10",
-    "scipy >= 1.7",
-    "networkx >= 2.7",
-    "scikit-learn >= 1.0",
-    "jax >= 0.4",
-    "jaxlib >= 0.4",
-    "matplotlib >= 3.5.0",
 ]
 
 [project.optional-dependencies]
@@ -43,9 +34,18 @@ dev = [
     "black >= 23.12.1",
     "pre-commit >= 3.2.0",
 ]
+demos = [
+    "torch_geometric >= 2.4.0",
+    "torch-cluster >= 1.6.3",
+    "torch-sparse >= 0.6.10",
+]
 
 [project.scripts]
-gmt_torchgeo = "graph_matching_tools.scripts.PyTorchGeo_Example:main"
+gmt_demo_pytorchdata = "graph_matching_tools.scripts.gmt_demo_pytorchdata:main"
+gmt_demo_randomgraph = "graph_matching_tools.scripts.gmt_demo_randomgraph:main"
+#gmt_demo_kmeans = "graph_matching_tools.scripts.gmt_demo_kmeans:main"
+#gmt_demo_intgraph = "graph_matching_tools.scripts.gmt_demo_intgraph:main"
+#gmt_demo_selflearning = "graph_matching_tools.scripts.gmt_demo_selflearning:main"
 
 [project.urls]
 "Homepage" = "https://github.com/fxdupe/graphmatchingtools"
@@ -53,7 +53,7 @@ gmt_torchgeo = "graph_matching_tools.scripts.PyTorchGeo_Example:main"
 
 [build-system]
 requires = [
-    "setuptools >= 62",
+    "setuptools >= 67",
     "wheel"
 ]
 build-backend = "setuptools.build_meta"
@@ -62,6 +62,10 @@ build-backend = "setuptools.build_meta"
 where = ["."]
 exclude = ["test*"]
 namespaces = false
+
+[tool.setuptools.dynamic]
+readme = {file = "README.md"}
+dependencies = {file = "requirements.txt"}
 
 [tool.coverage.run]
 branch = true
@@ -72,8 +76,8 @@ omit = [
     "/usr/*",
     # omit this single file
     "tests/*",
-    # omit scripts
-    "graph_matching_tools/scripts/*",
+    # omit demos
+    "graph_matching_tools/demos/*",
     # omit GAE for the moment
     "graph_matching_tools/learning/GAE.py",
 ]
@@ -101,29 +105,49 @@ skip_covered = true
 minversion = "7.0"
 addopts = "--cov=graph_matching_tools"
 
-#[tool.poetry]
-#name = "Graph Matching Tools"
-#version = "0.9.0"
-#description = "Tools for multiple graph matching with coherence"
-#authors = ["François-Xavier Dupé <francois-xavier.dupe@univ-amu.fr>",
-#    "Rohit Yadav <rohit.yadav@univ-amu.fr>"]
-#
-#[tool.poetry.dependencies]
-#python = ">=3.9"
-#numpy = ">1.10"
-#scipy = ">=1.7"
-#networkx = ">=2.7"
-#scikit-learn = ">=1.0"
-#jax = ">=0.4"
-#jaxlib = ">=0.4"
-#
-#[tool.poetry.dev-dependencies]
-#pytest = ">=7.0"
-#pytest-cov = ">=3.0"
-#coverage = ">=6.0"
-#sphinx = ">=6.0"
-#sphinx-autoapi = ">=2.0"
-#furo = ">=2022.12.7"
-#tox = ">=4.0"
-#black = ">=23.12.1"
-#pre-commit = ">=3.2.0"
+[tool.poetry]
+name = "Graph Matching Tools"
+version = "0.9.0"
+description = "Tools for multiple graph matching with coherence"
+license = "MIT"
+readme = "README.md"
+authors = [
+    "François-Xavier Dupé <francois-xavier.dupe@univ-amu.fr>",
+    "Rohit Yadav <rohit.yadav@univ-amu.fr>",
+    "Guillaume Auzias <guillaume.auzais@univ-amu.fr>",
+    "Sylvain Takerkart <sylvain.takerkart@univ-amu.fr>",
+]
+keywords = ["graph matching", "multiway matching", "multigraph matching", "pairwise matching"]
+packages = [{include = "graph_matching_tools"},]
+
+[tool.poetry.dependencies]
+python = ">=3.10, <3.13"
+numpy = "^1.10.0"
+scipy = "^1.7.0"
+networkx = "^2.7.0"
+scikit-learn = "^1.0.0"
+jax = "^0.4.0"
+jaxlib = "^0.4.0"
+matplotlib = "^3.5.0"
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.0"
+pytest-cov = "^3.0"
+coverage = "^6.0"
+sphinx = "^7.0"
+sphinx-autoapi = "^2.0"
+furo = ">=2022.12.7"
+tox = "^4.0"
+black = ">=23.12.1"
+pre-commit = "^3.2.0"
+
+[tool.poetry.group.demos]
+optional = true
+
+[tool.poetry.group.demos.dependencies]
+torch_geometric = "^2.4.0"
+torch-cluster = "^1.6.3"
+torch-sparse = "^0.6.10"

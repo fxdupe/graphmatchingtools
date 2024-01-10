@@ -1,5 +1,5 @@
 """
-Example script with KMeans
+Example script with KMeans to be used with INT graphs.
 """
 import os
 import argparse
@@ -15,11 +15,12 @@ from graph_matching_tools.utils.permutations import (
 )
 
 
-def get_all_coords(list_graphs):
-    """
-    Get the coordinates from the graphs
-    :param list_graphs: the list of graph
-    :return: the array of coordinates
+def get_all_coords(list_graphs: list[nx.Graph]) -> np.ndarray:
+    """Get the coordinates from the graphs.
+
+    :param list[nx.Graph] list_graphs: the list of graph.
+    :return: the array of coordinates.
+    :rtype: np.ndarray
     """
     g_all_coords = []
     for g in list_graphs:
@@ -29,10 +30,8 @@ def get_all_coords(list_graphs):
     return g_all_coords
 
 
-if __name__ == "__main__":
-    default_to_graph_folder = (
-        "/home/rohit/PhD_Work/GM_my_version/Graph_matching/data/simu_graph/simu_test/"
-    )
+def main() -> None:
+    default_to_graph_folder = "simu_test/"
     parser = argparse.ArgumentParser(description="Segmentation from learning method.")
     parser.add_argument(
         "-g",
@@ -101,3 +100,7 @@ if __name__ == "__main__":
     nx.write_gpickle(scores, "kmeans_score_k_" + str(k) + ".gpickle")
 
     print(scores)
+
+
+if __name__ == "__main__":
+    main()

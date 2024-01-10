@@ -20,32 +20,33 @@ import graph_matching_tools.io.pygeo_graphs as pyg
 
 
 def create_random_graph_method(
-    size,
-    node_number,
-    edge_proba,
-    shuffle=False,
-    add_noise=False,
-    node_noise_variance=1.0,
-    edge_noise_variance=1.0,
-    node_data_dim=1,
-    edge_data_dim=1,
-    remove_nodes=False,
-    max_node_removed=5,
-):
-    """Use Erdos-Renyi way of generating graph
+    size: int,
+    node_number: int,
+    edge_proba: float,
+    shuffle: bool = False,
+    add_noise: bool = False,
+    node_noise_variance: float = 1.0,
+    edge_noise_variance: float = 1.0,
+    node_data_dim: int = 1,
+    edge_data_dim: int = 1,
+    remove_nodes: bool = False,
+    max_node_removed: int = 5,
+) -> tuple[list[nx.Graph], list[list[int]], list[list[int]]]:
+    """Erdos-Renyi graphs generator with perturbations.
 
-    :param size: the number of graphs
-    :param node_number: the number of nodes
-    :param edge_proba: the proba for edges
-    :param shuffle: if True shuffle the nodes
-    :param add_noise: if True add noise on data
-    :param node_noise_variance: the variance of the noise on node data
-    :param edge_noise_variance: the variance of the noise on edge data
-    :param node_data_dim: the dimension of the data of nodes
-    :param edge_data_dim: the dimension of the data of edges
-    :param remove_nodes: True to remove nodes at random (they are transformed into dummy nodes)
-    :param max_node_removed: the maximal number of removed nodes
-    :return: a random graph
+    :param int size: the number of graphs.
+    :param int node_number: the number of nodes.
+    :param float edge_proba: the proba for edges.
+    :param bool shuffle: if True shuffle the nodes.
+    :param bool add_noise: if True add noise on data.
+    :param float node_noise_variance: the variance of the noise on node data.
+    :param float edge_noise_variance: the variance of the noise on edge data.
+    :param int node_data_dim: the dimension of the data of nodes.
+    :param int edge_data_dim: the dimension of the data of edges.
+    :param bool remove_nodes: True to remove nodes at random (they are transformed into dummy nodes).
+    :param int max_node_removed: the maximal number of removed nodes.
+    :return: a tuple with a set of graph, the groundtruth matching and the list of dummy nodes.
+    :rtype: tuple[list[nx.Graph], list[list[int]], list[list[int]]]
     """
     graphs = []
     graph1 = nx.gnp_random_graph(node_number, edge_proba)
@@ -94,7 +95,9 @@ def create_random_graph_method(
             nb_removed = np.random.randint(
                 0, np.minimum(max_node_removed + 1, nx.number_of_nodes(graphs[i_g]))
             )
-            idx = np.random.choice(graphs[i_g].nodes, nb_removed, replace=False)
+            idx = np.random.choice(
+                np.array(graphs[i_g].nodes), nb_removed, replace=False
+            )
             # Transform the nodes into dummy nodes
             for i_n in idx:
                 dummies.append(i_n)
@@ -109,11 +112,12 @@ def create_random_graph_method(
     return graphs, g_index, dummy_index
 
 
-def run_graph_generation(args):
-    """Run everything
+def run_graph_generation(args: argparse.Namespace) -> tuple[float, float]:
+    """Run everything for testing MKERGM compared to MatchEIG.
 
-    :param args: the arguments from the command line
-    :return: the f1-score
+    :param argparse.Namespace args: the arguments from the command line.
+    :return: the f1-score for both methods.
+    :rtype: tuple[float, float]
     """
     all_graphs, all_index, dummy_index = create_random_graph_method(
         args.number_of_graphs,
@@ -183,7 +187,7 @@ def run_graph_generation(args):
     return f1_score_new, f1_score_eig
 
 
-if __name__ == "__main__":
+def main() -> None:
     parser = argparse.ArgumentParser(description="Multiway random graph testing.")
     parser.add_argument(
         "--rank", help="The maximal rank of the results", type=int, default=20
@@ -250,3 +254,7 @@ if __name__ == "__main__":
 
     print("F1-Score (Ours) = {:.3f}".format(np.mean(scores)))
     print("F1-Score (MathEIG) = {:.3f}".format(np.mean(scores_eig)))
+
+
+if __name__ == "__main__":
+    main()
