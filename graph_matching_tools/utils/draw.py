@@ -3,6 +3,7 @@ Some plotting methods for illustration purpose.
 
 .. moduleauthor:: François-Xavier Dupé
 """
+
 import matplotlib.pyplot as plt
 import networkx as nx
 

@@ -5,6 +5,7 @@ As published in "Kernelized multi-graph matching", ACML 2022
 
 .. moduleauthor:: François-Xavier Dupé
 """
+
 from typing import Callable, Optional
 
 import numpy as np

@@ -3,6 +3,7 @@ Implementation of the MM method proposed by Brijnesh J. Jain
 
 .. moduleauthor:: François-Xavier Dupé
 """
+
 from typing import Callable, Optional
 
 import numpy as np

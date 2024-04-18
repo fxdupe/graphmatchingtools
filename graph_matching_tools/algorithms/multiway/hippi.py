@@ -3,6 +3,7 @@ HiPPI algorithm as described in ICCV 2019 paper.
 
 .. moduleauthor:: François-Xavier Dupé
 """
+
 from typing import Optional
 
 import numpy as np

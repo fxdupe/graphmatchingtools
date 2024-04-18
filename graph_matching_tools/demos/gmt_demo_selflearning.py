@@ -3,6 +3,7 @@ Example of matching with self learning (for improving the features).
 
 .. moduleauthor: François-Xavier Dupé
 """
+
 import argparse
 
 import numpy as np

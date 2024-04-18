@@ -5,6 +5,7 @@ This code is from the paper
 
 .. moduleauthor:: François-Xavier Dupé
 """
+
 from typing import Optional
 
 import numpy as np

@@ -3,6 +3,7 @@ Random Fourier Features and utility functions
 
 ..moduleauthor:: François-Xavier Dupé
 """
+
 from typing import Optional
 
 import numpy as np

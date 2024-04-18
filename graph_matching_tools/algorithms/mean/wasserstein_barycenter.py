@@ -8,6 +8,7 @@ Note: this using the L2 loss (i.e. q=2)
 
 .. moduleauthor:: François-Xavier Dupé
 """
+
 from typing import Optional
 
 import numpy as np

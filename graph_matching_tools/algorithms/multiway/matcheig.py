@@ -3,6 +3,7 @@ MatchEIG algorithm as described in ICCV 2017 paper.
 
 .. moduleauthor:: François-Xavier Dupé
 """
+
 import numpy as np
 import scipy.optimize as sco
 

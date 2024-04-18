@@ -3,6 +3,7 @@ Direct multigraph version of KerGM
 
 .. moduleauthor:: François-Xavier Dupé
 """
+
 import numpy as np
 import networkx as nx
 

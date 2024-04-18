@@ -6,6 +6,7 @@ Advances in Neural Information Processing Systems, 33.
 
 .. moduleauthor:: François-Xavier Dupé
 """
+
 from typing import Optional
 
 import numpy as np
@@ -103,9 +104,9 @@ def ga_mgmc(
                     weights, gamma=tau_node, iterations=inner_iterations
                 )
                 knode[index_i : index_i + sizes[i], index_j : index_j + sizes[j]] = res
-                knode[
-                    index_j : index_j + sizes[j], index_i : index_i + sizes[i]
-                ] = res.T
+                knode[index_j : index_j + sizes[j], index_i : index_i + sizes[i]] = (
+                    res.T
+                )
                 index_j += sizes[j]
             index_i += sizes[i]
         knode += np.identity(knode.shape[0])

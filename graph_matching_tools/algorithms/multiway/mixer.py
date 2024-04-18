@@ -5,6 +5,7 @@ IEEE Robotics and Automation Letters, 8(5), 2462-2469.
 
 .. moduleauthor:: François-Xavier Dupé
 """
+
 import numpy as np
 
 

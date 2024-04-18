@@ -3,6 +3,7 @@ Example of matching with random graphs
 
 .. moduleauthor: François-Xavier Dupé
 """
+
 import argparse
 import copy
 

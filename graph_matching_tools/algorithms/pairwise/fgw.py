@@ -4,10 +4,13 @@ Implementation of Vayer, T., Chapel, L., Flamary, R., Tavenard, R., & Courty, N.
  Optimal transport for structured data with application on graphs.
  In International Conference on Machine Learning (pp. 6275-6284). PMLR.
 
+With correction from thesis of Cédric Vincent-Cuaz.
+
 Note: this using the L2 loss (i.e. q=2)
 
 .. moduleauthor:: François-Xavier Dupé
 """
+
 import numpy as np
 
 import graph_matching_tools.algorithms.pairwise.kergm as kergm
@@ -51,15 +54,12 @@ def _line_search_l2_loss(
     :return: the new step size.
     :rtype: float
     """
-    a = -2.0 * alpha * np.trace(new_transport.T @ cost_s @ new_transport @ cost_t)
+    delta_transport = new_transport - transport
+    a = -2.0 * alpha * np.trace(delta_transport.T @ cost_s @ delta_transport @ cost_t)
 
-    b = np.trace(new_transport.T @ ((1 - alpha) * distances + alpha * c_const))
+    b = np.trace(delta_transport.T @ ((1 - alpha) * distances + alpha * c_const))
     b -= 2.0 * alpha * np.trace(transport.T @ cost_s @ new_transport @ cost_t)
     b -= 2.0 * alpha * np.trace(new_transport.T @ cost_s @ transport @ cost_t)
-
-    # The following line is present in the paper but not used in formula
-    # c = np.trace(transport.T @ ((1.0 - alpha) * (distances ** 2.0) + alpha *
-    #                             (c_const - cost_s @ transport @ (2.0 * cost_t).T)))
 
     tau = 0.0
     if a > 0:

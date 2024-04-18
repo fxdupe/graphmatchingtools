@@ -3,6 +3,7 @@ Score for matching comparison
 
 .. moduleauthor:: François-Xavier Dupé
 """
+
 import numpy as np
 
 

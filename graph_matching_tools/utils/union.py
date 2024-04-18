@@ -4,6 +4,7 @@
 
 .. moduleauthor:: François-Xavier Dupé
 """
+
 import numpy as np
 
 

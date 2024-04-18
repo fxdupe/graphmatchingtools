@@ -3,6 +3,7 @@ Set of functions for Pytorch-Geometrics datasets
 
 .. moduleauthor:: François-Xavier Dupé
 """
+
 import numpy as np
 import networkx as nx
 from torch_geometric.datasets import WILLOWObjectClass

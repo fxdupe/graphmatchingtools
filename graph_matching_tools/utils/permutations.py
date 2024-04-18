@@ -3,6 +3,7 @@ Utility function for permutation matrix
 
 .. moduleauthor:: François-Xavier Dupé
 """
+
 import numpy as np
 
 

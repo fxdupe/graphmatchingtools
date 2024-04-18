@@ -4,6 +4,7 @@ This code is directly from the paper
 
 .. moduleauthor:: François-Xavier Dupé
 """
+
 from typing import Callable
 
 import numpy as np
@@ -104,9 +105,9 @@ def compute_multiway_objective(
                     incs[i_g2].shape[0] + incs[i_g2].shape[1],
                 )
             )
-            d_mat[
-                0 : kedges[i_g1][i_g2].shape[0], 0 : kedges[i_g1][i_g2].shape[1]
-            ] = kedges[i_g1][i_g2]
+            d_mat[0 : kedges[i_g1][i_g2].shape[0], 0 : kedges[i_g1][i_g2].shape[1]] = (
+                kedges[i_g1][i_g2]
+            )
             d_mat[0 : kedges[i_g1][i_g2].shape[0], kedges[i_g1][i_g2].shape[1] :] = (
                 -kedges[i_g1][i_g2] @ incs[i_g2].T
             )
@@ -153,9 +154,9 @@ def create_multiway_local_gradient(
             incs[target_graph].shape[0] + incs[target_graph].shape[1],
         )
     )
-    d_mat[
-        0 : kedges[target_graph].shape[0], 0 : kedges[target_graph].shape[1]
-    ] = kedges[target_graph]
+    d_mat[0 : kedges[target_graph].shape[0], 0 : kedges[target_graph].shape[1]] = (
+        kedges[target_graph]
+    )
     d_mat[0 : kedges[target_graph].shape[0], kedges[target_graph].shape[1] :] = (
         -kedges[target_graph] @ incs[target_graph].T
     )

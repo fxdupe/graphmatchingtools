@@ -10,6 +10,7 @@ This code only works for graphs of the same size (i.e. number of nodes)
 
 .. moduleauthor:: François-Xavier Dupé
 """
+
 import copy
 
 import numpy as np
@@ -128,9 +129,9 @@ def stochastic_dist_mkergm(
             i_size = 0
             for i in range(index.shape[0]):
                 # Imply diagonal the gradient
-                bulk[
-                    i_size : i_size + b_sizes[i], i_size : i_size + b_sizes[i]
-                ] = np.identity(b_sizes[i])
+                bulk[i_size : i_size + b_sizes[i], i_size : i_size + b_sizes[i]] = (
+                    np.identity(b_sizes[i])
+                )
 
                 j_size = i_size + b_sizes[i]
                 for j in range(i + 1, index.shape[0]):

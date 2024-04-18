@@ -1,6 +1,7 @@
 """
 Example script with KMeans to be used with INT graphs.
 """
+
 import os
 import argparse
 

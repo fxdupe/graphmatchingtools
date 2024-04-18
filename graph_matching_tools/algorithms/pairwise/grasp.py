@@ -4,6 +4,7 @@ This code is directly from the paper
 
 .. moduleauthor:: François-Xavier Dupé
 """
+
 from typing import Optional, Callable
 
 import numpy as np

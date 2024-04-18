@@ -3,6 +3,7 @@ Utility functions for the multiway matching.
 
 .. moduleauthor:: François-Xavier Dupé
 """
+
 import numpy as np
 import scipy.optimize as sco
 

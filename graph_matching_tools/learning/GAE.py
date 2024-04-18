@@ -4,6 +4,7 @@ Graph Auto-Encoder as proposed by Zipf et Welling in "Variational Graph Auto-Enc
 
 .. moduleauthor:: François-Xavier Dupé
 """
+
 import copy
 
 import numpy as np

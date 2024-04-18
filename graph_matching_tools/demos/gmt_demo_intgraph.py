@@ -2,6 +2,7 @@
 
 .. moduleauthor:: François-Xavier Dupé
 """
+
 import argparse
 import os
 import pickle

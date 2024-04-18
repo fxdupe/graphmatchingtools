@@ -3,6 +3,7 @@ MSync method for graph matching synchronization.
 
 .. moduleauthor:: François-Xavier Dupé
 """
+
 from typing import Optional
 
 import numpy as np

@@ -7,6 +7,7 @@ TODO: use JAX instead of Numpy (must check the compatibility of the code)
 
 .. moduleauthor:: François-Xavier Dupé
 """
+
 import numpy as np
 
 

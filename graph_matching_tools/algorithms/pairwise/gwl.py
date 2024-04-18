@@ -8,6 +8,7 @@ TODO: code need to be improved with a better gradient computation
 
 .. moduleauthor:: François-Xavier Dupé
 """
+
 from typing import Optional
 
 import numpy as np

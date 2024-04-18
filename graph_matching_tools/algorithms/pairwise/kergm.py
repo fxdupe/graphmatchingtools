@@ -5,6 +5,7 @@ Zhang, Z., Xiang, Y., Wu, L., Xue, B., & Nehorai, A. (2019). KerGM: Kernelized g
 
 .. moduleauthor:: François-Xavier Dupé
 """
+
 from typing import Callable, Optional
 
 import numpy as np

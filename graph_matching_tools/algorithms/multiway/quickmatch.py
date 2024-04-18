@@ -6,6 +6,7 @@ In Proceedings of the IEEE international conference on computer vision (pp. 4057
 
 .. moduleauthor:: François-Xavier Dupé
 """
+
 import numpy as np
 import networkx as nx
 

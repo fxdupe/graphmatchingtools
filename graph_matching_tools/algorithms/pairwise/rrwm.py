@@ -5,6 +5,7 @@ This code is directly from two papers
 
 .. moduleauthor:: François-Xavier Dupé
 """
+
 from typing import Callable
 
 import numpy as np
@@ -135,12 +136,9 @@ def classical_rrwm(
             if (p_source[1], p_target[1]) not in target_graph.edges:
                 continue
             # Compute affinity
-            knode[
-                p_source[0] * n + p_source[1], p_target[0] * n + p_target[1]
-            ] = node_kernel(
-                source_graph, p_source[0], target_graph, p_source[1]
-            ) * node_kernel(
-                source_graph, p_target[0], target_graph, p_target[1]
+            knode[p_source[0] * n + p_source[1], p_target[0] * n + p_target[1]] = (
+                node_kernel(source_graph, p_source[0], target_graph, p_source[1])
+                * node_kernel(source_graph, p_target[0], target_graph, p_target[1])
             )
 
     x = np.ones((m, n)) / (m * n)
