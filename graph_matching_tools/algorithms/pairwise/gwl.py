@@ -4,8 +4,6 @@ Implementation of Gromov-Wasserstein Learning method for graph matching, from th
 Xu, H., Luo, D., Zha, H., & Carin, L. (2019, May). Gromov-wasserstein learning for graph matching and node embedding.
 In International conference on machine learning (pp. 6932-6941). PMLR.
 
-TODO: code need to be improved with a better gradient computation
-
 .. moduleauthor:: François-Xavier Dupé
 """
 
@@ -15,27 +13,7 @@ import numpy as np
 import jax
 import jax.numpy as jnp
 
-
-def _loss_function(
-    cost_s: np.ndarray, cost_t: np.ndarray, transport: np.ndarray
-) -> np.ndarray:
-    """Loss function (here L2-norm).
-
-    :param np.ndarray cost_s: the cost matrix for the "source" graph.
-    :param np.ndarray cost_t: the cost matrix for the "target" graph.
-    :param np.ndarray transport: the transport matrix between the two graphs.
-    :return: the loss function for each element.
-    :rtype: np.ndarray
-    """
-    res = np.zeros((cost_s.shape[0], cost_t.shape[0]))
-    for j_s in range(cost_s.shape[0]):
-        for j_t in range(cost_t.shape[0]):
-            c_j_s = jnp.squeeze(cost_s[:, j_s])
-            c_j_t = jnp.squeeze(cost_t[:, j_t])
-            res[j_s, j_t] = jnp.sum(
-                ((c_j_s[:, jnp.newaxis] - c_j_t[jnp.newaxis, :]) ** 2) * transport
-            )
-    return res
+import graph_matching_tools.algorithms.pairwise.fgw as fgw
 
 
 def _distance_matrix(x_s: np.ndarray, x_t: np.ndarray) -> jax.Array:
@@ -84,9 +62,14 @@ def _gw_proximal_point_solver(
     t_m = mu_s.reshape(-1, 1) @ mu_t.reshape(1, -1)
     a = mu_s
     b = mu_t
+    c_const = fgw.compute_c_constant(
+        cost_s, cost_t, mu_s.reshape((-1, 1)), mu_t.reshape((-1, 1))
+    )
+
     for n in range(outer_iterations):
         cmn = (
-            _loss_function(cost_s, cost_t, t_m)
+            c_const
+            - cost_s @ t_m @ (2.0 * cost_t).T
             + alpha * _distance_matrix(x_s, x_t)
             + gamma
         )
@@ -94,7 +77,7 @@ def _gw_proximal_point_solver(
         for j in range(inner_iterations):
             b = mu_t / (g.T @ a)
             a = mu_s / (g @ b)
-        t_m = jnp.diag(a) @ g @ jnp.diag(b)
+        t_m = jnp.diag(a.flatten()) @ g @ jnp.diag(b.flatten())
     return t_m
 
 
@@ -245,8 +228,8 @@ def gromov_wasserstein_learning(
     >>> t_m, x_s, x_t = gwl_pairwise.gromov_wasserstein_learning(cost_s, cost_t, mu_s, mu_t, 1.0, 1.0,
     ...     3, 20, 20, 20, 0.01, cost_st=distance, use_cross_cost=True, random_seed=1)
     >>> t_m
-    array([[6.4347525e-17, 4.9999997e-01],
-           [5.0000000e-01, 6.4452484e-17]], dtype=float32)
+    array([[6.4347525e-17, 5.0000000e-01],
+           [5.0000000e-01, 6.4452451e-17]], dtype=float32)
     """
     # Learning steps
     rng = np.random.default_rng(seed=random_seed)

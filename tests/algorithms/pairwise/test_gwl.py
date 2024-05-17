@@ -6,12 +6,6 @@ import graph_matching_tools.algorithms.pairwise.gwl as gwl
 
 
 class TestGWL(TestCase):
-    def test_loss_function(self):
-        c_s = np.ones((10, 10))
-        c_t = np.ones((10, 10))
-        transport = np.ones((10, 10)) * 0.5
-        res = gwl._loss_function(c_s, c_t, transport)
-        self.assertTrue(np.linalg.norm(res - 0.0) < 1e-4, "Loss function test")
 
     def test_distance_matrix(self):
         x_s = np.ones((10, 10))
@@ -26,15 +20,16 @@ class TestGWL(TestCase):
     def test_gw_proximal_point_solver(self):
         c_s = np.ones((10, 10))
         c_t = np.ones((11, 11))
-        mu_s = np.ones((10,))
-        mu_t = np.ones((11,))
+        mu_s = np.ones((10, 1)) / 10
+        mu_t = np.ones((11, 1)) / 10
         x_s = np.ones((10, 10))
         x_t = np.ones((11, 10))
 
         res = gwl._gw_proximal_point_solver(
-            c_s, c_t, mu_s, mu_t, x_s, x_t, 0.1, 0.1, 10, 1
+            c_s, c_t, mu_s, mu_t, x_s, x_t, 0.1, 1.0, 10, 1
         )
-        self.assertTrue(np.linalg.norm(res - 0.0909) < 1e-2, "Inner S-H loop test")
+
+        self.assertTrue(np.linalg.norm(res - 0.00909091) < 1e-2, "Inner S-H loop test")
 
     def test_update_embeddings_gradient(self):
         c_s = np.ones((10, 10))
@@ -74,8 +69,8 @@ class TestGWL(TestCase):
         cost_st = np.array(
             [[1.0, 1.0, 0.0], [0.0, 1.0, 1.0], [1.0, 0.0, 1.0]], dtype="d"
         )
-        mu_s = np.array([2, 1, 1]) / 4.0
-        mu_t = np.array([1, 1, 2]) / 4.0
+        mu_s = np.reshape(np.array([2, 1, 1]) / 4.0, (-1, 1))
+        mu_t = np.reshape(np.array([1, 1, 2]) / 4.0, (-1, 1))
 
         transport = gwl.gromov_wasserstein_learning(
             cost_s,

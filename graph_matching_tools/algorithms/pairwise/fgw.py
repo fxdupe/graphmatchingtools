@@ -16,7 +16,7 @@ import numpy as np
 import graph_matching_tools.algorithms.pairwise.kergm as kergm
 
 
-def _compute_c_constant(
+def compute_c_constant(
     cost_s: np.ndarray, cost_t: np.ndarray, mu_s: np.ndarray, mu_t: np.ndarray
 ) -> np.ndarray:
     """Compute the constant matrix that appear in the loss function.
@@ -118,7 +118,7 @@ def fgw_direct_matching(
     transport = mu_s @ mu_t.T
     q = 2  # Set as a variable but mostly a constant
     distances_q = distances**q
-    c_const = _compute_c_constant(cost_s, cost_t, mu_s, mu_t)
+    c_const = compute_c_constant(cost_s, cost_t, mu_s, mu_t)
 
     for iteration in range(iterations):
         # 1 - Gradient computation

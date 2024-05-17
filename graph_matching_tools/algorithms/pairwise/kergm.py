@@ -176,7 +176,7 @@ def _gap_value(
     :param np.ndarray x: the current permutation matrix.
     :param np.ndarray x_grad: the gradient at x.
     :param np.ndarray y: the new permutation matrix.
-    :param float gamma: the weighted of the entropy term.
+    :param float gamma: the weight of the entropy term.
     :param float epsilon: the float precision (to avoid overflow).
     :return: the value of the gap between x and y.
     :rtype: np.ndarray
