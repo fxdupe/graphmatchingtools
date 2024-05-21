@@ -15,7 +15,7 @@ import scipy.optimize as sco
 
 # import ot
 
-import graph_matching_tools.algorithms.pairwise.kergm as kergm
+import graph_matching_tools.solvers.ot.sinkhorn as sinkhorn
 import graph_matching_tools.utils.utils as utils
 
 
@@ -100,7 +100,7 @@ def ga_mgmc(
                 #     reg=tau_node,
                 #     numItermax=inner_iterations,
                 # )
-                res = kergm.sinkhorn_method(
+                res = sinkhorn.sinkhorn_method(
                     weights, gamma=tau_node, iterations=inner_iterations
                 )
                 knode[index_i : index_i + sizes[i], index_j : index_j + sizes[j]] = res
@@ -129,7 +129,7 @@ def ga_mgmc(
                 #     reg=tau,
                 #     numItermax=inner_iterations,
                 # )
-                u[index : index + sizes[i], :] = kergm.sinkhorn_method(
+                u[index : index + sizes[i], :] = sinkhorn.sinkhorn_method(
                     vi, gamma=tau, iterations=inner_iterations
                 )
                 index += sizes[i]

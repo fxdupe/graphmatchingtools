@@ -8,7 +8,7 @@ import numpy as np
 import networkx as nx
 import random
 
-import graph_matching_tools.algorithms.pairwise.kergm as kergm
+import graph_matching_tools.solvers.ot.sinkhorn as sinkhorn
 
 
 def get_dim_data_edges(graph: nx.Graph, data_edge: str) -> int:
@@ -119,7 +119,7 @@ def normalized_softperm_matrix(
         j_index = i_index
         for i_y in range(i_x, len(sizes)):
             x_ij = x[i_index : i_index + sizes[i_x], j_index : j_index + sizes[i_y]]
-            x_ij = kergm.sinkhorn_method(
+            x_ij = sinkhorn.sinkhorn_method(
                 x_ij, gamma=entropy
             )  # , mu_s=np.ones((x_ij.shape[0])),
             # mu_t=np.ones((x_ij.shape[1])))

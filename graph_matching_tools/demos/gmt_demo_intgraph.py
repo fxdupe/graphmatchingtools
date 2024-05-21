@@ -18,13 +18,13 @@ import graph_matching_tools.algorithms.multiway.dist_mkergm as dist_mkergm
 import graph_matching_tools.algorithms.multiway.stiefel as stiefel
 import graph_matching_tools.algorithms.multiway.irgcl as irgcl
 import graph_matching_tools.algorithms.multiway.kergm as multi_kergm
-import graph_matching_tools.algorithms.pairwise.kergm as kergm
 import graph_matching_tools.utils.utils as utils
 import graph_matching_tools.utils.permutations as permutations
 import graph_matching_tools.algorithms.kernels.gaussian as gaussian
 import graph_matching_tools.algorithms.kernels.utils as kutils
 import graph_matching_tools.algorithms.kernels.rff as rff
 import graph_matching_tools.metrics.matching as measures
+import graph_matching_tools.solvers.ot.sinkhorn as sinkhorn
 
 
 def add_dummy_nodes(
@@ -252,7 +252,7 @@ def main() -> None:
                 weights = kutils.compute_knode(
                     all_graphs[i_g1], all_graphs[i_g2], node_kernel
                 )
-                weights = kergm.sinkhorn_method(weights, gamma=3.0, iterations=20)
+                weights = sinkhorn.sinkhorn_method(weights, gamma=3.0, iterations=20)
                 affinities[i_g1, i_g2, :, :] = weights
                 affinities[i_g2, i_g1, :, :] = np.squeeze(
                     affinities[i_g1, i_g2, :, :]

@@ -14,6 +14,7 @@ keywords = ["graph matching", "multiway matching", "multigraph matching", "pairw
 classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3",
     "Development Status :: 4 - Beta",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",

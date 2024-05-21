@@ -13,7 +13,7 @@ Note: this using the L2 loss (i.e. q=2)
 
 import numpy as np
 
-import graph_matching_tools.algorithms.pairwise.kergm as kergm
+import graph_matching_tools.solvers.ot.sinkhorn as sinkhorn
 
 
 def compute_c_constant(
@@ -125,7 +125,7 @@ def fgw_direct_matching(
         tmp = c_const - cost_s @ transport @ (2.0 * cost_t).T
         grad = (1.0 - alpha) * distances_q + 2.0 * alpha * tmp
         # 2 - Apply OT constraints
-        new_transport = kergm.sinkhorn_method(
+        new_transport = sinkhorn.sinkhorn_method(
             grad,
             mu_s=np.squeeze(mu_s),
             mu_t=np.squeeze(mu_t),
