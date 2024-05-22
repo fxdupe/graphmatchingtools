@@ -12,7 +12,7 @@ import numpy as np
 import scipy.optimize as sco
 import networkx as nx
 
-from solvers.ot.sinkhorn import sinkhorn_method
+import graph_matching_tools.solvers.ot.sinkhorn as sinkhorn
 
 
 def _compute_axb(
@@ -218,7 +218,7 @@ def _kergm_fw_method(
 
     for iteration in range(iterations):
         grad = gradient(xt, alpha)
-        yt = sinkhorn_method(
+        yt = sinkhorn.sinkhorn_method(
             grad,
             gamma=entropy_gamma,
             tolerance=inner_tolerance,

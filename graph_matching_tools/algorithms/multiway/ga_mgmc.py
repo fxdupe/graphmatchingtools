@@ -13,8 +13,6 @@ import numpy as np
 import networkx as nx
 import scipy.optimize as sco
 
-# import ot
-
 import graph_matching_tools.solvers.ot.sinkhorn as sinkhorn
 import graph_matching_tools.utils.utils as utils
 
@@ -93,13 +91,6 @@ def ga_mgmc(
                 weights = aff_node[
                     index_i : index_i + sizes[i], index_j : index_j + sizes[j]
                 ]
-                # res = ot.bregman.sinkhorn_log(
-                #     np.ones(weights.shape[0]),
-                #     np.ones(weights.shape[1]),
-                #     weights,
-                #     reg=tau_node,
-                #     numItermax=inner_iterations,
-                # )
                 res = sinkhorn.sinkhorn_method(
                     weights, gamma=tau_node, iterations=inner_iterations
                 )
@@ -122,13 +113,6 @@ def ga_mgmc(
             index = 0
             for i in range(len(sizes)):
                 vi = v[index : index + sizes[i], :]
-                # u[index : index + sizes[i], :] = ot.bregman.sinkhorn_log(
-                #     np.ones(vi.shape[0]),
-                #     np.ones(vi.shape[1]),
-                #     vi,
-                #     reg=tau,
-                #     numItermax=inner_iterations,
-                # )
                 u[index : index + sizes[i], :] = sinkhorn.sinkhorn_method(
                     vi, gamma=tau, iterations=inner_iterations
                 )
