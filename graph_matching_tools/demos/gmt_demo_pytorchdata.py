@@ -234,7 +234,6 @@ def main() -> None:
     print("Full-size: {} nodes".format(full_size))
 
     # Compute node affinities
-    node_kernel = None
     knode = None
 
     if (

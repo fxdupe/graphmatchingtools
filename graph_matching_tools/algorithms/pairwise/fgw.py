@@ -132,6 +132,7 @@ def fgw_direct_matching(
             gamma=gamma,
             iterations=inner_iterations,
         )
+        # new_transport = sns.sinkhorn_newton_sparse_method(grad, mu_s, mu_t, 1/gamma)
         # 3 - Line-search
         tau = _line_search_l2_loss(
             c_const, distances, cost_s, cost_t, transport, new_transport, alpha

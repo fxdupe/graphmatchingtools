@@ -113,11 +113,15 @@ class TestUtils(unittest.TestCase):
             [4.0, 0.0, 0.0, 0.0],
             [0.0, 0.0, 0.0, 5.0],
         ]
-        res = utils.normalized_softperm_matrix(np.array(test_matrix), [2, 2], 0.001)
+        res = utils.normalized_softperm_matrix(
+            1.0 - np.array(test_matrix) / 5.0, [2, 2], 0.01
+        )
         truth_matrix = [
-            [0.5, 0.0, 0.5, 0.0],
-            [0.0, 0.5, 0.0, 0.5],
-            [0.5, 0.0, 0.0, 0.5],
-            [0.0, 0.5, 0.5, 0.0],
+            [
+                [4.24835426e-16, 5.00000000e-01, 2.48756219e-03, 5.00000000e-01],
+                [4.97512438e-01, 2.48756219e-03, 4.97512438e-01, 8.75651076e-25],
+                [2.48756219e-03, 4.97512438e-01, 5.00000000e-01, 3.72007598e-42],
+                [5.00000000e-01, 8.75651076e-25, 2.48756219e-03, 4.97512438e-01],
+            ]
         ]
         self.assertTrue(np.linalg.norm(res - np.array(truth_matrix)) < 1e-2)
