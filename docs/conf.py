@@ -53,6 +53,7 @@ import networkx as nx
 import graph_matching_tools.algorithms.kernels.gaussian as kern
 import graph_matching_tools.algorithms.kernels.utils as utils
 import graph_matching_tools.algorithms.multiway.gwl as gwl
+import graph_matching_tools.algorithms.multiway.fgw as fgw
 import graph_matching_tools.algorithms.mean.wasserstein_barycenter as wb
 import graph_matching_tools.algorithms.kernels.rff as rff
 import graph_matching_tools.algorithms.multiway.matcheig as matcheig
