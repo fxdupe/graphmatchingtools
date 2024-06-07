@@ -11,7 +11,7 @@ import numpy as np
 import networkx as nx
 import scipy.optimize as sco
 
-import graph_matching_tools.utils.manopt as manopt
+import graph_matching_tools.solvers.manifold.landing as manopt
 
 
 def _create_gradient(

@@ -2,7 +2,7 @@ from unittest import TestCase
 
 import numpy as np
 
-import graph_matching_tools.utils.manopt as manopt
+import graph_matching_tools.solvers.manifold.landing as manopt
 
 
 class TestManOpt(TestCase):

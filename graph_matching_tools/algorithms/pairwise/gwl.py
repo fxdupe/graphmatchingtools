@@ -24,9 +24,7 @@ def _distance_matrix(x_s: np.ndarray, x_t: np.ndarray) -> jax.Array:
     :return: the normalized distance matrix.
     :rtype: jax.Array
     """
-    # n_s = np.linalg.norm(x_s, axis=1)
     n_s = jnp.sqrt(jnp.sum(x_s**2.0, axis=1))
-    # n_t = np.linalg.norm(x_t, axis=1)
     n_t = jnp.sqrt(jnp.sum(x_t**2.0, axis=1))
     dist = 1.0 - jnp.diag(1.0 / n_s) @ x_s @ x_t.T @ jnp.diag(1.0 / n_t)
     return dist

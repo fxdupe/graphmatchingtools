@@ -18,13 +18,13 @@ import graph_matching_tools.algorithms.multiway.dist_mkergm as dist_mkergm
 import graph_matching_tools.algorithms.multiway.stiefel as stiefel
 import graph_matching_tools.algorithms.multiway.irgcl as irgcl
 import graph_matching_tools.algorithms.multiway.kergm as multi_kergm
+import graph_matching_tools.algorithms.multiway.ga_mgmc as ga_mgmc
 import graph_matching_tools.utils.utils as utils
 import graph_matching_tools.utils.permutations as permutations
 import graph_matching_tools.algorithms.kernels.gaussian as gaussian
 import graph_matching_tools.algorithms.kernels.utils as kutils
 import graph_matching_tools.algorithms.kernels.rff as rff
 import graph_matching_tools.metrics.matching as measures
-import graph_matching_tools.solvers.ot.sinkhorn as sinkhorn
 
 
 def add_dummy_nodes(
@@ -226,71 +226,16 @@ def main() -> None:
             u_nodes = stiefel.sparse_stiefel_manifold_sync(m_res, args.rank, sizes)
         m_res = u_nodes @ u_nodes.T
     elif args.method == "gamgm":
-        # Here we assume that the graphs have the same number of nodes
-        import pygmtools
-
-        adj_graphs = np.zeros(
-            (
-                len(sizes),
-                nx.number_of_nodes(all_graphs[0]),
-                nx.number_of_nodes(all_graphs[0]),
-            )
+        u_nodes = ga_mgmc.ga_mgmc(
+            all_graphs,
+            knode,
+            args.rank,
+            "weight",
+            tau=args.entropy,
+            tau_min=args.gamgm_tau_min,
+            iterations=args.iterations,
         )
-        for i_g in range(len(all_graphs)):
-            adj_graphs[i_g, :, :] = nx.to_numpy_array(all_graphs[i_g], weight=None)
-
-        affinities = np.zeros(
-            (
-                len(sizes),
-                len(sizes),
-                nx.number_of_nodes(all_graphs[0]),
-                nx.number_of_nodes(all_graphs[0]),
-            )
-        )
-        for i_g1 in range(len(all_graphs)):
-            for i_g2 in range(i_g1, len(all_graphs)):
-                weights = kutils.compute_knode(
-                    all_graphs[i_g1], all_graphs[i_g2], node_kernel
-                )
-                weights = sinkhorn.sinkhorn_method(weights, gamma=3.0, iterations=20)
-                affinities[i_g1, i_g2, :, :] = weights
-                affinities[i_g2, i_g1, :, :] = np.squeeze(
-                    affinities[i_g1, i_g2, :, :]
-                ).transpose()
-
-        res = pygmtools.multi_graph_solvers.gamgm(
-            adj_graphs,
-            affinities,
-            n_univ=args.rank,
-            sk_init_tau=2.0,
-            sk_min_tau=0.1,
-            sk_gamma=0.5,
-            param_lambda=1.0,
-            max_iter=50,
-            verbose=True,
-        )
-        res = pygmtools.utils.MultiMatchingResult.to_numpy(res)
-        m_res = np.zeros(
-            (
-                len(sizes) * nx.number_of_nodes(all_graphs[0]),
-                len(sizes) * nx.number_of_nodes(all_graphs[0]),
-            )
-        )
-
-        size1 = 0
-        n_nodes = nx.number_of_nodes(all_graphs[0])
-        for i_g1 in range(len(all_graphs)):
-            size2 = size1
-            for i_g2 in range(i_g1 + 1, len(all_graphs)):
-                m_res[size1 : size1 + n_nodes, size2 : size2 + n_nodes] = res[
-                    i_g1, i_g2
-                ]
-                m_res[size2 : size2 + n_nodes, size1 : size1 + n_nodes] = res[
-                    i_g2, i_g1
-                ]
-                size2 += n_nodes
-            size1 += n_nodes
-        np.fill_diagonal(m_res, 1)
+        m_res = u_nodes @ u_nodes.T
     elif args.method == "kergm":
         m_res = multi_kergm.multi_pairwise_kergm(
             all_graphs,

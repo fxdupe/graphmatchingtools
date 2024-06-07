@@ -4,7 +4,7 @@ Implementation of Vayer, T., Chapel, L., Flamary, R., Tavenard, R., & Courty, N.
  Optimal transport for structured data with application on graphs.
  In International Conference on Machine Learning (pp. 6275-6284). PMLR.
 
-With correction from thesis of Cédric Vincent-Cuaz.
+With corrections from thesis of Cédric Vincent-Cuaz.
 
 Note: this using the L2 loss (i.e. q=2)
 

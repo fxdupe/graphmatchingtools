@@ -30,6 +30,8 @@ import graph_matching_tools.algorithms.multiway.matchals as matchals
 import graph_matching_tools.algorithms.multiway.boolean_nmf as nmf
 import graph_matching_tools.algorithms.multiway.fmgm as fmgm
 import graph_matching_tools.algorithms.multiway.mixer as mixer
+import graph_matching_tools.algorithms.multiway.gwl as gwl
+import graph_matching_tools.algorithms.mean.wasserstein_barycenter as wb
 import graph_matching_tools.io.pygeo_graphs as pyg
 
 
@@ -77,6 +79,7 @@ def main() -> None:
             "dist_mkergm",
             "fmgm",
             "mixer",
+            "gwl",
         ],
         default="mkergm",
     )
@@ -323,6 +326,40 @@ def main() -> None:
             args.nb_alphas,
             args.iterations,
             rff=args.rff,
+        )
+    elif args.method == "gwl":
+        mus = [wb._get_degree_distributions(g) for g in all_graphs]
+        node_kernel = gaussian.create_gaussian_node_kernel(
+            args.sigma, "pos" if args.database == "PascalPF" else "x"
+        )
+        costs = [
+            (
+                1.0
+                - ku.compute_knode(g, g, node_kernel)
+                * nx.to_numpy_array(g, weight=None)
+            )
+            for g in all_graphs
+        ]
+        cross_costs = dict()
+        for i_s in range(len(all_graphs)):
+            for i_t in range(i_s + 1, len(all_graphs)):
+                cost_st = 1.0 - ku.compute_knode(
+                    all_graphs[i_s], all_graphs[i_t], node_kernel
+                )
+                cross_costs["{},{}".format(i_s, i_t)] = cost_st
+
+        m_res = gwl.multi_pairwise_gwl(
+            costs,
+            mus,
+            0.5,
+            args.entropy,
+            args.rank,
+            args.iterations,
+            100,
+            100,
+            0.01,
+            True,
+            cross_costs,
         )
     elif args.method == "dist_mkergm":
         node_kernel = gaussian.create_gaussian_node_kernel(

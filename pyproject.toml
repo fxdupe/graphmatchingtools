@@ -32,7 +32,7 @@ dev = [
     "sphinx-autoapi >= 2.0",
     "furo >= 2022.12.7",
     "tox >= 4.0",
-    "black >= 23.12.1",
+    "black >= 24.4.0",
     "pre-commit >= 3.2.0",
 ]
 demos = [
