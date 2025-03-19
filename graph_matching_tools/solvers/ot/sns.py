@@ -8,7 +8,8 @@ This is the implementation of Tang, X., Shavlovsky, M., Rahmanian, H., Tardini, 
 """
 
 import numpy as np
-import scipy.optimize as sco
+
+import graph_matching_tools.solvers.convex.conjugate_gradient as cg
 
 
 def _objective_function(
@@ -24,7 +25,7 @@ def _objective_function(
     :return: the value at z.
     :rtype: float
     """
-    tmp = -cost + z[0 : cost.shape[0], 0] + z[cost.shape[0] :, 0].T
+    tmp = -cost + z[0 : cost.shape[1], 0] + z[cost.shape[0] :, 0].T
     p1 = -np.exp(eta * tmp - 1) / eta
     p2 = z.T @ np.concatenate([mu_s, mu_t], axis=0)
     return p1.sum() + p2
@@ -63,7 +64,7 @@ def _compute_transport_from_dual(
     (x, y) = (z[0 : cost.shape[0], :], z[cost.shape[0] :, :])
     transport = np.exp(
         eta
-        * (-cost + x @ np.ones((1, cost.shape[0])) + np.ones((cost.shape[1], 1)) @ y.T)
+        * (-cost + x @ np.ones((1, cost.shape[1])) + np.ones((cost.shape[0], 1)) @ y.T)
         - 1
     )
     return transport
@@ -164,8 +165,8 @@ def sinkhorn_newton_sparse_method(
             eta
             * (
                 -cost
-                + x @ np.ones((1, cost.shape[0]))
-                + np.ones((cost.shape[1], 1)) @ y.T
+                + x @ np.ones((1, cost.shape[1]))
+                + np.ones((cost.shape[0], 1)) @ y.T
             )
             - 1.0
         )
@@ -174,14 +175,15 @@ def sinkhorn_newton_sparse_method(
             eta
             * (
                 -cost
-                + x @ np.ones((1, cost.shape[0]))
-                + np.ones((cost.shape[1], 1)) @ y.T
+                + x @ np.ones((1, cost.shape[1]))
+                + np.ones((cost.shape[0], 1)) @ y.T
             )
             - 1.0
         )
         new_y = y + (np.log(mu_t) - np.log(p.T @ np.ones((p.shape[0], 1)))) / eta
 
-        if np.linalg.norm(new_y - y) / np.linalg.norm(new_y) < tolerance:
+        norm_new_y = np.linalg.norm(new_y)
+        if norm_new_y < 1e-6 or np.linalg.norm(new_y - y) / norm_new_y < tolerance:
             break
         y = new_y
 
@@ -203,9 +205,10 @@ def sinkhorn_newton_sparse_method(
         gradient[p.shape[0] :, :] = mu_t - p.T @ np.ones((p.shape[0], 1))
 
         # Get the direction
-        result = sco.lsq_linear(hessian, (-gradient).flat)
-        direction = result["x"]
-        direction = np.reshape(direction, (-1, 1))
+        # result = sco.lsq_linear(hessian, (-gradient).flat, lsq_solver="lsmr")
+        # direction = result["x"]
+        # direction = np.reshape(direction, (-1, 1))
+        direction = cg.conjugate_gradient(hessian, -gradient)
 
         # Linesearch (concave function)
         alpha = _linesearch(z, direction, alpha * 2.0, cost, mu_s, mu_t, eta)

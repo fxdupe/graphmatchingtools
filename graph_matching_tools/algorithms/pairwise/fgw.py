@@ -13,7 +13,7 @@ Note: this using the L2 loss (i.e. q=2)
 
 import numpy as np
 
-import graph_matching_tools.solvers.ot.sinkhorn as sinkhorn
+import graph_matching_tools.solvers.ot.sns as sns
 
 
 def compute_c_constant(
@@ -80,7 +80,9 @@ def fgw_direct_matching(
     alpha: float,
     iterations: int,
     gamma: float = 1.0,
-    inner_iterations: int = 1000,
+    rho: float = 0.8,
+    inner_iterations_step1: int = 100,
+    inner_iterations_step2: int = 100,
 ) -> np.ndarray:
     """Fused Gromov-Wasserstein method for graph matching using optimal transport.
 
@@ -92,7 +94,9 @@ def fgw_direct_matching(
     :param float alpha: the equilibrium between cost and distances.
     :param int iterations: the number of iterations for convergence.
     :param float gamma: the strength of the regularization for the OT solver.
-    :param int inner_iterations: the number of inner iterations for Sinkhorn-Knopp.
+    :param float rho: percentage of remaining value while computing Hessian in sns method.
+    :param int inner_iterations_step1: the number of iterations for the classical steps in OT solver (sns).
+    :param int inner_iterations_step2: the number of iterations for the Newton's steps in OT solver (sns).
     :return: the transport map.
     :rtype: np.ndarray
 
@@ -125,14 +129,15 @@ def fgw_direct_matching(
         tmp = c_const - cost_s @ transport @ (2.0 * cost_t).T
         grad = (1.0 - alpha) * distances_q + 2.0 * alpha * tmp
         # 2 - Apply OT constraints
-        new_transport = sinkhorn.sinkhorn_method(
+        new_transport = sns.sinkhorn_newton_sparse_method(
             grad,
-            mu_s=np.squeeze(mu_s),
-            mu_t=np.squeeze(mu_t),
-            gamma=gamma,
-            iterations=inner_iterations,
+            mu_s,
+            mu_t,
+            eta=1 / gamma,
+            rho=rho,
+            n1_iterations=inner_iterations_step1,
+            n2_iterations=inner_iterations_step2,
         )
-        # new_transport = sns.sinkhorn_newton_sparse_method(grad, mu_s, mu_t, 1/gamma)
         # 3 - Line-search
         tau = _line_search_l2_loss(
             c_const, distances, cost_s, cost_t, transport, new_transport, alpha

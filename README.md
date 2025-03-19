@@ -39,6 +39,17 @@ The scope of this work is to offer reproducible research and alternatives.
 - [MMM method based on pairwise matching](https://www.sciencedirect.com/science/article/abs/pii/S003132031630139X)
 - [Wasserstein barycenter using FGW](https://proceedings.mlr.press/v97/titouan19a.html)
 
+## Auxiliary methods (aka solvers...)
+
+### Optimal transport
+
+- [Sinkhorn-Knopp](https://proceedings.neurips.cc/paper/2013/hash/af21d0c97db2e27e13572cbf59eb343d-Abstract.html)
+- [Sinkhorn algorithm with sparse Newton iterations](https://arxiv.org/abs/2401.12253)
+
+### Manifold optimization
+
+- [Fast and accurate optimization on the orthogonal manifold without retraction](https://proceedings.mlr.press/v151/ablin22a)
+
 ## Installation
 
 The package can be installed in editable mode using the following command from the base directory,

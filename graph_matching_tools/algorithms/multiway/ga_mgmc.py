@@ -13,7 +13,7 @@ import numpy as np
 import networkx as nx
 import scipy.optimize as sco
 
-import graph_matching_tools.solvers.ot.sinkhorn as sinkhorn
+import graph_matching_tools.solvers.ot.sns as sns
 import graph_matching_tools.utils.utils as utils
 
 
@@ -31,7 +31,9 @@ def ga_mgmc(
     iterations: int = 200,
     init: Optional[np.ndarray] = None,
     normalize_aff: bool = False,
-    inner_iterations: int = 10,
+    rho: float = 0.8,
+    inner_iterations_step1: int = 100,
+    inner_iterations_step2: int = 100,
 ) -> np.ndarray:
     """Graduated assignment multi-graph matching (GA-MGM).
 
@@ -48,7 +50,9 @@ def ga_mgmc(
     :param int iterations: the maximal number of iterations.
     :param np.ndarray init: an initialization (optional).
     :param bool normalize_aff: True to normalize the affinity node matrix.
-    :param int inner_iterations: The number of iterations for Sinkhorn.
+    :param float rho: percentage of remaining value while computing Hessian in sns method.
+    :param int inner_iterations_step1: the number of iterations for the classical steps in OT solver (sns).
+    :param int inner_iterations_step2: the number of iterations for the Newton's steps in OT solver (sns).
     :return: the list the node projections (graph by graph).
     :rtype: np.ndarray
 
@@ -58,7 +62,7 @@ def ga_mgmc(
 
     >>> node_kernel = kern.create_gaussian_node_kernel(2.0, "weight")
     >>> knode = utils.create_full_node_affinity_matrix(graphs, node_kernel)
-    >>> u = ga_mgmc.ga_mgmc(graphs, knode, 3, "weight", tau=0.1, tau_min=1e-2)
+    >>> u = ga_mgmc.ga_mgmc(graphs, knode, 3, "weight", tau=0.8, tau_min=0.5)
     >>> u @ u.T
     array([[1., 0., 0., 1., 0., 1., 0.],
            [0., 1., 1., 0., 0., 0., 1.],
@@ -91,8 +95,14 @@ def ga_mgmc(
                 weights = aff_node[
                     index_i : index_i + sizes[i], index_j : index_j + sizes[j]
                 ]
-                res = sinkhorn.sinkhorn_method(
-                    weights, gamma=tau_node, iterations=inner_iterations
+                res = sns.sinkhorn_newton_sparse_method(
+                    weights,
+                    np.ones((sizes[i], 1)) / sizes[i],
+                    np.ones((sizes[j], 1)) / sizes[j],
+                    eta=1 / tau_node,
+                    rho=rho,
+                    n1_iterations=inner_iterations_step1,
+                    n2_iterations=inner_iterations_step2,
                 )
                 knode[index_i : index_i + sizes[i], index_j : index_j + sizes[j]] = res
                 knode[index_j : index_j + sizes[j], index_i : index_i + sizes[i]] = (
@@ -113,8 +123,14 @@ def ga_mgmc(
             index = 0
             for i in range(len(sizes)):
                 vi = v[index : index + sizes[i], :]
-                u[index : index + sizes[i], :] = sinkhorn.sinkhorn_method(
-                    vi, gamma=tau, iterations=inner_iterations
+                u[index : index + sizes[i], :] = sns.sinkhorn_newton_sparse_method(
+                    vi,
+                    np.ones((vi.shape[0], 1)) / vi.shape[0],
+                    np.ones((vi.shape[1], 1)) / vi.shape[1],
+                    eta=1 / tau,
+                    rho=rho,
+                    n1_iterations=inner_iterations_step1,
+                    n2_iterations=inner_iterations_step2,
                 )
                 index += sizes[i]
 

@@ -13,10 +13,10 @@ sys.path.insert(0, os.path.abspath("../"))
 
 project = "GraphMatchingTools"
 copyright = (
-    "2023-2024, François-Xavier Dupé, Rohit Yadav, Guillaume Auzias, Sylvain Takerkart"
+    "2023-2025, François-Xavier Dupé, Rohit Yadav, Guillaume Auzias, Sylvain Takerkart"
 )
 author = "François-Xavier Dupé, Rohit Yadav, Guillaume Auzias, Sylvain Takerkart"
-release = "0.9.0"
+release = "0.9.2"
 show_authors = True
 
 # -- General configuration ---------------------------------------------------

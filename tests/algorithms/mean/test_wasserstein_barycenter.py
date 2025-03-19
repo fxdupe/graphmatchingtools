@@ -71,22 +71,24 @@ class TestWassersteinBarycenter(TestCase):
 
         graphs = [g1, g2, g3]
         mean_cost, mean_data = mean.fgw_wasserstein_barycenter(
-            graphs, 0.5, 10, 30, 1.0, gamma=0.01
+            graphs, 0.5, 10, 30, 1.0, gamma=0.1
         )
 
         truth_cost = np.array(
             [
-                [7.61092558e-02, 2.48764482e-01, 1.29966434e-01, 1.15899133e-01],
-                [2.48764482e-01, 1.07612502e-01, 1.67441185e-01, 1.71573280e-01],
-                [1.29966434e-01, 1.67441185e-01, 5.89453649e-15, 3.46624861e-02],
-                [1.15899133e-01, 1.71573280e-01, 3.46624861e-02, 3.12103216e-03],
+                [0.09061904, 0.23730902, 0.12653064, 0.11267371],
+                [0.23730902, 0.12323478, 0.16275617, 0.16414926],
+                [0.12653064, 0.16275617, 0.00667758, 0.03636981],
+                [0.11267371, 0.16414926, 0.03636981, 0.02334748],
             ]
         )
         truth_data = np.array(
             [
-                [2.44166414, 3.78325001, 0.56761783, 0.64904692],
+                [2.39582502, 3.70749711, 0.85011517, 0.60990108],
             ]
         )
 
+        print(mean_cost)
+        print(mean_data)
         self.assertEqual(np.linalg.norm(mean_cost - truth_cost) < 1e-3, True)
         self.assertEqual(np.linalg.norm(mean_data - truth_data) < 1e-3, True)

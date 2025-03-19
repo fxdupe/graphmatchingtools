@@ -102,7 +102,7 @@ def fgw_wasserstein_barycenter(
     node_sigma: float = 1.0,
     weights: Optional[np.ndarray] = None,
     gamma: float = 1.0,
-    ot_iterations: int = 1000,
+    rho: float = 0.8,
     graph_init: int = 0,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Fused Gromov-Wasserstein + Frechet mean for Wasserstein barycenter.
@@ -118,7 +118,7 @@ def fgw_wasserstein_barycenter(
     :param float node_sigma: the sigma for the Gaussian kernel used for distance between node data.
     :param Optional[np.ndarray] weights: the weight associated to each graph.
     :param float gamma: the strength of thr regularization for the OT solver.
-    :param int ot_iterations: the maximal number of iteration for the OT solver.
+    :param float rho: percentage of remaining value while computing Hessian in sns method.
     :param int graph_init: the index of the graph used as initialization (default: 0).
     :return: the cost and data of the barycenter.
     :rtype: tuple[np.ndarray, np.ndarray]
@@ -149,14 +149,14 @@ def fgw_wasserstein_barycenter(
     >>> g3.add_edge(0, 3, weight=2.0)
     >>> g3.add_edge(1, 2, weight=3.0)
     >>> graphs = [g1, g2, g3]
-    >>> mean_cost, mean_data = fgw_barycenter.fgw_wasserstein_barycenter(graphs, 0.1, 10, 100, gamma=0.1)
+    >>> mean_cost, mean_data = fgw_barycenter.fgw_wasserstein_barycenter(graphs, 0.1, 10, 100, gamma=0.5)
     >>> mean_cost
-    array([[0.08348553, 0.23034241, 0.11774141, 0.104657  ],
-           [0.23034241, 0.0958167 , 0.1718178 , 0.15438657],
-           [0.11774141, 0.1718178 , 0.00336387, 0.02950206],
-           [0.104657  , 0.15438657, 0.02950206, 0.02300908]])
+    array([[0.18533547, 0.21425122, 0.10635751, 0.10392826],
+           [0.21425122, 0.17972486, 0.10271096, 0.10433109],
+           [0.10635751, 0.10271096, 0.04693286, 0.04931178],
+           [0.10392826, 0.10433109, 0.04931178, 0.04879482]])
     >>> mean_data
-    array([[2.43740991, 3.75699393, 1.27688604, 1.00094441]])
+    array([[2.47647803, 1.57681529, 4.71966496, 1.84041193]])
     """
     if weights is None:
         weights = np.ones((len(graphs),)) / len(graphs)
@@ -189,7 +189,7 @@ def fgw_wasserstein_barycenter(
                 alpha,
                 fgw_iterations,
                 gamma=gamma,
-                inner_iterations=ot_iterations,
+                rho=rho,
             )
             transports.append(transport)
 
