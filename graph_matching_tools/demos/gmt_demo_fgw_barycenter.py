@@ -17,8 +17,7 @@ import matplotlib.colors as mcol
 import matplotlib.pyplot as plt
 from matplotlib import cm
 
-# import graph_matching_tools.solvers.ot.sns as sns
-# import graph_matching_tools.algorithms.mean.wasserstein_barycenter as bary
+import graph_matching_tools.algorithms.mean.wasserstein_barycenter as fgwbary
 import graph_matching_tools.algorithms.pairwise.fgw as fgw
 
 
@@ -73,7 +72,7 @@ def build_noisy_circular_graph(
     g = nx.Graph()
     g.add_nodes_from(list(range(N)))
     for i in range(N):
-        noise = float(np.random.normal(mu, sigma, 1))
+        noise = float(np.random.normal(mu, sigma, 1)[0])
         if with_noise:
             g.add_node(i, attr_name=math.sin((2 * i * math.pi / N)) + noise)
         else:
@@ -89,7 +88,7 @@ def build_noisy_circular_graph(
                 if i == N - 1:
                     g.add_edge(i, 1)
     g.add_edge(N, 0)
-    noise = float(np.random.normal(mu, sigma, 1))
+    noise = float(np.random.normal(mu, sigma, 1)[0])
     if with_noise:
         g.add_node(N, attr_name=math.sin((2 * N * math.pi / N)) + noise)
     else:
@@ -135,18 +134,41 @@ def plot_barycenter_fgw():
     plt.suptitle("Dataset of noisy graphs. Color indicates the label", fontsize=20)
     plt.show()
 
-    # Cs = [shortest_path(nx.adjacency_matrix(x).todense()) for x in X0]
-    # ps = [np.ones(len(x.nodes())) / len(x.nodes()) for x in X0]
-    # Ys = [
-    #     np.array([v for (k, v) in nx.get_node_attributes(x, "attr_name").items()]).reshape(
-    #         -1, 1
-    #     )
-    #     for x in X0
-    # ]
-    # lambdas = np.array([np.ones(len(Ys)) / len(Ys)]).ravel()
-    # sizebary = 15  # we choose a barycenter with 15 nodes
+    Cs = [shortest_path(nx.adjacency_matrix(x).todense()) for x in X0]
+    ps = [np.ones(len(x.nodes())) / len(x.nodes()) for x in X0]
+    Ys = [
+        np.array(
+            [v for (k, v) in nx.get_node_attributes(x, "attr_name").items()]
+        ).reshape(-1, 1)
+        for x in X0
+    ]
 
-    # TODO: improve current code
+    C, A = fgwbary.fgw_wasserstein_barycenter_direct(
+        Cs,
+        ps,
+        Ys,
+        gamma=0.1,
+        node_sigma=1.0,
+        iterations=10,
+        fgw_iterations=20,
+        barycenter_size=15,
+        inner_iterations_step1=1000,
+        inner_iterations_step2=1000,
+    )
+
+    # Plot the barycenter
+    bary = nx.from_numpy_array(
+        sp_to_adjacency(C, threshinf=0, threshsup=find_thresh(C, sup=100, step=100)[0])
+    )
+    for i, v in enumerate(A.ravel()):
+        bary.add_node(i, attr_name=v)
+
+    pos = nx.kamada_kawai_layout(bary)
+    nx.draw(
+        bary, pos=pos, node_color=graph_colors(bary, vmin=-1, vmax=1), with_labels=False
+    )
+    plt.suptitle("Barycenter", fontsize=20)
+    plt.show()
 
 
 def plot_fgw():
@@ -280,4 +302,5 @@ def plot_fgw():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Barycenter computation examples.")
 
-    plot_fgw()
+    # plot_fgw()
+    plot_barycenter_fgw()

@@ -48,7 +48,7 @@ class TestWassersteinBarycenter(TestCase):
         g1 = nx.Graph()
         g1.add_node(0, weight=np.array((3.0,)))
         g1.add_node(1, weight=np.array((4.0,)))
-        g1.add_node(2, weight=np.array((0.0,)))
+        g1.add_node(2, weight=np.array((1.0,)))
         g1.add_node(3, weight=np.array((0.0,)))
         g1.add_edge(0, 1, weight=3.0)
 
@@ -56,7 +56,7 @@ class TestWassersteinBarycenter(TestCase):
         g2.add_node(0, weight=np.array((5.0,)))
         g2.add_node(1, weight=np.array((1.0,)))
         g2.add_node(2, weight=np.array((2.0,)))
-        g2.add_node(3, weight=np.array((0.0,)))
+        g2.add_node(3, weight=np.array((1.0,)))
         g2.add_edge(0, 1, weight=1.0)
         g2.add_edge(0, 2, weight=4.0)
 
@@ -71,24 +71,28 @@ class TestWassersteinBarycenter(TestCase):
 
         graphs = [g1, g2, g3]
         mean_cost, mean_data = mean.fgw_wasserstein_barycenter(
-            graphs, 0.5, 10, 30, 1.0, gamma=0.1
+            graphs,
+            0.5,
+            10,
+            100,
+            node_sigma=1.0,
+            gamma=0.05,
+            inner_iterations_step1=1000,
+            inner_iterations_step2=1000,
+            random_state=10,
         )
 
         truth_cost = np.array(
             [
-                [0.09061904, 0.23730902, 0.12653064, 0.11267371],
-                [0.23730902, 0.12323478, 0.16275617, 0.16414926],
-                [0.12653064, 0.16275617, 0.00667758, 0.03636981],
-                [0.11267371, 0.16414926, 0.03636981, 0.02334748],
+                [0.31935154, 0.85442201, 0.33248795, 0.67673441],
+                [0.85442201, 0.10125423, 0.83209174, 0.29453955],
+                [0.33248795, 0.83209174, 0.34289364, 0.65310959],
+                [0.67673441, 0.29453955, 0.65310959, 0.24662307],
             ]
         )
-        truth_data = np.array(
-            [
-                [2.39582502, 3.70749711, 0.85011517, 0.60990108],
-            ]
-        )
+        truth_data = np.array([3.70289568, 0.87833747, 3.61585852, 1.60290834])
 
-        print(mean_cost)
-        print(mean_data)
         self.assertEqual(np.linalg.norm(mean_cost - truth_cost) < 1e-3, True)
-        self.assertEqual(np.linalg.norm(mean_data - truth_data) < 1e-3, True)
+        self.assertEqual(
+            np.linalg.norm(np.squeeze(mean_data) - truth_data) < 1e-3, True
+        )
