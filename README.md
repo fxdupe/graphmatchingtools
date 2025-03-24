@@ -50,6 +50,11 @@ The scope of this work is to offer reproducible research and alternatives.
 
 - [Fast and accurate optimization on the orthogonal manifold without retraction](https://proceedings.mlr.press/v151/ablin22a)
 
+### Graph generation
+
+- Sucal pits graph using methods and code from papers [1](https://www.sciencedirect.com/science/article/pii/S1361841516300251),
+[2](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0293886) and [3](https://ieeexplore.ieee.org/abstract/document/9897185/).
+
 ## Installation
 
 The package can be installed in editable mode using the following command from the base directory,

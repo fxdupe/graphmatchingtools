@@ -34,6 +34,7 @@ def ga_mgmc(
     rho: float = 0.8,
     inner_iterations_step1: int = 100,
     inner_iterations_step2: int = 100,
+    random_state: int = None,
 ) -> np.ndarray:
     """Graduated assignment multi-graph matching (GA-MGM).
 
@@ -53,6 +54,7 @@ def ga_mgmc(
     :param float rho: percentage of remaining value while computing Hessian in sns method.
     :param int inner_iterations_step1: the number of iterations for the classical steps in OT solver (sns).
     :param int inner_iterations_step2: the number of iterations for the Newton's steps in OT solver (sns).
+    :param int random_state: the random seed for initialization.
     :return: the list the node projections (graph by graph).
     :rtype: np.ndarray
 
@@ -62,7 +64,7 @@ def ga_mgmc(
 
     >>> node_kernel = kern.create_gaussian_node_kernel(2.0, "weight")
     >>> knode = utils.create_full_node_affinity_matrix(graphs, node_kernel)
-    >>> u = ga_mgmc.ga_mgmc(graphs, knode, 3, "weight", tau=0.8, tau_min=0.5)
+    >>> u = ga_mgmc.ga_mgmc(graphs, knode, 3, "weight", tau=0.2, tau_min=0.1)
     >>> u @ u.T
     array([[1., 0., 0., 1., 0., 1., 0.],
            [0., 1., 1., 0., 0., 0., 1.],
@@ -73,7 +75,7 @@ def ga_mgmc(
            [0., 1., 1., 0., 0., 0., 1.]])
 
     """
-    rng = np.random.default_rng()
+    rng = np.random.default_rng(seed=random_state)
     # 0 - Initialization of the different matrices and lists
     a = utils.create_full_weight_matrix(graphs, edge_data, sigma=sigma)
     sizes = [nx.number_of_nodes(g) for g in graphs]

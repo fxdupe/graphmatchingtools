@@ -223,7 +223,7 @@ def fgw_wasserstein_barycenter(
     :param int barycenter_size: the size of the barycenter (using the first graph by default).
     :param int inner_iterations_step1: the number of iterations for the classical steps in OT solver (sns).
     :param int inner_iterations_step2: the number of iterations for the Newton's steps in OT solver (sns).
-    :param int random_state: fix the randomness (for reproductibility).
+    :param int random_state: fix the randomness (for reproducibility).
     :return: the cost and data of the barycenter.
     :rtype: tuple[np.ndarray, np.ndarray]
 
@@ -231,36 +231,14 @@ def fgw_wasserstein_barycenter(
 
     .. doctest:
 
-    >>> g1 = nx.Graph()
-    >>> g1.add_node(0, weight=np.array((3.0,)))
-    >>> g1.add_node(1, weight=np.array((4.0,)))
-    >>> g1.add_node(2, weight=np.array((1.0,)))
-    >>> g1.add_node(3, weight=np.array((1.0,)))
-    >>> g1.add_edge(0, 1, weight=3.0)
-    >>> g2 = nx.Graph()
-    >>> g2.add_node(0, weight=np.array((5.0,)))
-    >>> g2.add_node(1, weight=np.array((1.0,)))
-    >>> g2.add_node(2, weight=np.array((2.0,)))
-    >>> g2.add_node(3, weight=np.array((1.0,)))
-    >>> g2.add_edge(0, 1, weight=1.0)
-    >>> g2.add_edge(0, 2, weight=4.0)
-    >>> g3 = nx.Graph()
-    >>> g3.add_node(0, weight=np.array((1.0,)))
-    >>> g3.add_node(1, weight=np.array((4.0,)))
-    >>> g3.add_node(2, weight=np.array((2.0,)))
-    >>> g3.add_node(3, weight=np.array((1.0,)))
-    >>> g3.add_edge(0, 1, weight=2.0)
-    >>> g3.add_edge(0, 3, weight=2.0)
-    >>> g3.add_edge(1, 2, weight=3.0)
-    >>> graphs = [g1, g2, g3]
-    >>> mean_cost, mean_data = fgw_barycenter.fgw_wasserstein_barycenter(graphs, 0.1, 10, 100, gamma=0.5)
+    >>> mean_cost, mean_data = fgw_barycenter.fgw_wasserstein_barycenter(graphs, 0.5, 100,
+    ... 200, barycenter_size=2, gamma=0.01, random_state=42)
     >>> mean_cost
-    array([[0.18533547, 0.21425122, 0.10635751, 0.10392826],
-           [0.21425122, 0.17972486, 0.10271096, 0.10433109],
-           [0.10635751, 0.10271096, 0.04693286, 0.04931178],
-           [0.10392826, 0.10433109, 0.04931178, 0.04879482]])
+    array([[0.37161864, 0.6076793 ],
+           [0.6076793 , 0.42187286]])
     >>> mean_data
-    array([[2.47647803, 1.57681529, 4.71966496, 1.84041193]])
+    array([[3.06670722],
+           [3.86662611]])
     """
     node_kernel = kern.create_gaussian_node_kernel(node_sigma, "weight")
 

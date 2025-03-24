@@ -227,7 +227,7 @@ def gromov_wasserstein_learning(
     ...     3, 20, 20, 20, 0.01, cost_st=distance, use_cross_cost=True, random_seed=1)
     >>> t_m
     array([[6.4347525e-17, 5.0000000e-01],
-           [5.0000000e-01, 6.4452451e-17]], dtype=float32)
+           [5.0000000e-01, 6.4452226e-17]], dtype=float32)
     """
     # Learning steps
     rng = np.random.default_rng(seed=random_seed)

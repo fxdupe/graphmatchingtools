@@ -1,11 +1,9 @@
 """Test of the UNION-FIND algorithm
+
 .. moduleauthor:: François-Xavier Dupé
 """
 
 import unittest
-from unittest import TestCase
-
-import numpy as np
 
 import graph_matching_tools.utils.union as uf
 

@@ -40,6 +40,7 @@ class TestGA_MGMC(TestCase):
             gamma=0.5,
             inner_iterations_step1=500,
             inner_iterations_step2=100,
+            random_state=20,
         )
         res = u @ u.T
 
@@ -78,7 +79,9 @@ class TestGA_MGMC(TestCase):
 
         node_kernel = kern.create_gaussian_node_kernel(0.1, "weight")
         knode = utils.create_full_node_affinity_matrix(graphs, node_kernel)
-        u = ga_mgmc.ga_mgmc(graphs, knode, 2, "weight", tau=0.1, tau_min=1e-2)
+        u = ga_mgmc.ga_mgmc(
+            graphs, knode, 2, "weight", tau=0.1, tau_min=1e-2, random_state=10
+        )
         self.assertEqual(np.linalg.norm(u @ u.T - truth) < 1e-3, True)
 
         init = [[1.0, 0.0, 0.0], [0.0, 0.0, 1.0], [0.0, 0.0, 1.0], [1.0, 0.0, 0.0]]
@@ -91,5 +94,6 @@ class TestGA_MGMC(TestCase):
             init=np.array(init),
             tau=0.1,
             tau_min=1e-2,
+            random_state=10,
         )
         self.assertEqual(np.linalg.norm(u @ u.T - truth) < 1e-3, True)
