@@ -84,6 +84,7 @@ omit = [
     "graph_matching_tools/demos/*",
     # omit GAE for the moment
     "graph_matching_tools/learning/GAE.py",
+    "graph_matching_tools/utils/draw.py",
 ]
 
 [tool.coverage.report]

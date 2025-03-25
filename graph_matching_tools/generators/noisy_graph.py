@@ -11,7 +11,7 @@ import numpy as np
 import trimesh
 
 import graph_matching_tools.generators.topology as topology
-from graph_matching_tools.utils.sphere import Sphere
+import graph_matching_tools.utils.sphere as sphere
 
 
 def sphere_random_sampling(vertex_number: int = 100, radius: float = 1.0) -> np.ndarray:
@@ -31,25 +31,25 @@ def sphere_random_sampling(vertex_number: int = 100, radius: float = 1.0) -> np.
     return coords
 
 
-def tri_from_hull(vertices: np.ndarray) -> trimesh.Trimesh:
+def compute_hull_from_vertices(vertices: np.ndarray) -> trimesh.Trimesh:
     """Compute faces from vertices using trimesh convex hull.
 
     :param np.ndarray vertices: a set of vertices.
     :return: the convex hull from the faces.
     :rtype: trimesh.Trimesh
     """
-    return trimesh.Trimesh(vertices=vertices, process=False).convex_hull()
+    return trimesh.Trimesh(vertices=vertices, process=False).convex_hull
 
 
-def edge_len_threshold(graph: nx.Graph, thr: float) -> list:
+def edge_len_threshold(graph: nx.Graph, percent: float) -> list:
     """Get percentage of edges at random.
 
     :param nx.Graph graph: the input graph.
-    :param float thr: the percentage of new edges.
+    :param float percent: the percentage of new edges.
     :return: the set of selected edges.
     :rtype: list
     """
-    return random.sample(list(graph.edges), round(len(graph.edges) * thr))
+    return random.sample(list(graph.edges), round(len(graph.edges) * percent))
 
 
 def compute_beta(alpha: float, n: int, mean: float) -> float:
@@ -96,10 +96,9 @@ def generate_outliers_numbers(
     )  # corresponding alpha with respect to given mu and sigma
     beta = compute_beta(alpha, nb_vertices, mu)  # corresponding beta
 
+    print(alpha, beta)
     nb_supress = betabinom.rvs(nb_vertices, alpha, beta, size=1)[0]
-    nb_outliers = betabinom.rvs(nb_vertices, alpha, beta, size=1)[
-        0
-    ]  # Sample nb_outliers
+    nb_outliers = betabinom.rvs(nb_vertices, alpha, beta, size=1)[0]
 
     return int(nb_outliers), int(nb_supress)
 
@@ -122,11 +121,9 @@ def von_mises_sampling(
         mean_original = original_coord / np.linalg.norm(
             original_coord
         )  # convert to unit vector
-        noisy_coordinate = (
-            Sphere()
-            .sample(1, distribution="vMF", mu=mean_original, kappa=sigma_noise_nodes)
-            .sample[0]
-        )
+        noisy_coordinate = sphere.sample_sphere(
+            1, mu=mean_original, kappa=sigma_noise_nodes
+        ).sample[0]
 
         noisy_coordinate = noisy_coordinate * np.linalg.norm(
             original_coord
@@ -146,6 +143,7 @@ def noisy_graph_generation(
     sigma_noise_edges: float = 1.0,
     radius: int = 100,
     label_outlier: int = 0,
+    edge_delete_percent: float = 0.1,
 ) -> nx.Graph:
     """Generate a noisy version of a reference graph.
 
@@ -155,6 +153,7 @@ def noisy_graph_generation(
     :param float sigma_noise_edges: the variance of the noise on the attributes of the edges.
     :param int radius: the size the sphere used for the sampling.
     :param int label_outlier: the label of the outliers.
+    :param float edge_delete_percent: the percent of removed edges for the edges.
     :return: the noisy graph.
     :rtype: nx.Graph
     """
@@ -178,7 +177,7 @@ def noisy_graph_generation(
     )
 
     all_coord = np.array([node["coord"] for node in sample_nodes.values()])
-    compute_noisy_edges = tri_from_hull(
+    compute_noisy_edges = compute_hull_from_vertices(
         all_coord
     )  # take all perturbed coord and comp conv hull.
     adj_matrix = topology.adjacency_matrix(
@@ -189,9 +188,8 @@ def noisy_graph_generation(
     nx.set_node_attributes(noisy_graph, sample_nodes)
     nx.set_edge_attributes(noisy_graph, 1.0, name="weight")
 
-    edge_to_remove = edge_len_threshold(noisy_graph, 0.10)
+    edge_to_remove = edge_len_threshold(noisy_graph, edge_delete_percent)
     noisy_graph.remove_edges_from(edge_to_remove)
-
     noisy_graph.remove_edges_from(nx.selfloop_edges(noisy_graph))
 
     return noisy_graph

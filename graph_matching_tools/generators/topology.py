@@ -19,7 +19,7 @@ def adjacency_matrix(mesh: trimesh.Trimesh) -> scipy.sparse.coo_matrix:
     :rtype: scipy.sparse.coo_matrix
     """
     adja = trimesh.graph.edges_to_coo(
-        mesh.edges, data=np.ones(len(mesh.edges()), dtype=np.int64)
+        mesh.edges, data=np.ones(mesh.edges.shape[0], dtype=np.int64)
     )
     adja = adja + adja.transpose()
     adja[adja > 0] = 1
