@@ -61,7 +61,6 @@ class TestSNS(TestCase):
 
         self.assertEqual(res.shape[0], matrix.shape[0])
         self.assertEqual(res.shape[1], matrix.shape[1])
-        print(res)
         self.assertTrue(np.linalg.norm(res - truth) < 1e-4)
 
     def test_linesearch(self):

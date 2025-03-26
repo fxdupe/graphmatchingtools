@@ -96,11 +96,10 @@ def generate_outliers_numbers(
     )  # corresponding alpha with respect to given mu and sigma
     beta = compute_beta(alpha, nb_vertices, mu)  # corresponding beta
 
-    print(alpha, beta)
-    nb_supress = betabinom.rvs(nb_vertices, alpha, beta, size=1)[0]
+    nb_suppress = betabinom.rvs(nb_vertices, alpha, beta, size=1)[0]
     nb_outliers = betabinom.rvs(nb_vertices, alpha, beta, size=1)[0]
 
-    return int(nb_outliers), int(nb_supress)
+    return int(nb_outliers), int(nb_suppress)
 
 
 def von_mises_sampling(
@@ -142,8 +141,12 @@ def noisy_graph_generation(
     sigma_noise_nodes: float = 1.0,
     sigma_noise_edges: float = 1.0,
     radius: int = 100,
-    label_outlier: int = 0,
+    label_outlier: int = -1,
     edge_delete_percent: float = 0.1,
+    outlier_mu: float = 12.0,
+    outlier_sigma: float = 4.0,
+    suppress_nodes: bool = True,
+    add_outliers: bool = True,
 ) -> nx.Graph:
     """Generate a noisy version of a reference graph.
 
@@ -154,29 +157,44 @@ def noisy_graph_generation(
     :param int radius: the size the sphere used for the sampling.
     :param int label_outlier: the label of the outliers.
     :param float edge_delete_percent: the percent of removed edges for the edges.
+    :param float outlier_mu: the mean number of outliers.
+    :param float outlier_sigma: the standard deviation of the outliers.
+    :param bool suppress_nodes: if True some nodes are suppressed.
+    :param bool add_outliers: if True outlier nodes are added.
     :return: the noisy graph.
     :rtype: nx.Graph
     """
-    sample_nodes = von_mises_sampling(nb_vertices, original_graph, sigma_noise_nodes)
-    nb_outliers, nb_supress = generate_outliers_numbers(nb_vertices)
-
-    outliers = sphere_random_sampling(vertex_number=nb_outliers, radius=radius)
-    for outlier in outliers:
-        random_key = random.choice(list(sample_nodes.items()))[0]
-        sample_nodes[random_key] = {
-            "coord": outlier,
-            "is_outlier": True,
-            "label": label_outlier,
-        }
-
-    sample_nodes = dict(
-        sorted(
-            sample_nodes.items(),
-            key=lambda item: (item[1]["label"] >= 0, item[1]["label"]),
-        )
+    noisy_coord_nodes = von_mises_sampling(
+        nb_vertices, original_graph, sigma_noise_nodes
+    )
+    nb_outliers, nb_suppress = generate_outliers_numbers(
+        nb_vertices, mu=outlier_mu, sigma=outlier_sigma
     )
 
-    all_coord = np.array([node["coord"] for node in sample_nodes.values()])
+    if suppress_nodes and nb_suppress > 0:
+        suppress_list = random.sample(list(noisy_coord_nodes.keys()), nb_suppress)
+        for i in suppress_list:
+            del noisy_coord_nodes[i]
+
+    if add_outliers and nb_outliers > 0:
+        outliers = sphere_random_sampling(vertex_number=nb_outliers, radius=radius)
+        for outlier in outliers:
+            random_key = random.choice(list(noisy_coord_nodes.keys()))
+            noisy_coord_nodes[random_key] = {
+                "coord": outlier,
+                "label": label_outlier,
+                "is_outlier": True,
+            }
+
+    sorted_nodes = sorted(
+        noisy_coord_nodes.items(),
+        key=lambda item: (item[1]["label"] >= 0, item[1]["label"]),
+    )
+    noisy_nodes = {}
+    for item in range(len(sorted_nodes)):
+        noisy_nodes[item] = sorted_nodes[item][1]
+
+    all_coord = np.array([node["coord"] for node in noisy_nodes.values()])
     compute_noisy_edges = compute_hull_from_vertices(
         all_coord
     )  # take all perturbed coord and comp conv hull.
@@ -185,7 +203,7 @@ def noisy_graph_generation(
     )  # compute the new adjacency mat.
 
     noisy_graph = nx.from_numpy_array(adj_matrix.todense())
-    nx.set_node_attributes(noisy_graph, sample_nodes)
+    nx.set_node_attributes(noisy_graph, noisy_nodes)
     nx.set_edge_attributes(noisy_graph, 1.0, name="weight")
 
     edge_to_remove = edge_len_threshold(noisy_graph, edge_delete_percent)
