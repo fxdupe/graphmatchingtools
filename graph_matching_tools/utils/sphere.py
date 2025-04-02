@@ -1,39 +1,16 @@
-"""This module contains tools to plotting and sampling points on a sphere tools.
+"""This module contains tools for sampling points on a 3D sphere.
 
 ..moduleauthor:: Marius Thorre, Rohit Yadav
 """
 
 import numpy as np
-from matplotlib import pyplot as plt
-import seaborn as sns
 
 from graph_matching_tools.utils.von_mises import sample_von_mises
 
 
-class vMFSample:
-    """
-    Class for 3D coordinates from the sample_von_mises function
-    and kappa value.
-    """
-
-    def __init__(self, sample, kappa):
-        """
-        Store 3D coordinates from the sample_von_mises function
-        and kappa value.
-
-        :param np.ndarray sample: one sample.
-        :param float kappa: parameter of vMF distribution.
-        """
-        tp = np.transpose(sample)
-        self.x = tp[0]
-        self.y = tp[1]
-        self.z = tp[2]
-        self.kappa = kappa
-        self.sample = sample
-
-
 def make_sphere(radius: float) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Get mesh for a sphere of a given radius.
+
     :param float radius: the radius of the sphere.
     :return: tuple which contains the sphere coordinate
     :rtype: tuple
@@ -45,67 +22,57 @@ def make_sphere(radius: float) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     return x, y, z
 
 
-def draw_sphere(ax, radius: float) -> None:  # pragma: no cover
-    """Draw an empty sphere
-    :param ax: axis where to plot sphere
-    :param float radius: value of sphere radius
-    """
-    x, y, z = make_sphere(radius - 0.01)  # subtract a little so points show on sphere
-    ax.plot_surface(
-        x,
-        y,
-        z,
-        rstride=1,
-        cstride=1,
-        color=sns.xkcd_rgb["light grey"],
-        alpha=0.5,
-        linewidth=0,
-    )
-
-
-def plot(data, radius: float = 1.0) -> None:  # pragma: no cover
-    """Plot a sphere with samples superposed, if supplied.
-
-    :param float radius: radius of the base sphere
-    :param tuple data: list of sample objects
-    """
-    sns.set_style("dark")
-    ax = plt.figure().add_subplot(projection="3d")
-
-    draw_sphere(ax=ax, radius=radius)
-    N = len(data)
-
-    colors = [sns.color_palette("GnBu_d", N)[i] for i in reversed(range(N))]
-    data_check = data[0]
-
-    if type(data_check) is vMFSample:
-        i = 0
-        ax.scatter(
-            data.x,
-            data.y,
-            data.z,
-            s=50,
-            alpha=0.7,
-            label="$\\kappa = $" + str(data.kappa),
-            color=colors[i],
-        )
-    else:
-        print("Error: data type not recognised")
-
-    ax.set_axis_off()
-    ax.legend(bbox_to_anchor=[0.65, 0.75])
-
-
-def sample_sphere(
-    nb_sample: int,
+def random_coordinate_sampling(
+    nb_samples: int,
     mu: np.ndarray,
     kappa: float,
-):
-    """Sample points on a spherical surface.
-    :param int nb_sample: number of samples.
-    :param Optional[np.ndarray] mu: parameter of vMF distribution.
-    :param Optional[float] kappa: parameter of vMF distribution.
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Sample random coordinate on a spherical surface (using von Mises - Fisher distribution).
+
+    :param int nb_samples: number of samples.
+    :param np.ndarray mu: mean of the vMF distribution.
+    :param float kappa: variance vMF distribution.
+    :rtype: tuple[np.ndarray, np.ndarray, np.ndarray]
     """
-    s = sample_von_mises(mu, kappa, nb_sample)
-    vMFSample(s, kappa)
-    return vMFSample(s, kappa)
+    samples = sample_von_mises(mu, kappa, nb_samples)
+    return samples[:, 0], samples[:, 1], samples[:, 2]
+
+
+def random_sampling(
+    vertex_number: int, radius: float = 1.0
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Generate a sphere with random sampling.
+
+    :param int vertex_number: number of vertices in the output spherical mesh.
+    :param float radius: radius of the output sphere.
+    :return: a tuple with the coordinates of each point.
+    :rtype: tuple[np.ndarray, np.ndarray, np.ndarray]
+    """
+    coords = np.zeros((vertex_number, 3))
+    for i in range(vertex_number):
+        M = np.random.normal(size=(3, 3))
+        Q, R = np.linalg.qr(M)
+        coords[i, :] = Q[:, 0].transpose() * np.sign(R[0, 0])
+    coords = radius * coords
+    return coords[:, 0], coords[:, 1], coords[:, 2]
+
+
+def regular_sampling(
+    nb_point: int, radius: float
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Generate regular points on the sphere (using Fibonacci).
+
+    :param int nb_point: the number of points to generate.
+    :param float radius: the radius of the sphere.
+    :return: the generated points.
+    :rtype: tuple[np.ndarray]
+    """
+    inc = np.pi * (3 - np.sqrt(5))
+    off = 2.0 / nb_point
+    k = np.arange(0, nb_point)
+    y = k * off - 1.0 + 0.5 * off
+    r = np.sqrt(1 - y * y)
+    phi = k * inc
+    x = np.cos(phi) * r
+    z = np.sin(phi) * r
+    return x * radius, y * radius, z * radius

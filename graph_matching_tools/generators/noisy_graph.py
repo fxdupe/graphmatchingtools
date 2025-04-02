@@ -11,24 +11,8 @@ import numpy as np
 import trimesh
 
 import graph_matching_tools.generators.topology as topology
+import graph_matching_tools.generators.reference_graph as reference_graph
 import graph_matching_tools.utils.sphere as sphere
-
-
-def sphere_random_sampling(vertex_number: int = 100, radius: float = 1.0) -> np.ndarray:
-    """Generate a sphere with random sampling.
-
-    :param int vertex_number: the number of vertices.
-    :param float radius: the radius of the sphere.
-    :return: a sphere coordinate array.
-    :rtype: np.ndarray
-    """
-    coords = np.zeros((vertex_number, 3))
-    for i in range(vertex_number):
-        m = np.random.normal(size=(3, 3))
-        q, r = np.linalg.qr(m)
-        coords[i, :] = q[:, 0].transpose() * np.sign(r[0, 0])
-    coords = radius * coords
-    return coords
 
 
 def compute_hull_from_vertices(vertices: np.ndarray) -> trimesh.Trimesh:
@@ -103,13 +87,13 @@ def generate_outliers_numbers(
 
 
 def von_mises_sampling(
-    nb_vertices: int, original_graph: nx.Graph, sigma_noise_nodes: float
+    nb_vertices: int, original_graph: nx.Graph, kappa_noise_nodes: float
 ) -> dict:
     """Perturbed the coordinates of a given graph.
 
     :param nb_vertices: the number of vertices.
     :param nx.Graph original_graph: the input unperturbed graph.
-    :param float sigma_noise_nodes: the variance of the noise.
+    :param float kappa_noise_nodes: the variance of the noise.
     :return: a dictionary with the noisy attributes for each node.
     :rtype: dict
     """
@@ -120,15 +104,19 @@ def von_mises_sampling(
         mean_original = original_coord / np.linalg.norm(
             original_coord
         )  # convert to unit vector
-        noisy_coordinate = sphere.sample_sphere(
-            1, mu=mean_original, kappa=sigma_noise_nodes
-        ).sample[0]
+        noisy_coordinate = sphere.random_coordinate_sampling(
+            1, mu=mean_original, kappa=kappa_noise_nodes
+        )
 
-        noisy_coordinate = noisy_coordinate * np.linalg.norm(
-            original_coord
-        )  # rescale to original size
+        # rescale to original size
+        noisy_coordinate = list(noisy_coordinate)
+        for dim in range(len(noisy_coordinate)):
+            noisy_coordinate[dim] = np.squeeze(noisy_coordinate[dim]) * np.linalg.norm(
+                original_coord
+            )
+
         noisy_coord[index] = {
-            "coord": noisy_coordinate,
+            "coord": np.array(noisy_coordinate),
             "label": index + 1,
             "is_outlier": False,
         }
@@ -138,34 +126,34 @@ def von_mises_sampling(
 def noisy_graph_generation(
     original_graph: nx.Graph,
     nb_vertices: int,
-    sigma_noise_nodes: float = 1.0,
-    sigma_noise_edges: float = 1.0,
-    radius: int = 100,
+    kappa_noise_nodes: float = 1.0,
+    radius: float = 1.0,
     label_outlier: int = -1,
     edge_delete_percent: float = 0.1,
     outlier_mu: float = 12.0,
     outlier_sigma: float = 4.0,
     suppress_nodes: bool = True,
     add_outliers: bool = True,
+    edge_shuffle: bool = True,
 ) -> nx.Graph:
     """Generate a noisy version of a reference graph.
 
     :param nx.Graph original_graph: the reference graph.
     :param int nb_vertices: the number of vertices of the reference graph.
-    :param float sigma_noise_nodes: the variance of the noise on the attributes of the nodes.
-    :param float sigma_noise_edges: the variance of the noise on the attributes of the edges.
-    :param int radius: the size the sphere used for the sampling.
+    :param float kappa_noise_nodes: the variance of the noise on the attributes of the nodes.
+    :param float radius: the size the sphere used for the sampling.
     :param int label_outlier: the label of the outliers.
     :param float edge_delete_percent: the percent of removed edges for the edges.
-    :param float outlier_mu: the mean number of outliers.
-    :param float outlier_sigma: the standard deviation of the outliers.
+    :param float outlier_mu: the mean number of outliers and suppressed nodes.
+    :param float outlier_sigma: the standard deviation for the outlier generation.
     :param bool suppress_nodes: if True some nodes are suppressed.
     :param bool add_outliers: if True outlier nodes are added.
+    :param bool edge_shuffle: if True edges are shuffled.
     :return: the noisy graph.
     :rtype: nx.Graph
     """
     noisy_coord_nodes = von_mises_sampling(
-        nb_vertices, original_graph, sigma_noise_nodes
+        nb_vertices, original_graph, kappa_noise_nodes
     )
     nb_outliers, nb_suppress = generate_outliers_numbers(
         nb_vertices, mu=outlier_mu, sigma=outlier_sigma
@@ -177,18 +165,20 @@ def noisy_graph_generation(
             del noisy_coord_nodes[i]
 
     if add_outliers and nb_outliers > 0:
-        outliers = sphere_random_sampling(vertex_number=nb_outliers, radius=radius)
-        for outlier in outliers:
-            random_key = random.choice(list(noisy_coord_nodes.keys()))
-            noisy_coord_nodes[random_key] = {
-                "coord": outlier,
+        x_out, y_out, z_out = sphere.random_sampling(
+            vertex_number=nb_outliers, radius=radius
+        )
+        max_key = original_graph.number_of_nodes() + 1
+        for outlier in range(nb_outliers):
+            noisy_coord_nodes[max_key + outlier] = {
+                "coord": np.array([x_out[outlier], y_out[outlier], z_out[outlier]]),
                 "label": label_outlier,
                 "is_outlier": True,
             }
 
     sorted_nodes = sorted(
         noisy_coord_nodes.items(),
-        key=lambda item: (item[1]["label"] >= 0, item[1]["label"]),
+        key=lambda element: (element[1]["label"] < 0, element[1]["label"]),
     )
     noisy_nodes = {}
     for item in range(len(sorted_nodes)):
@@ -204,10 +194,12 @@ def noisy_graph_generation(
 
     noisy_graph = nx.from_numpy_array(adj_matrix.todense())
     nx.set_node_attributes(noisy_graph, noisy_nodes)
-    nx.set_edge_attributes(noisy_graph, 1.0, name="weight")
 
     edge_to_remove = edge_len_threshold(noisy_graph, edge_delete_percent)
     noisy_graph.remove_edges_from(edge_to_remove)
     noisy_graph.remove_edges_from(nx.selfloop_edges(noisy_graph))
+    noisy_graph = reference_graph.compute_edges_attributes(
+        noisy_graph, radius, shuffle=edge_shuffle
+    )
 
     return noisy_graph

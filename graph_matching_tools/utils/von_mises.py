@@ -25,7 +25,7 @@ def sample_von_mises(mu: np.ndarray, kappa: float, num_samples: int) -> np.ndarr
     :return: N-dimensional samples.
     :rtype: np.ndarray
     """
-    dim = len(mu)
+    dim = mu.shape[0]
     result = np.zeros((num_samples, dim))
     for nn in range(num_samples):
         # sample offset from center (on sphere) with spread kappa

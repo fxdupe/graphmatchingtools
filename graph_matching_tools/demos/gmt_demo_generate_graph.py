@@ -11,9 +11,9 @@ import graph_matching_tools.generators.reference_graph as reference_graph
 
 
 def graph_generations():
-    graph_reference = reference_graph.generate_reference_graph(25, 100.0)
+    graph_reference = reference_graph.generate_reference_graph(100, 1.0)
     list_noisy_graph = graph_family.generation_graph_family(
-        10, 25, graph_reference, 2.0, 1.0
+        10, 100, graph_reference, 1.0, 10.0
     )
     return graph_reference, list_noisy_graph
 
@@ -26,7 +26,11 @@ if __name__ == "__main__":
     nx.draw(noisy_graphs[7], with_labels=True)
     plt.show()
 
-    for node, node_data in noisy_graphs[7].nodes.items():
+    for node, node_data in noisy_graphs[1].nodes.items():
         print(node_data["coord"])
         print(node_data["label"])
         print(node_data["is_outlier"])
+
+    for edge, edge_data in noisy_graphs[1].edges.items():
+        print(edge_data["geodesic_distance"])
+        print(edge_data["id"])

@@ -5,9 +5,49 @@
 
 import numpy as np
 import networkx as nx
+import random
 
 import graph_matching_tools.generators.noisy_graph as ng
 import graph_matching_tools.generators.topology as topology
+import graph_matching_tools.utils.sphere as sphere
+
+
+def compute_edges_attributes(graph: nx.Graph, radius: float, shuffle=False) -> nx.Graph:
+    """Compute the edges attributes for a graph
+
+    :param nx.Graph graph: the input graph.
+    :param float radius: the radius of the sphere.
+    :param bool shuffle: whether to shuffle edges (False by default).
+    :return: the graph.
+    :rtype: nx.Graph
+    """
+    # We add a geodesic distance between the two ends of an edge
+    edge_attribute_dict = dict()
+    id_counter = 0  # useful for affinity matrix calculation
+
+    edges = [e for e in graph.edges()]
+    if shuffle:
+        random.shuffle(edges)
+
+    for edge in edges:
+        # We calculate the geodesic distance
+        end_a = graph.nodes()[edge[0]]["coord"]
+        end_b = graph.nodes()[edge[1]]["coord"]
+        geodesic_dist = get_geodesic_distance_sphere(end_a, end_b, radius)
+
+        # add the information in the dictionary
+        edge_attribute_dict[edge] = {
+            "geodesic_distance": geodesic_dist,
+            "id": id_counter,
+            "weight": 1.0,
+        }
+
+        id_counter += 1
+
+    # add the edge attributes to the graph
+    nx.set_edge_attributes(graph, edge_attribute_dict)
+
+    return graph
 
 
 def get_geodesic_distance_sphere(
@@ -26,27 +66,6 @@ def get_geodesic_distance_sphere(
     )
 
 
-def fibonacci(
-    nb_point: int, radius: float
-) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Generate random points on the sphere.
-
-    :param int nb_point: the number of points to generate.
-    :param float radius: the radius of the sphere.
-    :return: the generated points.
-    :rtype: tuple[np.ndarray]
-    """
-    inc = np.pi * (3 - np.sqrt(5))
-    off = 2.0 / nb_point
-    k = np.arange(0, nb_point)
-    y = k * off - 1.0 + 0.5 * off
-    r = np.sqrt(1 - y * y)
-    phi = k * inc
-    x = np.cos(phi) * r
-    z = np.sin(phi) * r
-    return x * radius, y * radius, z * radius
-
-
 def generate_reference_graph(nb_vertices: int, radius: float) -> nx.Graph:
     """Generate a reference graph.
 
@@ -55,7 +74,7 @@ def generate_reference_graph(nb_vertices: int, radius: float) -> nx.Graph:
     :return: the generated reference graph.
     :rtype: nx.Graph
     """
-    x, y, z = fibonacci(nb_point=nb_vertices, radius=radius)
+    x, y, z = sphere.random_sampling(vertex_number=nb_vertices, radius=radius)
     sphere_random_sampling = np.vstack((x, y, z)).T
     sphere_random_sampling = ng.compute_hull_from_vertices(
         sphere_random_sampling
@@ -71,30 +90,10 @@ def generate_reference_graph(nb_vertices: int, radius: float) -> nx.Graph:
             "coord": np.array(sphere_random_sampling.vertices[node]),
             "label": label,
         }
-    # add the node attributes to the graph
+    # add the node and edge attributes to the graph
     nx.set_node_attributes(graph, node_attribute_dict)
-    #
-    # # We add a default weight on each edge of 1
-    nx.set_edge_attributes(graph, 1.0, name="weight")
+    graph = compute_edges_attributes(graph, radius)
 
-    # We add a geodesic distance between the two ends of an edge
-    edge_attribute_dict = {}
-    id_counter = 0  # useful for affinity matrix calculation
-    for edge in graph.edges:
-        # We calculate the geodesic distance
-        end_a = graph.nodes()[edge[0]]["coord"]
-        end_b = graph.nodes()[edge[1]]["coord"]
-        geodesic_dist = get_geodesic_distance_sphere(end_a, end_b, radius)
-
-        # add the information in the dictionary
-        edge_attribute_dict[edge] = {
-            "geodesic_distance": geodesic_dist,
-            "id": id_counter,
-        }
-        id_counter += 1
-
-    # add the edge attributes to the graph
-    nx.set_edge_attributes(graph, edge_attribute_dict)
     return graph
 
 

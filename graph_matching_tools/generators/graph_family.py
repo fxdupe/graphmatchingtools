@@ -12,8 +12,7 @@ def generation_graph_family(
     nb_sample_graphs: int,
     nb_vertices: int,
     ref_graph: nx.Graph,
-    noise_node: float = 1,
-    noise_edge: float = 1,
+    kappa_noise_node: float = 1.0,
     outlier_mu: float = 12.0,
     outlier_sigma: float = 4.0,
 ) -> list[nx.graph]:
@@ -22,8 +21,7 @@ def generation_graph_family(
     :param int nb_sample_graphs: the number of graphs to generate.
     :param int nb_vertices: the number of vertices in the reference graph.
     :param nx.Graph ref_graph: the reference graph.
-    :param float noise_node: the amount of noise to add on the nodes.
-    :param float noise_edge: the amount of noise to add on the edges.
+    :param float kappa_noise_node: the amount of noise to add on the nodes.
     :param float outlier_mu: the mean number of outliers.
     :param float outlier_sigma: the standard deviation of the outliers.
     :return: a list of graphs.
@@ -41,8 +39,7 @@ def generation_graph_family(
         noisy_graph = ng.noisy_graph_generation(
             reference_graph,
             nb_vertices,
-            noise_node,
-            noise_edge,
+            kappa_noise_node,
             outlier_mu=outlier_mu,
             outlier_sigma=outlier_sigma,
         )
