@@ -160,7 +160,7 @@ def fgw_wasserstein_barycenter_direct(
 
         # 1 - Update the transport maps
         for i_g in range(len(costs)):
-            distances = _compute_distance_matrix(costs[i_g], mean_data, node_sigma)
+            distances = _compute_distance_matrix(data[i_g], mean_data, node_sigma)
             transport = fgw.fgw_direct_matching(
                 costs[i_g],
                 mean_cost,

@@ -1,0 +1,1 @@
+{"node_number": 100, "kappa_noise_node": 400.0, "outlier_mu": 12.0, "outlier_sigma": 4.0, "edge_delete_percent": 0.1, "add_outliers": true, "suppress_nodes": true}

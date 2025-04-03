@@ -1,5 +1,7 @@
 """
 Module for importing graphs
+
+.. moduleauthor:: François-Xavier Dupé
 """
 
 import os
@@ -10,14 +12,14 @@ import networkx as nx
 
 class GraphDataset:
     """
-    Class for a set of graphs
+    Class for a set of generated graphs.
     """
 
     def __init__(
         self,
         path_to_graphs: str,
         path_to_groundtruth_ref: str,
-        suffix: str = ".gpickle",
+        suffix: str = ".pkl",
     ) -> None:
         """Constructor
 
@@ -37,10 +39,9 @@ class GraphDataset:
             with open(path_to_graphs + "/" + g, "rb") as f:
                 graph = pickle.load(f)
                 self.list_graphs.append(graph)
-                print(graph)
 
         self.sizes = [nx.number_of_nodes(g) for g in self.list_graphs]
         self.nodes = [list(graph.nodes()) for graph in self.list_graphs]
 
         with open(path_to_groundtruth_ref, "rb") as f:
-            self.labels = pickle.load(f)
+            self.node_references = pickle.load(f)

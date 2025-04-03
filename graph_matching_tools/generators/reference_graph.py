@@ -5,19 +5,17 @@
 
 import numpy as np
 import networkx as nx
-import random
 
 import graph_matching_tools.generators.noisy_graph as ng
 import graph_matching_tools.generators.topology as topology
 import graph_matching_tools.utils.sphere as sphere
 
 
-def compute_edges_attributes(graph: nx.Graph, radius: float, shuffle=False) -> nx.Graph:
+def compute_edges_attributes(graph: nx.Graph, radius: float) -> nx.Graph:
     """Compute the edges attributes for a graph
 
     :param nx.Graph graph: the input graph.
     :param float radius: the radius of the sphere.
-    :param bool shuffle: whether to shuffle edges (False by default).
     :return: the graph.
     :rtype: nx.Graph
     """
@@ -25,11 +23,7 @@ def compute_edges_attributes(graph: nx.Graph, radius: float, shuffle=False) -> n
     edge_attribute_dict = dict()
     id_counter = 0  # useful for affinity matrix calculation
 
-    edges = [e for e in graph.edges()]
-    if shuffle:
-        random.shuffle(edges)
-
-    for edge in edges:
+    for edge in graph.edges():
         # We calculate the geodesic distance
         end_a = graph.nodes()[edge[0]]["coord"]
         end_b = graph.nodes()[edge[1]]["coord"]
@@ -89,6 +83,7 @@ def generate_reference_graph(nb_vertices: int, radius: float) -> nx.Graph:
         node_attribute_dict[node] = {
             "coord": np.array(sphere_random_sampling.vertices[node]),
             "label": label,
+            "is_outlier": False,
         }
     # add the node and edge attributes to the graph
     nx.set_node_attributes(graph, node_attribute_dict)

@@ -71,7 +71,7 @@ def main() -> None:
         "--template",
         help="The file name extension (for filtering)",
         type=str,
-        default=".gpickle",
+        default=".pkl",
     )
     parser.add_argument(
         "--sigma", help="The sigma parameter (nodes)", type=float, default=200.0

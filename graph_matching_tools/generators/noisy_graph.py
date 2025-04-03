@@ -86,19 +86,16 @@ def generate_outliers_numbers(
     return int(nb_outliers), int(nb_suppress)
 
 
-def von_mises_sampling(
-    nb_vertices: int, original_graph: nx.Graph, kappa_noise_nodes: float
-) -> dict:
+def von_mises_sampling(original_graph: nx.Graph, kappa_noise_nodes: float) -> dict:
     """Perturbed the coordinates of a given graph.
 
-    :param nb_vertices: the number of vertices.
     :param nx.Graph original_graph: the input unperturbed graph.
     :param float kappa_noise_nodes: the variance of the noise.
     :return: a dictionary with the noisy attributes for each node.
     :rtype: dict
     """
     noisy_coord = {}
-    for index in range(nb_vertices):
+    for index in range(original_graph.number_of_nodes()):
         # Sampling from Von Mises - Fisher distribution
         original_coord = original_graph.nodes[index]["coord"]
         mean_original = original_coord / np.linalg.norm(
@@ -125,7 +122,6 @@ def von_mises_sampling(
 
 def noisy_graph_generation(
     original_graph: nx.Graph,
-    nb_vertices: int,
     kappa_noise_nodes: float = 1.0,
     radius: float = 1.0,
     label_outlier: int = -1,
@@ -134,12 +130,10 @@ def noisy_graph_generation(
     outlier_sigma: float = 4.0,
     suppress_nodes: bool = True,
     add_outliers: bool = True,
-    edge_shuffle: bool = True,
 ) -> nx.Graph:
     """Generate a noisy version of a reference graph.
 
     :param nx.Graph original_graph: the reference graph.
-    :param int nb_vertices: the number of vertices of the reference graph.
     :param float kappa_noise_nodes: the variance of the noise on the attributes of the nodes.
     :param float radius: the size the sphere used for the sampling.
     :param int label_outlier: the label of the outliers.
@@ -148,15 +142,12 @@ def noisy_graph_generation(
     :param float outlier_sigma: the standard deviation for the outlier generation.
     :param bool suppress_nodes: if True some nodes are suppressed.
     :param bool add_outliers: if True outlier nodes are added.
-    :param bool edge_shuffle: if True edges are shuffled.
     :return: the noisy graph.
     :rtype: nx.Graph
     """
-    noisy_coord_nodes = von_mises_sampling(
-        nb_vertices, original_graph, kappa_noise_nodes
-    )
+    noisy_coord_nodes = von_mises_sampling(original_graph, kappa_noise_nodes)
     nb_outliers, nb_suppress = generate_outliers_numbers(
-        nb_vertices, mu=outlier_mu, sigma=outlier_sigma
+        original_graph.number_of_nodes(), mu=outlier_mu, sigma=outlier_sigma
     )
 
     if suppress_nodes and nb_suppress > 0:
@@ -198,8 +189,6 @@ def noisy_graph_generation(
     edge_to_remove = edge_len_threshold(noisy_graph, edge_delete_percent)
     noisy_graph.remove_edges_from(edge_to_remove)
     noisy_graph.remove_edges_from(nx.selfloop_edges(noisy_graph))
-    noisy_graph = reference_graph.compute_edges_attributes(
-        noisy_graph, radius, shuffle=edge_shuffle
-    )
+    noisy_graph = reference_graph.compute_edges_attributes(noisy_graph, radius)
 
     return noisy_graph

@@ -73,7 +73,7 @@ where <output> is the output directory for documentation.
 
 ## Examples
 
-We provide 3 examples based on this toolbox,
+We provide several examples based on this toolbox,
 1. KMeans for graph matching.
 2. Application of our method on random graph with a comparison against MatchEIG.
 3. Application of different methods on Willow and PascalVOC databases using
@@ -81,6 +81,11 @@ We provide 3 examples based on this toolbox,
 the MKerGM method on the *duck* class from Willow we can execute,
 ```shell
 gmt_demo_pytorchdata --category duck --sigma 70.0 --gamma 0.01  --rff 200 --iterations 20 --rank 10
+```
+4. Generation of simulated sucal pits graph. For example, to generate 11 graphs (one reference with 10 noisy version)
+and kappa=400, we can execute,
+```shell
+graph_matching_tools/demos/gmt_demo_generate_graph.py --add_outliers --suppress_nodes --coord_noise_kappa 400 --sample_number 10 --save
 ```
 
 These examples may require modules that are not required in the setup.

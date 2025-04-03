@@ -4,6 +4,7 @@ Example script with KMeans to be used with INT graphs.
 
 import os
 import argparse
+import pickle
 
 import numpy as np
 import networkx as nx
@@ -72,7 +73,7 @@ def main() -> None:
                     + trial
                     + "/"
                     + folder
-                    + "/permutation_to_ref_graph.gpickle"
+                    + "/permutation_to_ref_graph.pkl"
                 )
                 path_to_groundtruth = (
                     path_to_graph_folder
@@ -80,14 +81,15 @@ def main() -> None:
                     + trial
                     + "/"
                     + folder
-                    + "/ground_truth.gpickle"
+                    + "/ground_truth.pkl"
                 )
 
                 noise = folder.split(",")[0].split("_")[1]
 
                 graph_meta = GraphDataset(path_to_graphs, path_to_groundtruth_ref)
                 all_coords = get_all_coords(graph_meta.list_graphs)
-                ground_truth = nx.read_gpickle(path_to_groundtruth)
+                with open(path_to_groundtruth, "rb") as f:
+                    ground_truth = pickle.load(f)
                 res = get_permutation_matrix_from_dictionary(
                     ground_truth, graph_meta.sizes
                 )
@@ -98,7 +100,8 @@ def main() -> None:
 
                 scores[int(noise)].append(f1)
 
-    nx.write_gpickle(scores, "kmeans_score_k_" + str(k) + ".gpickle")
+    with open("kmeans_score_k_" + str(k) + ".pkl", "wb") as f:
+        pickle.dump(scores, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     print(scores)
 
