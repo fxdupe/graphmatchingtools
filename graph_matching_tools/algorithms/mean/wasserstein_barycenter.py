@@ -232,13 +232,13 @@ def fgw_wasserstein_barycenter(
     .. doctest:
 
     >>> mean_cost, mean_data = fgw_barycenter.fgw_wasserstein_barycenter(graphs, 0.5, 100,
-    ... 200, barycenter_size=2, gamma=0.01, random_state=42)
+    ... 200, barycenter_size=2, gamma=0.05, random_state=42)
     >>> mean_cost
-    array([[0.37161864, 0.6076793 ],
-           [0.6076793 , 0.42187286]])
+    array([[0.09222977, 0.93732388],
+           [0.93732388, 0.04197256]])
     >>> mean_data
-    array([[3.06670722],
-           [3.86662611]])
+    array([[4.86665866],
+           [2.06667467]])
     """
     node_kernel = kern.create_gaussian_node_kernel(node_sigma, "weight")
 

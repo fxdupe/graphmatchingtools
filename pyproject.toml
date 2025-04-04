@@ -1,6 +1,6 @@
 [project]
 name = "graphmatchingtools"
-version = "0.9.2"
+version = "0.10.0"
 authors = [
     { name = "François-Xavier Dupé", email = "francois-xavier.dupe@univ-amu.fr" },
     { name = "Rohit Yadav", email = "rohit.yadav@univ-amu.fr" },
@@ -58,7 +58,7 @@ gmt_demo_generate_graph = "graph_matching_tools.scripts.gmt_demo_generate_graph:
 
 [build-system]
 requires = [
-    "setuptools >= 69",
+    "setuptools >= 70",
     "wheel"
 ]
 build-backend = "setuptools.build_meta"
@@ -113,7 +113,7 @@ addopts = "--cov=graph_matching_tools"
 
 [tool.poetry]
 name = "Graph Matching Tools"
-version = "0.9.2"
+version = "0.10.0"
 description = "Tools for multiple graph matching with coherence"
 license = "MIT"
 readme = "README.md"

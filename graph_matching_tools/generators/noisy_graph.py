@@ -122,7 +122,7 @@ def von_mises_sampling(original_graph: nx.Graph, kappa_noise_nodes: float) -> di
 
 def noisy_graph_generation(
     original_graph: nx.Graph,
-    kappa_noise_nodes: float = 1.0,
+    kappa_noise_node: float = 1.0,
     radius: float = 1.0,
     label_outlier: int = -1,
     edge_delete_percent: float = 0.1,
@@ -134,7 +134,7 @@ def noisy_graph_generation(
     """Generate a noisy version of a reference graph.
 
     :param nx.Graph original_graph: the reference graph.
-    :param float kappa_noise_nodes: the variance of the noise on the attributes of the nodes.
+    :param float kappa_noise_node: the variance of the noise on the attributes of the nodes.
     :param float radius: the size the sphere used for the sampling.
     :param int label_outlier: the label of the outliers.
     :param float edge_delete_percent: the percent of removed edges for the edges.
@@ -145,7 +145,7 @@ def noisy_graph_generation(
     :return: the noisy graph.
     :rtype: nx.Graph
     """
-    noisy_coord_nodes = von_mises_sampling(original_graph, kappa_noise_nodes)
+    noisy_coord_nodes = von_mises_sampling(original_graph, kappa_noise_node)
     nb_outliers, nb_suppress = generate_outliers_numbers(
         original_graph.number_of_nodes(), mu=outlier_mu, sigma=outlier_sigma
     )

@@ -90,10 +90,13 @@ graph_matching_tools/demos/gmt_demo_generate_graph.py --add_outliers --suppress_
 
 These examples may require modules that are not required in the setup.
 
-## Authors
+## Current Authors
 - Guillaume Auzias (INT)
 - François-Xavier Dupé (LIS)
 - Sylvain Takerkart (INT)
-- Rohit Yadav (INT, LIS)
 
 All authors are from [Aix-Marseille University](https://univ-amu.fr).
+
+## Previous Authors
+- Rohit Yadav (INT, LIS)
+- Marius Thorre (LIS)

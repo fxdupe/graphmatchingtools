@@ -1,6 +1,19 @@
 Changelog
 =========
 
+0.10.0
+------
+
+Some bug fixes.
+
+Main changes:
+
+* Sulcal pits graphs generations (from PLOS One paper)
+* Update documentation
+* Update scripts
+* Improve the unit tests
+
+
 0.9.0
 -----
 

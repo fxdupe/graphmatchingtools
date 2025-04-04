@@ -16,7 +16,7 @@ copyright = (
     "2023-2025, François-Xavier Dupé, Rohit Yadav, Guillaume Auzias, Sylvain Takerkart"
 )
 author = "François-Xavier Dupé, Rohit Yadav, Guillaume Auzias, Sylvain Takerkart"
-release = "0.9.2"
+release = "0.10.0"
 show_authors = True
 
 # -- General configuration ---------------------------------------------------

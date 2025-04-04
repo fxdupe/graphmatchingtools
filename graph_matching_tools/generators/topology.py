@@ -2,7 +2,7 @@
 
 Extract from slam code.
 
-.. module_author:: François-Xavier Dupé
+.. moduleauthor:: François-Xavier Dupé
 """
 
 import numpy as np

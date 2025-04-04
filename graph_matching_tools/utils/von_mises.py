@@ -3,21 +3,21 @@ This solution originally appears here:
 http://stats.stackexchange.com/questions/156729/sampling-from-von-mises-fisher-distribution-in-python
 
 Also see:
-Sampling from vMF on S^2:
-    https://www.mitsuba-renderer.org/~wenzel/files/vmf.pdf
-    http://www.stat.pitt.edu/sungkyu/software/randvonMisesFisher3.pdf
+Sampling from vMF on :math:`S^2`:
+https://www.mitsuba-renderer.org/~wenzel/files/vmf.pdf
+http://www.stat.pitt.edu/sungkyu/software/randvonMisesFisher3.pdf
 
 This code was taken from the following project: https://github.com/clara-labs/spherecluster
 
-.. module_author:: Rohit Yadav
+.. moduleauthor:: Rohit Yadav
 """
 
 import numpy as np
 
 
 def sample_von_mises(mu: np.ndarray, kappa: float, num_samples: int) -> np.ndarray:
-    """Generate num_samples N-dimensional samples from von Mises Fisher
-    distribution around center mu $\\in R^N$ with concentration kappa.
+    r"""Generate N-dimensional samples from von Mises Fisher
+    distribution around center :math:`\mu \in R^N` with concentration :math:`\kappa`.
 
     :param np.ndarray mu: the mean of the distribution.
     :param float kappa: parameter of vMF distribution.
@@ -62,7 +62,7 @@ def _sample_weight(kappa: float, dim: int) -> np.ndarray:
 
 
 def _sample_orthonormal(mu: np.ndarray) -> np.ndarray:
-    """Sample point on sphere orthogonal to mu.
+    r"""Sample point on sphere orthogonal to :math:`\mu`.
 
     :param np.ndarray mu: the mean of the distribution.
     :return: N-dimensional point.

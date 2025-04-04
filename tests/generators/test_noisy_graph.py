@@ -8,6 +8,6 @@ class Test(TestCase):
     def test_noisy_graph_generation(self):
         graph = reference_graph.generate_reference_graph(25, 1.0)
         perturbed_graph = noisy_graph.noisy_graph_generation(
-            graph, kappa_noise_nodes=0.1
+            graph, kappa_noise_node=0.1
         )
         self.assertGreater(perturbed_graph.number_of_nodes(), 1)

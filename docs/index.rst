@@ -13,6 +13,7 @@ This is the documentation of GraphMatchingTools a set of method dedicated to gra
    :caption: Contents:
 
    tutorial
+   generation
    autoapi/index
    authors
    changelog
@@ -66,6 +67,24 @@ Mean graph methods
 - `MMM method based on pairwise matching <https://www.sciencedirect.com/science/article/abs/pii/S003132031630139X>`_
 - `Wasserstein barycenter using FGW <https://proceedings.mlr.press/v97/titouan19a.html>`_
 
+Auxiliary methods (aka solvers...)
+==================================
+
+Optimal transport
+-----------------
+
+- `Sinkhorn-Knopp <https://proceedings.neurips.cc/paper/2013/hash/af21d0c97db2e27e13572cbf59eb343d-Abstract.html>`_
+- `Sinkhorn algorithm with sparse Newton iterations <https://arxiv.org/abs/2401.12253>`_
+
+Manifold optimization
+---------------------
+
+- `Fast and accurate optimization on the orthogonal manifold without retraction <https://proceedings.mlr.press/v151/ablin22a>`_
+
+Graph generation
+----------------
+
+- Sucal pits graph using methods and code from papers `[1] <https://www.sciencedirect.com/science/article/pii/S1361841516300251>`_, `[2] <https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0293886>`_ and `[3] <https://ieeexplore.ieee.org/abstract/document/9897185/>`_.
 
 
 About the examples
