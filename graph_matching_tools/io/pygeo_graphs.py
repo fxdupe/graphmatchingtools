@@ -7,7 +7,7 @@ Set of functions for Pytorch-Geometrics datasets
 import numpy as np
 import networkx as nx
 from torch_geometric.datasets import WILLOWObjectClass
-from torch_geometric.datasets import PascalVOCKeypoints as PascalVOC
+from torch_geometric.datasets import PascalVOCKeypoints
 from torch_geometric.datasets import PascalPF
 from torch_geometric.datasets import TUDataset
 import torch_geometric.transforms as transforms
@@ -96,7 +96,7 @@ def get_pascalvoc_graph_database(
 
     if name == "PascalVOC":
         pre_filter = lambda data: data.pos.size(0) > 0  # noqa
-        dataset = PascalVOC(
+        dataset = PascalVOCKeypoints(
             repo, category, train=False, transform=transform, pre_filter=pre_filter
         )
     elif name == "PascalPF":

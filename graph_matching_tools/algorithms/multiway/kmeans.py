@@ -1,7 +1,7 @@
 """
 KMean way of doing multigraph matching by clustering the nodes
 
-.. moduleauthor:: Rohit Yadav
+.. moduleauthor:: Rohit Yadav, François-Xavier Dupé
 """
 
 import numpy as np
@@ -21,23 +21,27 @@ def _create_perm_from_labels(labels: list[int]) -> np.ndarray:
     return u @ u.T
 
 
-def _get_labels_from_k_means(k: int, data: np.ndarray) -> list[int]:
+def _get_labels_from_k_means(k: int, data: np.ndarray, random_state=None) -> list[int]:
     """Get labels from the KMeans algorithm.
 
     :param int k: the number of clusters.
     :param np.ndarray data: the data to cluster.
+    :param int random_state: the random state.
     :return: the labels for each cluster.
     :rtype: list[int]
     """
-    kmeans = KMeans(n_clusters=k, random_state=0, n_init=10).fit(data)
+    kmeans = KMeans(n_clusters=k, random_state=random_state, n_init=10).fit(data)
     return kmeans.labels_
 
 
-def get_permutation_with_kmeans(k: int, data: np.ndarray) -> np.ndarray:
+def get_permutation_with_kmeans(
+    k: int, data: np.ndarray, random_state=None
+) -> np.ndarray:
     """Apply KMeans to get permutation matrix.
 
     :param int k: the number of clusters.
     :param np.ndarray data: the data array.
+    :param random_state: the random state.
     :return: the permutation matrix.
     :rtype: np.ndarray
 
@@ -57,6 +61,6 @@ def get_permutation_with_kmeans(k: int, data: np.ndarray) -> np.ndarray:
            [1., 0., 0., 1., 1., 1., 0.],
            [0., 1., 1., 0., 0., 0., 1.]])
     """
-    kmeans_labels = _get_labels_from_k_means(k, data)
+    kmeans_labels = _get_labels_from_k_means(k, data, random_state)
     perm = _create_perm_from_labels(kmeans_labels)
     return perm

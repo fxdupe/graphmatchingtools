@@ -33,14 +33,13 @@ def get_all_coords(list_graphs: list[nx.Graph]) -> np.ndarray:
 
 
 def main() -> None:
-    default_to_graph_folder = "simu_test/"
-    parser = argparse.ArgumentParser(description="Segmentation from learning method.")
+    parser = argparse.ArgumentParser(
+        description="K-Mean node matching applied to different sets of graphs."
+    )
     parser.add_argument(
-        "-g",
-        "--graph_dir",
-        help="The directory with the graph",
+        "directory",
+        help="The directory with the different sets of graphs",
         type=str,
-        default=default_to_graph_folder,
     )
     parser.add_argument(
         "-k",
@@ -49,59 +48,51 @@ def main() -> None:
         type=int,
         default=110,
     )
+    parser.add_argument(
+        "--ground_truth_name",
+        help="The name of the ground truth file",
+        type=str,
+        default="ground_truth.pkl",
+    )
+    parser.add_argument(
+        "--graph_directory_name",
+        help="The name of the directory with the graphs",
+        type=str,
+        default="graphs",
+    )
+    parser.add_argument(
+        "--save_results",
+        help="Save the results into a file",
+        action="store_true",
+        default=False,
+    )
     args = parser.parse_args()
-    path_to_graph_folder = args.graph_dir
-    k = args.kmeans_cluster
+    folders = np.sort(os.listdir(args.directory))
+    scores = dict()
 
-    trials = np.sort(os.listdir(path_to_graph_folder))
+    for folder in folders:
+        print("folder: ", folder)
 
-    scores = {100: [], 400: [], 700: [], 1000: [], 1300: []}
+        path_to_graphs = (
+            args.directory + "/" + folder + "/" + args.graph_directory_name + "/"
+        )
+        path_to_groundtruth = (
+            args.directory + "/" + folder + "/" + args.ground_truth_name
+        )
 
-    for trial in trials:
-        print("trial: ", trial)
+        graph_meta = GraphDataset(path_to_graphs, path_to_groundtruth)
+        all_coords = get_all_coords(graph_meta.list_graphs)
+        res = get_permutation_matrix_from_dictionary(
+            graph_meta.node_references, graph_meta.sizes
+        )
 
-        all_files = os.listdir(path_to_graph_folder + trial)
+        p = kmeans.get_permutation_with_kmeans(args.kmeans_cluster, all_coords)
+        f1, prec, rec = matching.compute_f1score(p, res)
+        scores[f"{folder}"] = f1
 
-        for folder in all_files:
-            if os.path.isdir(path_to_graph_folder + trial + "/" + folder):
-                path_to_graphs = (
-                    path_to_graph_folder + "/" + trial + "/" + folder + "/graphs/"
-                )
-                path_to_groundtruth_ref = (
-                    path_to_graph_folder
-                    + "/"
-                    + trial
-                    + "/"
-                    + folder
-                    + "/permutation_to_ref_graph.pkl"
-                )
-                path_to_groundtruth = (
-                    path_to_graph_folder
-                    + "/"
-                    + trial
-                    + "/"
-                    + folder
-                    + "/ground_truth.pkl"
-                )
-
-                noise = folder.split(",")[0].split("_")[1]
-
-                graph_meta = GraphDataset(path_to_graphs, path_to_groundtruth_ref)
-                all_coords = get_all_coords(graph_meta.list_graphs)
-                with open(path_to_groundtruth, "rb") as f:
-                    ground_truth = pickle.load(f)
-                res = get_permutation_matrix_from_dictionary(
-                    ground_truth, graph_meta.sizes
-                )
-
-                P = kmeans.get_permutation_with_kmeans(k, all_coords)
-
-                f1, prec, rec = matching.compute_f1score(P, res)
-
-                scores[int(noise)].append(f1)
-
-    with open("kmeans_score_k_" + str(k) + ".pkl", "wb") as f:
-        pickle.dump(scores, f, protocol=pickle.HIGHEST_PROTOCOL)
+    if args.save_results:
+        with open("kmeans_score_k_" + str(args.kmeans_cluster) + ".pkl", "wb") as f:
+            pickle.dump(scores, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     print(scores)
 

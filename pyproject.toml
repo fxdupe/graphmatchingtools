@@ -47,10 +47,10 @@ demos = [
 [project.scripts]
 gmt_demo_pytorchdata = "graph_matching_tools.scripts.gmt_demo_pytorchdata:main"
 gmt_demo_randomgraph = "graph_matching_tools.scripts.gmt_demo_randomgraph:main"
-#gmt_demo_kmeans = "graph_matching_tools.scripts.gmt_demo_kmeans:main"
+gmt_demo_kmeans = "graph_matching_tools.scripts.gmt_demo_kmeans:main"
 gmt_demo_intgraph = "graph_matching_tools.scripts.gmt_demo_intgraph:main"
 gmt_demo_generate_graph = "graph_matching_tools.scripts.gmt_demo_generate_graph:main"
-#gmt_demo_selflearning = "graph_matching_tools.scripts.gmt_demo_selflearning:main"
+gmt_demo_selflearning = "graph_matching_tools.scripts.gmt_demo_selflearning:main"
 
 [project.urls]
 "Homepage" = "https://github.com/fxdupe/graphmatchingtools"

@@ -129,7 +129,7 @@ def build_permutation_dictionary(graphs: list[nx.Graph]) -> dict:
     return full_permutation_dictionary
 
 
-if __name__ == "__main__":
+def main() -> None:
     parser = argparse.ArgumentParser(
         description="Simulated sucal pits graph generation."
     )
@@ -226,3 +226,7 @@ if __name__ == "__main__":
             generated_noisy_graph,
             current_parameters,
         )
+
+
+if __name__ == "__main__":
+    main()

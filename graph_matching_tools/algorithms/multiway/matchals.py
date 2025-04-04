@@ -1,5 +1,5 @@
 """
-MatchALS multigrpah method
+MatchALS multigraph method
 
 .. moduleauthor:: François-Xavier Dupé
 """
@@ -7,7 +7,6 @@ MatchALS multigrpah method
 from typing import Optional
 
 import numpy as np
-
 import scipy.linalg as scl
 
 
