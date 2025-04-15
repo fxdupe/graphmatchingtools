@@ -47,10 +47,14 @@ def _convert_to_networkx(dataset) -> list[nx.Graph]:  # pragma: no cover
     """
     graphs = []
     for idx in range(len(dataset)):
-        g = tf_utils.to_networkx(
-            dataset[idx], node_attrs=["pos", "x"], to_undirected=True
-        )
-        graphs.append(g)
+        try:
+            g = tf_utils.to_networkx(
+                dataset[idx], node_attrs=["pos", "x"], to_undirected=True
+            )
+            graphs.append(g)
+        except AssertionError:
+            # We pass if the graph is ill-shaped
+            pass
     return graphs
 
 
