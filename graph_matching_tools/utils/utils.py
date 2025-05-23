@@ -19,7 +19,9 @@ def get_dim_data_edges(graph: nx.Graph, data_edge: str) -> int:
     :return: the dimension of the data on edges.
     :rtype: int
     """
-    for u, v, data in graph.edges.data(data_edge):
+    for u, v, data in graph.edges.data(
+        data_edge
+    ):  # type: int, int, int | float | np.ndarray
         if np.isscalar(data):
             return 1
         elif isinstance(data, np.ndarray):
@@ -45,7 +47,7 @@ def create_full_adjacency_matrix(graphs: list[nx.Graph]) -> np.ndarray:
 
     index = 0
     for i in range(len(graphs)):
-        adj = nx.to_numpy_array(graphs[i], weight=None)
+        adj = nx.to_numpy_array(graphs[i], weight="")
         a[index : index + sizes[i], index : index + sizes[i]] = adj
         index += sizes[i]
 
@@ -74,7 +76,9 @@ def create_full_weight_matrix(
 
     index = 0
     for i in range(len(graphs)):
-        for n1, n2, data in graphs[i].edges.data(edge_data):
+        for n1, n2, data in graphs[i].edges.data(
+            edge_data
+        ):  # type: int, int, np.ndarray
             w[index + n1, index + n2] = np.exp(-(data**2.0) / (2.0 * sigma**2.0))
             w[index + n2, index + n1] = w[index + n1, index + n2]
         index += sizes[i]

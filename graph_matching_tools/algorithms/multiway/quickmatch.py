@@ -41,7 +41,7 @@ def _compute_density(
                     np.array(g.nodes[i][node_data]) - np.array(g.nodes[j][node_data])
                 )
                 if new_dist < dist:
-                    dist = new_dist
+                    dist = float(new_dist)
             min_distances[index] = dist
             index += 1
 
@@ -102,7 +102,7 @@ def _compute_parents(
                     )
                     if new_dist <= dist and densities[index] <= densities[inner_index]:
                         parent = inner_index
-                        dist = new_dist
+                        dist = float(new_dist)
                     inner_index += 1
             parents[index] = parent
             distances[index] = dist
@@ -144,11 +144,11 @@ def quickmatch(
 
     graph_index = np.zeros((full_size, 2), dtype="i")
     index = 0
-    for g in range(len(graphs)):
-        for i in range(nx.number_of_nodes(graphs[g])):
-            graph_index[index + i, 0] = g
+    for i_g in range(len(graphs)):
+        for i in range(nx.number_of_nodes(graphs[i_g])):
+            graph_index[index + i, 0] = i_g
             graph_index[index + i, 1] = i
-        index += nx.number_of_nodes(graphs[g])
+        index += nx.number_of_nodes(graphs[i_g])
 
     densities = _compute_density(graphs, sizes, node_data, rho_den)
     parents, distances = _compute_parents(graphs, sizes, node_data, densities)

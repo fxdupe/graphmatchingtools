@@ -24,11 +24,11 @@ def get_all_coords(list_graphs: list[nx.Graph]) -> np.ndarray:
     :return: the array of coordinates.
     :rtype: np.ndarray
     """
-    g_all_coords = []
+    g_all_coords_list = []  # type: list[np.ndarray]
     for g in list_graphs:
         coords = np.array(list(nx.get_node_attributes(g, "coord").values()))
-        g_all_coords.extend(coords)
-    g_all_coords = np.array(g_all_coords)
+        g_all_coords_list.extend(coords)
+    g_all_coords = np.array(g_all_coords_list)
     return g_all_coords
 
 

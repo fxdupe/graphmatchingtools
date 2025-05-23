@@ -191,7 +191,7 @@ def gromov_wasserstein_learning(
     cost_st: Optional[np.ndarray] = None,
     use_cross_cost: bool = False,
     random_seed: Optional[int] = None,
-) -> [np.ndarray, np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Gromov-Wasserstein Learning method for graph matching.
 
     :param np.ndarray cost_s: the cost matrix for the "source" graph.

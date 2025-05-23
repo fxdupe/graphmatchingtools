@@ -217,8 +217,8 @@ def main() -> None:
 
     all_graphs = [g for g in all_graphs]
 
-    dummy_index = []
-    graph_index = []
+    dummy_index = []  # type: list[list[int]]
+    graph_index = []  # type: list[list[int]]
 
     if args.add_dummy:
         dim = 2 if args.database == "PascalPF" else 1024
@@ -237,7 +237,7 @@ def main() -> None:
     print("Full-size: {} nodes".format(full_size))
 
     # Compute node affinities
-    knode = None
+    knode = np.zeros((1, 1))
 
     if (
         args.method != "quickm"
@@ -335,8 +335,7 @@ def main() -> None:
         costs = [
             (
                 1.0
-                - ku.compute_knode(g, g, node_kernel)
-                * nx.to_numpy_array(g, weight=None)
+                - ku.compute_knode(g, g, node_kernel) * nx.to_numpy_array(g, weight="")
             )
             for g in all_graphs
         ]

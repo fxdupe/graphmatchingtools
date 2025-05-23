@@ -13,9 +13,9 @@ def make_sphere(radius: float) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
 
     :param float radius: the radius of the sphere.
     :return: tuple which contains the sphere coordinate
-    :rtype: tuple
+    :rtype: tuple[np.ndarray, np.ndarray, np.ndarray]
     """
-    phi, theta = np.mgrid[0.0 : np.pi : 100j, 0.0 : 2.0 * np.pi : 100j]
+    phi, theta = np.mgrid[0.0 : np.pi : 100j, 0.0 : 2.0 * np.pi : 100j]  # type: ignore
     x = radius * np.sin(phi) * np.cos(theta)
     y = radius * np.sin(phi) * np.sin(theta)
     z = radius * np.cos(phi)
@@ -48,7 +48,9 @@ def random_sampling(
     :return: a tuple with the coordinates of each point.
     :rtype: tuple[np.ndarray, np.ndarray, np.ndarray]
     """
-    coords = np.zeros((vertex_number, 3))
+    coords = np.zeros(
+        (vertex_number, 3)
+    )  # type: np.ndarray[tuple[int, ...], np.dtype[np.float64]]
     for i in range(vertex_number):
         M = np.random.normal(size=(3, 3))
         Q, R = np.linalg.qr(M)

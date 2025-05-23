@@ -54,7 +54,7 @@ def grasp(
     target: nx.Graph,
     k: int,
     mu: float = 1.0,
-    time_steps: Optional[list[float]] = None,
+    time_steps: Optional[np.ndarray] = None,
 ) -> np.ndarray:
     """GRASP: scalable alignment by spectral corresponding functions
 
@@ -62,7 +62,7 @@ def grasp(
     :param nx.Graph target: the target graph.
     :param int k: the number of eigenvalues (dimension reduction).
     :param float mu: the equilibrium between matching and data.
-    :param Optional[list[float]] time_steps: a list of time steps.
+    :param Optional[np.ndarray] time_steps: a list of time steps.
     :return: the permutation matrix.
     :rtype: np.ndarray
 
@@ -148,7 +148,7 @@ def grasp(
     right_part = (phi_bar.T @ f).reshape(
         -1,
     )
-    c_mapping = sco.lsq_linear(left_part, right_part)
+    c_mapping = sco.lsq_linear(left_part, right_part)  # type: ignore
 
     # Step 5: matching by linear assignment
     cost = phi_bar @ np.diag(c_mapping["x"]) @ psi_hat.T

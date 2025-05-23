@@ -72,8 +72,8 @@ def multi_pairwise_gwl(
     for g_s in range(len(costs) - 1):
         index_t = index_s + sizes[g_s]
         for g_t in range(g_s + 1, len(costs)):
-            cost_st = None
-            if use_cross_cost:
+            cost_st = None  # type: Optional[np.ndarray]
+            if use_cross_cost and cross_costs is not None:
                 cost_st = cross_costs["{},{}".format(g_s, g_t)]
 
             t_m, _, _ = gwl.gromov_wasserstein_learning(

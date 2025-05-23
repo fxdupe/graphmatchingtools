@@ -70,7 +70,7 @@ def _get_data_matrix(graph: nx.Graph) -> np.ndarray:
 
 def get_adjacency_matrix_from_costs_with_valuation(
     cost: np.ndarray, threshold: float
-) -> tuple[np.ndarray, float]:
+) -> tuple[np.ndarray, np.floating]:
     """Compute the adjacency matrix from a cost matrix with a given threshold and compute a quality value.
     The value is computed as the norm of the difference between the cost matrix and the resulting shortest path
     matrix.
@@ -100,16 +100,16 @@ def fgw_wasserstein_barycenter_direct(
     data: list[np.ndarray],
     node_sigma: float = 1.0,
     alpha: float = 0.5,
-    weights: np.ndarray = None,
+    weights: Optional[np.ndarray] = None,
     iterations: int = 10,
     fgw_iterations: int = 10,
     gamma: float = 0.8,
     rho: float = 1.0,
-    graph_init: int = 0,
-    barycenter_size: int = None,
+    graph_init: Optional[int] = None,
+    barycenter_size: Optional[int] = None,
     inner_iterations_step1: int = 100,
     inner_iterations_step2: int = 100,
-    random_state=None,
+    random_state: Optional[int] = None,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Fused Gromov-Wasserstein + Frechet mean for Wasserstein barycenter.
     This code is closer to the one in the paper.
@@ -126,7 +126,7 @@ def fgw_wasserstein_barycenter_direct(
     :param fgw_iterations: The number of FGW iterations.
     :param gamma: The percentage of kept values in Hessian for sns method.
     :param rho: The rho parameter.
-    :param int graph_init: the index of the graph used as initialization (default: 0).
+    :param int graph_init: the index of the graph used as initialization.
     :param int barycenter_size: the size of the barycenter (using the first graph by default).
     :param int inner_iterations_step1: the number of iterations for the classical steps in OT solver (sns).
     :param int inner_iterations_step2: the number of iterations for the Newton's steps in OT solver (sns).
@@ -197,15 +197,15 @@ def fgw_wasserstein_barycenter(
     alpha: float,
     iterations: int,
     fgw_iterations: int,
-    barycenter_size: int = None,
+    barycenter_size: Optional[int] = None,
     node_sigma: float = 1.0,
     weights: Optional[np.ndarray] = None,
     gamma: float = 1.0,
     rho: float = 0.8,
-    graph_init: int = None,
+    graph_init: Optional[int] = None,
     inner_iterations_step1: int = 100,
     inner_iterations_step2: int = 100,
-    random_state=None,
+    random_state: Optional[int] = None,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Fused Gromov-Wasserstein + Frechet mean for Wasserstein barycenter.
 
@@ -217,7 +217,7 @@ def fgw_wasserstein_barycenter(
     :param int fgw_iterations: the number of iterations for each matching.
     :param float node_sigma: the sigma for the Gaussian kernel used for distance between node data.
     :param Optional[np.ndarray] weights: the weight associated to each graph.
-    :param float gamma: the strength of thr regularization for the OT solver.
+    :param float gamma: the strength of the regularization for the OT solver.
     :param float rho: percentage of remaining value while computing Hessian in sns method.
     :param int graph_init: the index of the graph used as initialization (default: 0).
     :param int barycenter_size: the size of the barycenter (using the first graph by default).

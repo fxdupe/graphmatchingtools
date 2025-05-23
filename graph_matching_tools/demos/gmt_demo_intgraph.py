@@ -183,7 +183,7 @@ def main() -> None:
                     g = pickle.load(f)
                 all_graphs.append(g)
 
-    dummy_index = []
+    dummy_index = []  # type: list[list[int]]
     if args.add_dummy:
         all_graphs, dummy_index = add_dummy_nodes(all_graphs, args.rank)
 
@@ -195,7 +195,7 @@ def main() -> None:
         m_res = np.load(args.load_res)
 
     node_kernel = gaussian.create_gaussian_node_kernel(args.sigma, "coord")
-    knode = None
+    knode = np.zeros((1, 1))
     if args.method != "gamgm":
         knode = kutils.create_full_node_affinity_matrix(all_graphs, node_kernel)
 

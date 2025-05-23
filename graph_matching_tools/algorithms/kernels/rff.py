@@ -19,12 +19,12 @@ def compute_phi(
     :param str data_name: the name of the data vector.
     :param np.ndarray vectors: the random vectors for the new features.
     :param np.ndarray offsets: the random offsets.
-    :return: the Phi matrix compute using RRF.
+    :return: the Phi matrix computed using RRF.
     :rtype: np.ndarray
     """
     n = nx.number_of_nodes(graph)
     phi = np.zeros((vectors.shape[1], n, n))
-    for u, v, data in graph.edges.data(data_name):
+    for u, v, data in graph.edges.data(data_name):  # type: int, int, np.ndarray
         nvect = np.sqrt(2 / vectors.shape[1]) * np.cos(
             np.dot(data.T, vectors) + offsets
         )

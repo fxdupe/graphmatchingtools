@@ -12,7 +12,7 @@ import graph_matching_tools.utils.sphere as sphere
 
 
 def compute_edges_attributes(graph: nx.Graph, radius: float) -> nx.Graph:
-    """Compute the edges attributes for a graph
+    """Compute edge's attributes for a graph.
 
     :param nx.Graph graph: the input graph.
     :param float radius: the radius of the sphere.
@@ -25,8 +25,8 @@ def compute_edges_attributes(graph: nx.Graph, radius: float) -> nx.Graph:
 
     for edge in graph.edges():
         # We calculate the geodesic distance
-        end_a = graph.nodes()[edge[0]]["coord"]
-        end_b = graph.nodes()[edge[1]]["coord"]
+        end_a = graph.nodes()[edge[0]]["coord"]  # type: ignore
+        end_b = graph.nodes()[edge[1]]["coord"]  # type: ignore
         geodesic_dist = get_geodesic_distance_sphere(end_a, end_b, radius)
 
         # add the information in the dictionary
@@ -47,7 +47,7 @@ def compute_edges_attributes(graph: nx.Graph, radius: float) -> nx.Graph:
 def get_geodesic_distance_sphere(
     coord_a: np.ndarray, coord_b: np.ndarray, radius: float
 ) -> float:
-    """Compute the geodesic distance of two 3D vectors on a sphere
+    """Compute the geodesic distance of two 3D vectors on a sphere.
 
     :param np.ndarray coord_a: first vector.
     :param np.ndarray coord_b: second vector.
@@ -69,15 +69,15 @@ def generate_reference_graph(nb_vertices: int, radius: float) -> nx.Graph:
     :rtype: nx.Graph
     """
     x, y, z = sphere.random_sampling(vertex_number=nb_vertices, radius=radius)
-    sphere_random_sampling = np.vstack((x, y, z)).T
+    sphere_random_sampling_array = np.vstack((x, y, z)).T
     sphere_random_sampling = ng.compute_hull_from_vertices(
-        sphere_random_sampling
+        sphere_random_sampling_array
     )  # Computing convex hull (adding edges)
 
     adja = topology.adjacency_matrix(sphere_random_sampling)
     graph = nx.from_numpy_array(adja.todense())
 
-    node_attribute_dict = {}
+    node_attribute_dict = {}  # type: dict[int, dict[str, np.ndarray | int | str]]
     for node, label in enumerate(graph.nodes()):
         # we set the label of nodes in the same order as in graph
         node_attribute_dict[node] = {

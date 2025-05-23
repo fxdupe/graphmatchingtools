@@ -56,7 +56,7 @@ def test_model(model: torch.nn.Module, dataloader: tgeo.data.DataLoader) -> floa
     :rtype: float
     """
     model.eval()
-    loss = 0
+    loss = torch.Tensor(0.0)
 
     # noinspection PyTypeChecker
     for batch, sample in enumerate(dataloader):
@@ -72,7 +72,7 @@ def test_model(model: torch.nn.Module, dataloader: tgeo.data.DataLoader) -> floa
             )  # Compute the loss solely based on the training nodes.
 
     # noinspection PyTypeChecker
-    return loss / len(dataloader)
+    return float(loss / len(dataloader))
 
 
 def update_graphs(graph_list: list[nx.Graph], model: torch.nn.Module) -> list[nx.Graph]:
@@ -144,12 +144,12 @@ def gae_learning(
             adj_tensor = torch.squeeze(
                 tgeo.utils.to_dense_adj(sample.edge_index, batch=sample.batch)
             )
-            loss = None
-            for graph in range(sample.batch[-1]):
-                embedding = out[sample.batch == graph, :]
+            loss = torch.Tensor(0.0)
+            for i_graph in range(sample.batch[-1]):
+                embedding = out[sample.batch == i_graph, :]
                 loss = criterion(
                     embedding @ embedding.T,
-                    adj_tensor[graph, :, :],
+                    adj_tensor[i_graph, :, :],
                 )  # Compute the loss solely based on the training nodes.
 
             loss.backward()  # Derive gradients.

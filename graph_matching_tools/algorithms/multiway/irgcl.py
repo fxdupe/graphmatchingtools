@@ -86,12 +86,12 @@ def _cemp(
     :param Callable[[int], int] beta: the increasing beta(t).
     :param int node_number: the number of nodes.
     :param int graph_number: the number of graphs.
-    :return: the initial weight matrix.
+    :return: the initial weight matrix or None.
     :rtype: np.ndarray
     """
     one_m = np.ones((node_number, node_number))
     w_init = adj
-    a_init = None
+    a_init = np.zeros((node_number, node_number))
     for t in range(t0):
         s_init = np.kron(w_init, one_m) * x
         tmp = (

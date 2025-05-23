@@ -126,8 +126,8 @@ def main() -> None:
     print("Size dataset: {} graphs".format(len(all_graphs)))
     print([nx.number_of_nodes(g) for g in all_graphs])
 
-    dummy_index = []
-    graph_index = []
+    dummy_index = []  # type: list[list[int]]
+    graph_index = []  # type: list[list[int]]
 
     data_matrices = [get_node_data_matrix(g, "x") for g in all_graphs]
     data_matrices = np.concatenate(data_matrices, axis=0)

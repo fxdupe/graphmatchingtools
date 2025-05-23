@@ -111,7 +111,7 @@ def stochastic_dist_mkergm(
     # Do the stochastic DCA
     for iteration in range(iterations):
         current_permutations = copy.deepcopy(permutations)
-        counter = dict()
+        counter = dict()  # type: dict[tuple[int, int], int]
         for sampling in range(batch_size):
             index = random_gen.choice(
                 set_of_graphs, size=batch_nb_graphs, replace=False, shuffle=True

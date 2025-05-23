@@ -80,8 +80,8 @@ def generate_outliers_numbers(
     )  # corresponding alpha with respect to given mu and sigma
     beta = compute_beta(alpha, nb_vertices, mu)  # corresponding beta
 
-    nb_suppress = betabinom.rvs(nb_vertices, alpha, beta, size=1)[0]
-    nb_outliers = betabinom.rvs(nb_vertices, alpha, beta, size=1)[0]
+    nb_suppress = betabinom.rvs(nb_vertices, alpha, beta, size=1)[0]  # type: ignore
+    nb_outliers = betabinom.rvs(nb_vertices, alpha, beta, size=1)[0]  # type: ignore
 
     return int(nb_outliers), int(nb_suppress)
 
@@ -101,12 +101,12 @@ def von_mises_sampling(original_graph: nx.Graph, kappa_noise_nodes: float) -> di
         mean_original = original_coord / np.linalg.norm(
             original_coord
         )  # convert to unit vector
-        noisy_coordinate = sphere.random_coordinate_sampling(
+        noisy_coordinate_samples = sphere.random_coordinate_sampling(
             1, mu=mean_original, kappa=kappa_noise_nodes
         )
 
         # rescale to original size
-        noisy_coordinate = list(noisy_coordinate)
+        noisy_coordinate = list(noisy_coordinate_samples)
         for dim in range(len(noisy_coordinate)):
             noisy_coordinate[dim] = np.squeeze(noisy_coordinate[dim]) * np.linalg.norm(
                 original_coord

@@ -34,7 +34,7 @@ def ga_mgmc(
     rho: float = 0.8,
     inner_iterations_step1: int = 100,
     inner_iterations_step2: int = 100,
-    random_state: int = None,
+    random_state: Optional[int] = None,
 ) -> np.ndarray:
     """Graduated assignment multi-graph matching (GA-MGM).
 

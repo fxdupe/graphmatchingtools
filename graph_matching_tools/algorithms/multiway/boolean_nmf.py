@@ -62,7 +62,7 @@ def _get_tensor_value(
 
 
 def _compute_intermediate_matrix(
-    x: np.ndarray, v1: np.ndarray, v2: np.array, rank: int, sparsity: int
+    x: np.ndarray, v1: np.ndarray, v2: np.ndarray, rank: int, sparsity: int
 ) -> tuple[np.ndarray, np.ndarray]:
     """Compute the intermediate matrices Ma and Mb
 

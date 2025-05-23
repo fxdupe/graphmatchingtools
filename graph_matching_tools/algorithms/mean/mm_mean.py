@@ -22,7 +22,7 @@ def get_graph_from_tensor(tensor: np.ndarray, tolerance: float = 1e-5) -> nx.Gra
     :return: the corresponding graph.
     :rtype: nx.Graph
     """
-    g = nx.Graph()
+    g = nx.Graph()  # type: nx.Graph
     for i in range(tensor.shape[1]):
         g.add_node(i, data=np.squeeze(tensor[:, i, i]))
     for i in range(tensor.shape[1]):
@@ -59,7 +59,7 @@ def get_tensor_from_graph(
     for i in range(tensor.shape[1]):
         tensor[0:dim_node, i, i] = graph.nodes[i][data_node]
     # 2.2 - The edges
-    for u, v, data in graph.edges.data(data_edge):
+    for u, v, data in graph.edges.data(data_edge):  # type: int, int, np.ndarray
         tensor[0:dim_edge, u, v] = data
         tensor[0:dim_edge, v, u] = data
 

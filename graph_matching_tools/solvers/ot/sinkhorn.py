@@ -43,7 +43,7 @@ def sinkhorn_method(
 
         u_norm = np.linalg.norm(u)
         if u_norm > 1e-3:
-            error = np.linalg.norm(unew - u) / u_norm
+            error = float(np.linalg.norm(unew - u) / u_norm)
         else:
             error = np.inf
         u = unew

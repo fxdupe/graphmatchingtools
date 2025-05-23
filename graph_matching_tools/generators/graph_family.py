@@ -17,7 +17,7 @@ def generation_graph_family(
     edge_delete_percent: float = 0.1,
     suppress_nodes: bool = True,
     add_outliers: bool = True,
-) -> list[nx.graph]:
+) -> list[nx.Graph]:
     """Generate noisy graphs from a reference graph.
 
     :param int nb_sample_graphs: the number of graphs to generate.

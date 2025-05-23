@@ -96,11 +96,11 @@ def create_random_graph_method(
             nb_removed = np.random.randint(
                 0, np.minimum(max_node_removed + 1, nx.number_of_nodes(graphs[i_g]))
             )
-            idx = np.random.choice(
+            idx_choice = np.random.choice(
                 np.array(graphs[i_g].nodes), nb_removed, replace=False
             )
             # Transform the nodes into dummy nodes
-            for i_n in idx:
+            for i_n in idx_choice:
                 dummies.append(i_n)
                 graphs[i_g].nodes[i_n]["weight"] = (
                     np.zeros((node_data_dim, 1)) + 1e9
@@ -141,7 +141,7 @@ def run_graph_generation(args: argparse.Namespace) -> tuple[float, float]:
     index = 0
     for i in range(len(all_graphs)):
         g_phi = np.zeros((args.data_dimension, args.node_number, args.node_number))
-        for u, v, data in all_graphs[i].edges.data("weight"):
+        for u, v, data in all_graphs[i].edges.data("weight"):  # type: int, int, float
             g_phi[:, u, v] = data
             g_phi[:, v, u] = data
         phi[:, index : index + g_sizes[i], index : index + g_sizes[i]] = g_phi
@@ -253,8 +253,8 @@ def main() -> None:
         scores.append(score)
         scores_eig.append(score_eig)
 
-    print("F1-Score (Ours) = {:.3f}".format(np.mean(scores)))
-    print("F1-Score (MathEIG) = {:.3f}".format(np.mean(scores_eig)))
+    print("F1-Score (Ours) = {:.3f}".format(float(np.mean(scores))))
+    print("F1-Score (MathEIG) = {:.3f}".format(float(np.mean(scores_eig))))
 
 
 if __name__ == "__main__":

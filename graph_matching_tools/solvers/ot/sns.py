@@ -7,6 +7,8 @@ This is the implementation of Tang, X., Shavlovsky, M., Rahmanian, H., Tardini, 
 .. moduleauthor: François-Xavier Dupé
 """
 
+from typing import Optional
+
 import numpy as np
 
 import graph_matching_tools.solvers.convex.conjugate_gradient as cg
@@ -125,8 +127,8 @@ def sinkhorn_newton_sparse_method(
     n1_iterations: int = 100,
     n2_iterations: int = 100,
     rho: float = 0.5,
-    x_init: np.ndarray = None,
-    y_init: np.ndarray = None,
+    x_init: Optional[np.ndarray] = None,
+    y_init: Optional[np.ndarray] = None,
     alpha: float = 1.0,
     tolerance: float = 1e-6,
 ) -> np.ndarray:
@@ -146,12 +148,12 @@ def sinkhorn_newton_sparse_method(
     :return: the transport matrix.
     :rtype: np.ndarray
     """
-    x = x_init
-    y = y_init
-    if x is None:
-        x = 0 * mu_s
-    if y is None:
-        y = 0 * mu_t
+    x = 0 * mu_s
+    y = 0 * mu_t
+    if x_init is not None:
+        x = x_init
+    if y_init is not None:
+        y = y_init
 
     # Compute the number of elements to keep
     if rho > 1.0 or rho < 0.0:
